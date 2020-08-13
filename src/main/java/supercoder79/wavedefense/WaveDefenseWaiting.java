@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import supercoder79.wavedefense.map.WaveDefenseMap;
 import supercoder79.wavedefense.map.WaveDefenseMapGenerator;
 import supercoder79.wavedefense.map.WaveDefenseSpawnLogic;
+import xyz.nucleoid.plasmid.game.GameOpenContext;
 import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.StartResult;
 import xyz.nucleoid.plasmid.game.event.AttackEntityListener;
@@ -46,17 +47,17 @@ public final class WaveDefenseWaiting {
 		this.spawnLogic = new WaveDefenseSpawnLogic(world, config);
 	}
 
-	public static CompletableFuture<Void> open(MinecraftServer server, WaveDefenseConfig config) {
+	public static CompletableFuture<Void> open(GameOpenContext<WaveDefenseConfig> context) {
 		WaveDefenseMapGenerator generator = new WaveDefenseMapGenerator();
 
 		return generator.create().thenAccept(map -> {
 			BubbleWorldConfig worldConfig = new BubbleWorldConfig()
-					.setGenerator(map.chunkGenerator(server))
+					.setGenerator(map.chunkGenerator(context.getServer()))
 					.setDefaultGameMode(GameMode.SPECTATOR);
 
-			GameWorld world = GameWorld.open(server, worldConfig);
+			GameWorld world = context.openWorld(worldConfig);
 
-			WaveDefenseWaiting waiting = new WaveDefenseWaiting(world, map, config);
+			WaveDefenseWaiting waiting = new WaveDefenseWaiting(world, map, context.getConfig());
 
 			world.openGame(game -> {
 				game.setRule(GameRule.CRAFTING, RuleResult.DENY);
