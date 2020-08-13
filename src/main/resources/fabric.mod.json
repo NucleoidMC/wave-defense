@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "wavedefense",
+  "version": "${version}",
+  "name": "Wave Defense",
+  "description": "A Fabric minigame that focuses on competitive PvE wave defense.",
+  "authors": [
+    "SuperCoder79",
+    "atylg"
+  ],
+  "contact": {},
+  "license": "LGPL-3.0",
+  "icon": "assets/wavedefense/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "supercoder79.wavedefense.WaveDefense"
+    ]
+  },
+  "mixins": [
+    "wavedefense.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.9.1+build.205",
+    "fabric": "*",
+    "minecraft": "1.16.2"
+  }
+}
