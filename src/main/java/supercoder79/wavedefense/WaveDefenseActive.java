@@ -198,10 +198,15 @@ public class WaveDefenseActive {
 		this.spawnLogic.resetPlayer(player, GameMode.ADVENTURE);
 		this.spawnLogic.spawnPlayer(player);
 
-		ItemStackBuilder shovelBuilder = ItemStackBuilder.of(Items.IRON_SWORD)
+		ItemStackBuilder swordBuilder = ItemStackBuilder.of(Items.IRON_SWORD)
 				.setUnbreakable();
 
-		player.inventory.insertStack(shovelBuilder.build());
+		player.inventory.insertStack(swordBuilder.build());
+
+		player.inventory.armor.set(3, ItemStackBuilder.of(Items.CHAINMAIL_HELMET).setUnbreakable().build());
+		player.inventory.armor.set(2, ItemStackBuilder.of(Items.CHAINMAIL_CHESTPLATE).setUnbreakable().build());
+		player.inventory.armor.set(1, ItemStackBuilder.of(Items.CHAINMAIL_LEGGINGS).setUnbreakable().build());
+		player.inventory.armor.set(0, ItemStackBuilder.of(Items.CHAINMAIL_BOOTS).setUnbreakable().build());
 	}
 
 	private void eliminatePlayer(ServerPlayerEntity player) {
