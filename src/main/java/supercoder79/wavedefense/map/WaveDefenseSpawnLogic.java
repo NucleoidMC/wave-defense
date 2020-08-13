@@ -57,7 +57,7 @@ public final class WaveDefenseSpawnLogic {
         BlockPos.Mutable mutable = pos.mutableCopy();
         mutable.setY(256);
         for (int y = 256; y > 0; y--) {
-            if (world.getBlockState(mutable.set(x, y, z)).isOpaque()) {
+            if (!world.getBlockState(mutable.set(x, y, z)).isAir()) {
                 break;
             }
         }

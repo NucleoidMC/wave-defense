@@ -51,11 +51,11 @@ public class WaveDefenseActive {
 
 	private final WaveDefenseSpawnLogic spawnLogic;
 
-	private boolean shouldSpawn = true;
-	private int zombiesToSpawn = 8;
+	private boolean shouldSpawn = false;
+	private int zombiesToSpawn = 0;
 	private int killedZombies = 0;
 	private int currentWave = 1;
-	private long nextWaveTick = Long.MAX_VALUE;
+	private long nextWaveTick = -1;
 
 	private WaveDefenseActive(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config, Set<PlayerRef> participants) {
 		this.world = world;
@@ -150,9 +150,9 @@ public class WaveDefenseActive {
 			shouldSpawn = true;
 			killedZombies = 0;
 			nextWaveTick = Long.MAX_VALUE;
-			broadcastMessage(new LiteralText("Starting wave " + currentWave + "!"));
+			zombiesToSpawn = zombieCount(currentWave);
+			broadcastMessage(new LiteralText("Starting wave " + currentWave + " with " + zombiesToSpawn + " zombies!"));
 		}
-
 
 		if (shouldSpawn) {
 			shouldSpawn = false;
@@ -161,9 +161,15 @@ public class WaveDefenseActive {
 				ZombieEntity zombie = EntityType.ZOMBIE.create(world);
 				BlockPos pos = WaveDefenseSpawnLogic.topPos(this.world, this.config);
 				zombie.refreshPositionAndAngles(pos, 0, 0);
+				// todo: zombie tiers
+				zombie.setCustomName(new LiteralText("T1 Zombie"));
 				world.spawnEntity(zombie);
 			}
 		}
+	}
+
+	private int zombieCount(int wave) {
+		return (int) ((0.15 * wave * wave) + (0.8 * wave) + 8);
 	}
 
 	private ActionResult onEntityDeath(LivingEntity entity, DamageSource source) {
