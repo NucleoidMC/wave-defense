@@ -222,6 +222,7 @@ public class WaveDefenseActive {
 		if (playersDead) {
 			// Display win results
 			broadcastMessage(new LiteralText("All players died....").formatted(Formatting.DARK_RED));
+			broadcastMessage(new LiteralText("You made it to wave " + currentWave + ".").formatted(Formatting.DARK_RED));
 
 			// Close game in 10 secs
 			gameCloseTick = this.world.getWorld().getTime() + (10 * 20);
