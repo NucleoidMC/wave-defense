@@ -1,6 +1,9 @@
 package supercoder79.wavedefense;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import supercoder79.wavedefense.map.WaveDefenseMap;
@@ -23,7 +26,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.WorldBorderS2CPacket;
@@ -46,16 +48,16 @@ public class WaveDefenseActive {
 	private final GameWorld world;
 	private final WaveDefenseMap map;
 	private final WaveDefenseConfig config;
-
 	private final Set<PlayerRef> participants;
-
 	private final WaveDefenseSpawnLogic spawnLogic;
+	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
 
 	private boolean shouldSpawn = false;
 	private int zombiesToSpawn = 0;
 	private int killedZombies = 0;
 	private int currentWave = 1;
 	private long nextWaveTick = -1;
+	private long gameCloseTick = Long.MAX_VALUE;
 
 	private WaveDefenseActive(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config, Set<PlayerRef> participants) {
 		this.world = world;
@@ -145,8 +147,13 @@ public class WaveDefenseActive {
 
 	private void tick() {
 		ServerWorld world = this.world.getWorld();
+		long time = world.getTime();
 
-		if (world.getTime() > nextWaveTick) {
+		if (time > gameCloseTick) {
+			this.world.close();
+		}
+
+		if (time > nextWaveTick) {
 			shouldSpawn = true;
 			killedZombies = 0;
 			nextWaveTick = Long.MAX_VALUE;
@@ -178,7 +185,7 @@ public class WaveDefenseActive {
 
 			if (source.getAttacker() instanceof ServerPlayerEntity) {
 				ServerPlayerEntity player = (ServerPlayerEntity) source.getAttacker();
-				player.sendMessage(new LiteralText("Killed zombie! " + (zombiesToSpawn - killedZombies) + " remain."), false);
+				player.sendMessage(new LiteralText("Killed zombie! " + (zombiesToSpawn - killedZombies) + " remain.").formatted(Formatting.GRAY), false);
 				player.inventory.insertStack(new ItemStack(Items.IRON_INGOT));
 			}
 
@@ -197,6 +204,22 @@ public class WaveDefenseActive {
 
 	private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
 		this.eliminatePlayer(player);
+
+		boolean playersDead = true;
+		for (ServerPlayerEntity playerEntity : this.world.getPlayers()) {
+			if (!playerEntity.isSpectator()) {
+				playersDead = false;
+			}
+		}
+
+		if (playersDead) {
+			// Display win results
+			broadcastMessage(new LiteralText("All players died....").formatted(Formatting.DARK_RED));
+
+			// Close game in 10 secs
+			gameCloseTick = this.world.getWorld().getTime() + (10 * 20);
+		}
+
 		return ActionResult.FAIL;
 	}
 
