@@ -41,6 +41,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 
@@ -51,6 +52,7 @@ public class WaveDefenseActive {
 	private final Set<PlayerRef> participants;
 	private final WaveDefenseSpawnLogic spawnLogic;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
+	private Difficulty oldDifficulty;
 
 	private boolean shouldSpawn = false;
 	private int zombiesToSpawn = 0;
@@ -74,6 +76,7 @@ public class WaveDefenseActive {
 				.collect(Collectors.toSet());
 
 		WaveDefenseActive active = new WaveDefenseActive(world, map, config, participants);
+		active.oldDifficulty = world.getWorld().getDifficulty();
 
 		world.openGame(game -> {
 			game.setRule(GameRule.CRAFTING, RuleResult.ALLOW);
@@ -83,7 +86,10 @@ public class WaveDefenseActive {
 			game.setRule(GameRule.FALL_DAMAGE, RuleResult.ALLOW);
 			game.setRule(GameRule.HUNGER, RuleResult.DENY);
 
-			world.getWorld().getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(false, world.getWorld().getServer());
+			ServerWorld serverWorld = world.getWorld();
+			serverWorld.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(false, world.getWorld().getServer());
+
+			serverWorld.getServer().setDifficulty(Difficulty.NORMAL, true);
 
 			game.on(GameOpenListener.EVENT, active::open);
 			game.on(GameCloseListener.EVENT, active::close);
@@ -126,6 +132,7 @@ public class WaveDefenseActive {
 	private void close() {
 		ServerWorld world = this.world.getWorld();
 		world.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(true, world.getServer());
+		world.getServer().setDifficulty(this.oldDifficulty, true);
 
 		for (ServerWorld serverWorld : world.getServer().getWorlds()) {
 			serverWorld.setTimeOfDay(1000L);
