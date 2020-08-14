@@ -1,8 +1,8 @@
 package supercoder79.wavedefense.map;
 
-import java.util.concurrent.CompletableFuture;
-
 import net.minecraft.util.Util;
+
+import java.util.concurrent.CompletableFuture;
 
 public class WaveDefenseMapGenerator {
 	public CompletableFuture<WaveDefenseMap> create() {
@@ -10,6 +10,7 @@ public class WaveDefenseMapGenerator {
 	}
 
 	public WaveDefenseMap build() {
-		return new WaveDefenseMap();
+		WaveDefensePath path = WaveDefensePath.generate(1024, 32);
+		return new WaveDefenseMap(path);
 	}
 }

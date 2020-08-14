@@ -1,12 +1,6 @@
 package supercoder79.wavedefense.map;
 
-import java.util.Random;
-
 import kdotjpg.opensimplex.OpenSimplexNoise;
-import xyz.nucleoid.plasmid.game.gen.feature.GrassGen;
-import xyz.nucleoid.plasmid.game.gen.feature.PoplarTreeGen;
-import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
@@ -16,16 +10,25 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.StructureAccessor;
+import xyz.nucleoid.plasmid.game.gen.feature.GrassGen;
+import xyz.nucleoid.plasmid.game.gen.feature.PoplarTreeGen;
+import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
+
+import java.util.Random;
 
 public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 	private final OpenSimplexNoise baseNoise;
 	private final OpenSimplexNoise detailNoise;
 
-	public WaveDefenseChunkGenerator(MinecraftServer server) {
+	private final WaveDefenseMap map;
+
+	public WaveDefenseChunkGenerator(MinecraftServer server, WaveDefenseMap map) {
 		super(server);
 		Random random = new Random();
 		baseNoise = new OpenSimplexNoise(random.nextLong());
 		detailNoise = new OpenSimplexNoise(random.nextLong());
+
+		this.map = map;
 	}
 
 	@Override
@@ -46,6 +49,12 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 				int height = (int) (56 + noise);
 
+				BlockState surface = Blocks.GRASS_BLOCK.getDefaultState();
+				mutable.set(x, 0, z);
+				if (this.map.path.distanceToPath2(mutable) < 4 * 4) {
+					surface = Blocks.GRASS_PATH.getDefaultState();
+				}
+
 				// Generation height ensures that the generator interates up to at least the water level.
 				int genHeight = Math.max(height, 48);
 				for (int y = 0; y <= genHeight; y++) {
@@ -54,7 +63,7 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 					if (y == height) {
 						// If the height and the generation height are the same, it means that we're on land
 						if (height == genHeight) {
-							state = Blocks.GRASS_BLOCK.getDefaultState();
+							state = surface;
 						} else {
 							// height and genHeight are different, so we're under water. Place dirt instead of grass.
 							state = Blocks.DIRT.getDefaultState();
