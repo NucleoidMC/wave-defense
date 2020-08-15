@@ -10,5 +10,9 @@ public interface BiomeGen {
 
 	int grassAmt(Random random);
 
+	default int shrubAmt(Random random) {
+		return 0;
+	};
+
 	RegistryKey<Biome> getFakingBiome();
 }

@@ -18,6 +18,7 @@ import net.minecraft.world.gen.StructureAccessor;
 
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
+import supercoder79.wavedefense.map.feature.ShrubGen;
 import xyz.nucleoid.plasmid.game.gen.feature.GrassGen;
 import xyz.nucleoid.plasmid.game.gen.feature.PoplarTreeGen;
 import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
@@ -129,6 +130,15 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 			int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
 			PoplarTreeGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+		}
+
+		int shrubAmt = biome.shrubAmt(random);
+		for (int i = 0; i < shrubAmt; i++) {
+			int x = chunkX + random.nextInt(16);
+			int z = chunkZ + random.nextInt(16);
+			int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+
+			ShrubGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
 		}
 
 		int grassAmt = biome.grassAmt(random);

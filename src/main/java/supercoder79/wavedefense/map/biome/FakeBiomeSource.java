@@ -1,7 +1,5 @@
 package supercoder79.wavedefense.map.biome;
 
-import java.util.List;
-
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -10,7 +8,6 @@ import kdotjpg.opensimplex.OpenSimplexNoise;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryLookupCodec;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BuiltinBiomes;
 import net.minecraft.world.biome.source.BiomeSource;
 
 public class FakeBiomeSource extends BiomeSource {
@@ -22,14 +19,16 @@ public class FakeBiomeSource extends BiomeSource {
 	private final Registry<Biome> biomeRegistry;
 	private final long seed;
 
-	private OpenSimplexNoise noise;
+	private final OpenSimplexNoise temperatureNoise;
+	private final OpenSimplexNoise rainfallNoise;
 
 	public FakeBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(ImmutableList.of());
 		this.biomeRegistry = biomeRegistry;
 		this.seed = seed;
 
-		noise = new OpenSimplexNoise(seed);
+		temperatureNoise = new OpenSimplexNoise(seed + 79);
+		rainfallNoise = new OpenSimplexNoise(seed - 79);
 	}
 
 	@Override
@@ -48,10 +47,21 @@ public class FakeBiomeSource extends BiomeSource {
 	}
 
 	public BiomeGen getRealBiome(int x, int z) {
-		if (noise.eval(x / 180.0, z / 180.0) > 0) {
-			return ForestGen.INSTANCE;
-		}
+		double temperature = (temperatureNoise.eval(x / 260.0, z / 260.0) + 1) / 2;
+		double rainfall = (rainfallNoise.eval(x / 260.0, z / 260.0) + 1) / 2;
 
-		return PlainsGen.INSTANCE;
+		if (temperature > 0.6) {
+			if (rainfall < 0.5) {
+				return ShrublandGen.INSTANCE;
+			} else {
+				return PlainsGen.INSTANCE;
+			}
+		} else {
+			if (rainfall > 0.5) {
+				return ForestGen.INSTANCE;
+			} else {
+				return PlainsGen.INSTANCE;
+			}
+		}
 	}
 }
