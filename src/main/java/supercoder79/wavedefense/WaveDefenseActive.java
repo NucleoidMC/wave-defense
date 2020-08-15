@@ -32,6 +32,7 @@ import xyz.nucleoid.plasmid.game.event.GameTickListener;
 import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
 import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
 import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
+import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
@@ -51,6 +52,7 @@ public class WaveDefenseActive {
 	private final Set<PlayerRef> participants;
 	private final WaveDefenseSpawnLogic spawnLogic;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
+	private final WaveDefenseBar bar;
 	private Difficulty oldDifficulty;
 
 	private boolean shouldSpawn = false;
@@ -70,6 +72,7 @@ public class WaveDefenseActive {
 
 		this.spawnLogic = new WaveDefenseSpawnLogic(world, config);
 		this.progress = new WaveDefenseProgress(config, map);
+		this.bar = new WaveDefenseBar();
 	}
 
 	public static void open(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
@@ -98,6 +101,7 @@ public class WaveDefenseActive {
 
 			game.on(OfferPlayerListener.EVENT, player -> JoinResult.ok());
 			game.on(PlayerAddListener.EVENT, active::addPlayer);
+			game.on(PlayerRemoveListener.EVENT, active::removePlayer);
 
 			game.on(GameTickListener.EVENT, active::tick);
 
@@ -144,9 +148,15 @@ public class WaveDefenseActive {
 	}
 
 	private void addPlayer(ServerPlayerEntity player) {
+		this.bar.addPlayer(player);
+
 		if (!this.participants.contains(PlayerRef.of(player))) {
 			this.spawnSpectator(player);
 		}
+	}
+
+	private void removePlayer(ServerPlayerEntity player) {
+		this.bar.removePlayer(player);
 	}
 
 	private void tick() {
@@ -159,6 +169,9 @@ public class WaveDefenseActive {
 		}
 
 		this.progress.tick(world, time);
+		if (time % 4 == 0) {
+			this.bar.tick(currentWave, zombiesToSpawn, killedZombies);
+		}
 
 		if (time > nextWaveTick) {
 			shouldSpawn = true;
@@ -192,7 +205,6 @@ public class WaveDefenseActive {
 
 			if (source.getAttacker() instanceof ServerPlayerEntity) {
 				ServerPlayerEntity player = (ServerPlayerEntity) source.getAttacker();
-				player.sendMessage(new LiteralText("Killed zombie! " + (zombiesToSpawn - killedZombies) + " remain.").formatted(Formatting.GRAY), false);
 				player.inventory.insertStack(new ItemStack(Items.IRON_INGOT));
 			}
 
