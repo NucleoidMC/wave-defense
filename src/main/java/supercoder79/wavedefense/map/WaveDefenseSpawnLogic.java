@@ -5,6 +5,7 @@ import java.util.Random;
 import supercoder79.wavedefense.WaveDefenseConfig;
 import xyz.nucleoid.plasmid.game.GameWorld;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
@@ -47,22 +48,27 @@ public final class WaveDefenseSpawnLogic {
     public static BlockPos topPos(GameWorld gameWorld, WaveDefenseConfig config) {
         ServerWorld world = gameWorld.getWorld();
 
-        Random random = world.getRandom();
-        int x = random.nextInt(config.borderSize) - (config.borderSize / 2);
-        int z = random.nextInt(config.borderSize) - (config.borderSize / 2);
-        BlockPos pos = new BlockPos(x, 60, z);
+        BlockPos pos = new BlockPos(0, 60, 0);
+        boolean foundPos = false;
+        while (!foundPos) {
+            Random random = world.getRandom();
+            int x = random.nextInt(config.borderSize) - (config.borderSize / 2);
+            int z = random.nextInt(config.borderSize) - (config.borderSize / 2);
+            pos = new BlockPos(x, 60, z);
 
-        // Get the y position by using this amazing hack
-        // TODO: fix
-        BlockPos.Mutable mutable = pos.mutableCopy();
-        mutable.setY(256);
-        for (int y = 256; y > 0; y--) {
-            if (!world.getBlockState(mutable.set(x, y, z)).getMaterial().blocksMovement()) {
-                break;
+            // Get the y position by using this amazing hack
+            // TODO: fix
+            BlockPos.Mutable mutable = pos.mutableCopy();
+            mutable.setY(256);
+            for (int y = 256; y > 0; y--) {
+                if (world.getBlockState(mutable.set(x, y, z)).isOf(Blocks.GRASS_BLOCK)) {
+                    foundPos = true;
+                    break;
+                }
             }
-        }
 
-        pos = mutable.up(2).toImmutable();
+            pos = mutable.up(2).toImmutable();
+        }
 
         return pos.toImmutable();
     }

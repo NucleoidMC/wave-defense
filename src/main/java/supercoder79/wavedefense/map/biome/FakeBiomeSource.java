@@ -21,6 +21,7 @@ public class FakeBiomeSource extends BiomeSource {
 
 	private final OpenSimplexNoise temperatureNoise;
 	private final OpenSimplexNoise rainfallNoise;
+	private final OpenSimplexNoise roughnessNoise;
 
 	public FakeBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(ImmutableList.of());
@@ -29,6 +30,7 @@ public class FakeBiomeSource extends BiomeSource {
 
 		temperatureNoise = new OpenSimplexNoise(seed + 79);
 		rainfallNoise = new OpenSimplexNoise(seed - 79);
+		roughnessNoise = new OpenSimplexNoise(seed);
 	}
 
 	@Override
@@ -48,6 +50,8 @@ public class FakeBiomeSource extends BiomeSource {
 
 	public BiomeGen getRealBiome(int x, int z) {
 		double temperature = (temperatureNoise.eval(x / 260.0, z / 260.0) + 1) / 2;
+		temperature = temperature * 0.9 + (((roughnessNoise.eval(x / 72.0, z / 72.0) + 1) / 2) * 0.1);
+
 		double rainfall = (rainfallNoise.eval(x / 260.0, z / 260.0) + 1) / 2;
 
 		if (temperature > 0.6) {
