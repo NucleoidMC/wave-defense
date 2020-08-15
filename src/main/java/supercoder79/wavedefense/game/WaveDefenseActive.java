@@ -45,7 +45,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 
-public class WaveDefenseActive {
+public final class WaveDefenseActive {
 	private final GameWorld world;
 	private final WaveDefenseMap map;
 	private final WaveDefenseConfig config;

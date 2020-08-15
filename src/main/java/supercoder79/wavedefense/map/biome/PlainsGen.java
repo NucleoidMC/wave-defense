@@ -6,7 +6,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BuiltinBiomes;
 
-public class PlainsGen implements BiomeGen {
+public final class PlainsGen implements BiomeGen {
 	public static final PlainsGen INSTANCE = new PlainsGen();
 
 	@Override

@@ -5,7 +5,7 @@ import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 
-public class WaveDefenseBar implements AutoCloseable {
+public final class WaveDefenseBar implements AutoCloseable {
 	private final ServerBossBar bar;
 
 	public WaveDefenseBar() {

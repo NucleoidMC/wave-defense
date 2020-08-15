@@ -6,7 +6,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BuiltinBiomes;
 
-public class ForestGen implements BiomeGen {
+public final class ForestGen implements BiomeGen {
 	public static final ForestGen INSTANCE = new ForestGen();
 
 	@Override

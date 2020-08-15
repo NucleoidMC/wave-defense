@@ -7,7 +7,7 @@ import supercoder79.wavedefense.map.gen.WaveDefensePath;
 
 import net.minecraft.util.Util;
 
-public class WaveDefenseMapGenerator {
+public final class WaveDefenseMapGenerator {
 	public CompletableFuture<WaveDefenseMap> create(WaveDefenseConfig config) {
 		return CompletableFuture.supplyAsync(() -> build(config), Util.getMainWorkerExecutor());
 	}

@@ -6,7 +6,7 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BuiltinBiomes;
 
-public class ShrublandGen implements BiomeGen {
+public final class ShrublandGen implements BiomeGen {
 	public static final ShrublandGen INSTANCE = new ShrublandGen();
 
 	@Override

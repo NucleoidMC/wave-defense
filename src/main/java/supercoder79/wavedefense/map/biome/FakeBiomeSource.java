@@ -10,7 +10,7 @@ import net.minecraft.util.registry.RegistryLookupCodec;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 
-public class FakeBiomeSource extends BiomeSource {
+public final class FakeBiomeSource extends BiomeSource {
 	public static final Codec<FakeBiomeSource> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			RegistryLookupCodec.of(Registry.BIOME_KEY).forGetter(source -> source.biomeRegistry),
 			Codec.LONG.fieldOf("seed").stable().forGetter(source -> source.seed))
