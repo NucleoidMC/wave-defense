@@ -10,6 +10,11 @@ public final class ForestGen implements BiomeGen {
 	public static final ForestGen INSTANCE = new ForestGen();
 
 	@Override
+	public double detailFactor() {
+		return 3.85;
+	}
+
+	@Override
 	public int treeAmt(Random random) {
 		return 3 + random.nextInt(4);
 	}

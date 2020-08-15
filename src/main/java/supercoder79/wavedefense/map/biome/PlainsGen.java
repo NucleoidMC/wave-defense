@@ -10,6 +10,16 @@ public final class PlainsGen implements BiomeGen {
 	public static final PlainsGen INSTANCE = new PlainsGen();
 
 	@Override
+	public double upperNoiseFactor() {
+		return 10;
+	}
+
+	@Override
+	public double lowerNoiseFactor() {
+		return 12;
+	}
+
+	@Override
 	public int treeAmt(Random random) {
 		return random.nextInt(2);
 	}

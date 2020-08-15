@@ -42,15 +42,14 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 		super(server);
 
 		Random random = new Random();
-		this.heightSampler = new WaveDefenseHeightSampler(map.path, random.nextLong());
+		this.biomeSource = new FakeBiomeSource(server.getRegistryManager().get(Registry.BIOME_KEY), random.nextLong());
+		this.heightSampler = new WaveDefenseHeightSampler(map.path, biomeSource, random.nextLong());
 		this.pathNoise = new OpenSimplexNoise(random.nextLong());
 		this.detailNoise = new OpenSimplexNoise(random.nextLong());
 		this.erosionNoise = new OpenSimplexNoise(random.nextLong());
 
 		this.map = map;
 		this.pathRadius = map.config.pathConfig.pathWidth;
-
-		this.biomeSource = new FakeBiomeSource(server.getRegistryManager().get(Registry.BIOME_KEY), random.nextLong());
 	}
 
 	@Override
