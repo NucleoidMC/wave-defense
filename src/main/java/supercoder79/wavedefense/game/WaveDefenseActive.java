@@ -1,4 +1,27 @@
-package supercoder79.wavedefense;
+package supercoder79.wavedefense.game;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import supercoder79.wavedefense.map.WaveDefenseMap;
+import supercoder79.wavedefense.map.WaveDefenseProgress;
+import xyz.nucleoid.plasmid.game.GameWorld;
+import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
+import xyz.nucleoid.plasmid.game.event.GameCloseListener;
+import xyz.nucleoid.plasmid.game.event.GameOpenListener;
+import xyz.nucleoid.plasmid.game.event.GameTickListener;
+import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
+import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
+import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
+import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
+import xyz.nucleoid.plasmid.game.player.JoinResult;
+import xyz.nucleoid.plasmid.game.rule.GameRule;
+import xyz.nucleoid.plasmid.game.rule.RuleResult;
+import xyz.nucleoid.plasmid.util.ItemStackBuilder;
+import xyz.nucleoid.plasmid.util.PlayerRef;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -21,29 +44,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
-import supercoder79.wavedefense.map.WaveDefenseMap;
-import supercoder79.wavedefense.map.WaveDefenseProgress;
-import supercoder79.wavedefense.map.WaveDefenseSpawnLogic;
-import xyz.nucleoid.plasmid.game.GameWorld;
-import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
-import xyz.nucleoid.plasmid.game.event.GameCloseListener;
-import xyz.nucleoid.plasmid.game.event.GameOpenListener;
-import xyz.nucleoid.plasmid.game.event.GameTickListener;
-import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
-import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
-import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
-import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
-import xyz.nucleoid.plasmid.game.player.JoinResult;
-import xyz.nucleoid.plasmid.game.rule.GameRule;
-import xyz.nucleoid.plasmid.game.rule.RuleResult;
-import xyz.nucleoid.plasmid.util.ItemStackBuilder;
-import xyz.nucleoid.plasmid.util.PlayerRef;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class WaveDefenseActive {
 	private final GameWorld world;
@@ -168,17 +168,17 @@ public class WaveDefenseActive {
 			return;
 		}
 
-		this.progress.tick(world, time);
-		if (time % 4 == 0) {
-			this.bar.tick(currentWave, zombiesToSpawn, killedZombies);
-		}
-
 		if (time > nextWaveTick) {
 			shouldSpawn = true;
 			killedZombies = 0;
 			nextWaveTick = Long.MAX_VALUE;
 			zombiesToSpawn = zombieCount(currentWave);
 			broadcastMessage(new LiteralText("Starting wave " + currentWave + " with " + zombiesToSpawn + " zombies!"));
+		}
+
+		this.progress.tick(world, time);
+		if (time % 4 == 0) {
+			this.bar.tick(currentWave, zombiesToSpawn, killedZombies);
 		}
 
 		if (shouldSpawn) {
@@ -196,7 +196,7 @@ public class WaveDefenseActive {
 	}
 
 	private int zombieCount(int wave) {
-		return (int) ((0.15 * wave * wave) + (0.8 * wave) + 8);
+		return (int) ((0.24 * wave * wave) + (0.95 * wave) + 8);
 	}
 
 	private ActionResult onEntityDeath(LivingEntity entity, DamageSource source) {

@@ -1,4 +1,4 @@
-package supercoder79.wavedefense;
+package supercoder79.wavedefense.game;
 
 import net.minecraft.entity.boss.BossBar;
 import net.minecraft.entity.boss.ServerBossBar;

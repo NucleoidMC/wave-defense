@@ -1,10 +1,11 @@
 package supercoder79.wavedefense.map;
 
-import net.minecraft.util.Util;
-
 import java.util.concurrent.CompletableFuture;
 
-import supercoder79.wavedefense.WaveDefenseConfig;
+import supercoder79.wavedefense.game.WaveDefenseConfig;
+import supercoder79.wavedefense.map.gen.WaveDefensePath;
+
+import net.minecraft.util.Util;
 
 public class WaveDefenseMapGenerator {
 	public CompletableFuture<WaveDefenseMap> create(WaveDefenseConfig config) {

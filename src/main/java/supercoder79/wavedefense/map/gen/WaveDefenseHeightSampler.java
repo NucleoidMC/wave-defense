@@ -1,8 +1,8 @@
-package supercoder79.wavedefense.map;
-
-import kdotjpg.opensimplex.OpenSimplexNoise;
+package supercoder79.wavedefense.map.gen;
 
 import java.util.Random;
+
+import kdotjpg.opensimplex.OpenSimplexNoise;
 
 public final class WaveDefenseHeightSampler {
     private final OpenSimplexNoise ridgeNoise;

@@ -1,6 +1,8 @@
 package supercoder79.wavedefense.map;
 
-import supercoder79.wavedefense.WaveDefenseConfig;
+import supercoder79.wavedefense.game.WaveDefenseConfig;
+import supercoder79.wavedefense.map.gen.WaveDefenseChunkGenerator;
+import supercoder79.wavedefense.map.gen.WaveDefensePath;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.gen.chunk.ChunkGenerator;

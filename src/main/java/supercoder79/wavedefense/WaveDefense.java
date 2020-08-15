@@ -1,5 +1,7 @@
 package supercoder79.wavedefense;
 
+import supercoder79.wavedefense.game.WaveDefenseConfig;
+import supercoder79.wavedefense.game.WaveDefenseWaiting;
 import xyz.nucleoid.plasmid.game.GameType;
 
 import net.minecraft.util.Identifier;

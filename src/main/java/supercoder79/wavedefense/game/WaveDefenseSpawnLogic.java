@@ -1,8 +1,7 @@
-package supercoder79.wavedefense.map;
+package supercoder79.wavedefense.game;
 
 import java.util.Random;
 
-import supercoder79.wavedefense.WaveDefenseConfig;
 import xyz.nucleoid.plasmid.game.GameWorld;
 
 import net.minecraft.block.Blocks;
@@ -12,7 +11,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.Heightmap;
 
 public final class WaveDefenseSpawnLogic {
     private final GameWorld world;

@@ -1,10 +1,9 @@
-package supercoder79.wavedefense;
+package supercoder79.wavedefense.game;
 
 import java.util.concurrent.CompletableFuture;
 
 import supercoder79.wavedefense.map.WaveDefenseMap;
 import supercoder79.wavedefense.map.WaveDefenseMapGenerator;
-import supercoder79.wavedefense.map.WaveDefenseSpawnLogic;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
 import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.StartResult;
@@ -23,7 +22,6 @@ import xyz.nucleoid.plasmid.game.world.bubble.BubbleWorldConfig;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
