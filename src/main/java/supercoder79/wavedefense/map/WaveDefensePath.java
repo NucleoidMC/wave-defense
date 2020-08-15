@@ -2,6 +2,7 @@ package supercoder79.wavedefense.map;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +10,11 @@ import java.util.Random;
 
 public final class WaveDefensePath {
     private final List<BlockPos> points;
+    private final int length;
 
-    WaveDefensePath(List<BlockPos> points) {
+    WaveDefensePath(List<BlockPos> points, int length) {
         this.points = points;
+        this.length = length;
     }
 
     public static WaveDefensePath generate(int totalLength, int segmentLength) {
@@ -35,7 +38,7 @@ public final class WaveDefensePath {
             currentLength += MathHelper.floor(Math.sqrt(deltaX * deltaX + deltaZ * deltaZ));
         }
 
-        return new WaveDefensePath(points);
+        return new WaveDefensePath(points, currentLength);
     }
 
     public int distanceToPath2(int x, int z) {
@@ -84,5 +87,31 @@ public final class WaveDefensePath {
 
     public List<BlockPos> getPoints() {
         return this.points;
+    }
+
+    public Vec3d getPointAlong(double progress) {
+        double x = progress * this.points.size();
+
+        int index = MathHelper.floor(x);
+        if (index < 0) {
+            return Vec3d.ofCenter(this.points.get(0));
+        } else if (index >= this.points.size() - 1) {
+            return Vec3d.ofCenter(this.points.get(this.points.size() - 1));
+        }
+
+        double mid = x - index;
+
+        BlockPos start = this.points.get(index);
+        BlockPos end = this.points.get(index + 1);
+
+        return new Vec3d(
+                start.getX() + (end.getX() - start.getX()) * mid,
+                0.0,
+                start.getZ() + (end.getZ() - start.getZ()) * mid
+        );
+    }
+
+    public int getLength() {
+        return this.length;
     }
 }

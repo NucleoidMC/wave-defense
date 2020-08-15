@@ -1,34 +1,11 @@
 package supercoder79.wavedefense;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import supercoder79.wavedefense.map.WaveDefenseMap;
-import supercoder79.wavedefense.map.WaveDefenseSpawnLogic;
-import xyz.nucleoid.plasmid.game.GameWorld;
-import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
-import xyz.nucleoid.plasmid.game.event.GameCloseListener;
-import xyz.nucleoid.plasmid.game.event.GameOpenListener;
-import xyz.nucleoid.plasmid.game.event.GameTickListener;
-import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
-import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
-import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
-import xyz.nucleoid.plasmid.game.player.JoinResult;
-import xyz.nucleoid.plasmid.game.rule.GameRule;
-import xyz.nucleoid.plasmid.game.rule.RuleResult;
-import xyz.nucleoid.plasmid.util.ItemStackBuilder;
-import xyz.nucleoid.plasmid.util.PlayerRef;
-
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.WorldBorderS2CPacket;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -44,6 +21,28 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import supercoder79.wavedefense.map.WaveDefenseMap;
+import supercoder79.wavedefense.map.WaveDefenseProgress;
+import supercoder79.wavedefense.map.WaveDefenseSpawnLogic;
+import xyz.nucleoid.plasmid.game.GameWorld;
+import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
+import xyz.nucleoid.plasmid.game.event.GameCloseListener;
+import xyz.nucleoid.plasmid.game.event.GameOpenListener;
+import xyz.nucleoid.plasmid.game.event.GameTickListener;
+import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
+import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
+import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
+import xyz.nucleoid.plasmid.game.player.JoinResult;
+import xyz.nucleoid.plasmid.game.rule.GameRule;
+import xyz.nucleoid.plasmid.game.rule.RuleResult;
+import xyz.nucleoid.plasmid.util.ItemStackBuilder;
+import xyz.nucleoid.plasmid.util.PlayerRef;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class WaveDefenseActive {
 	private final GameWorld world;
@@ -61,6 +60,8 @@ public class WaveDefenseActive {
 	private long nextWaveTick = -1;
 	private long gameCloseTick = Long.MAX_VALUE;
 
+	private final WaveDefenseProgress progress;
+
 	private WaveDefenseActive(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config, Set<PlayerRef> participants) {
 		this.world = world;
 		this.map = map;
@@ -68,6 +69,7 @@ public class WaveDefenseActive {
 		this.participants = participants;
 
 		this.spawnLogic = new WaveDefenseSpawnLogic(world, config);
+		this.progress = new WaveDefenseProgress(config, map);
 	}
 
 	public static void open(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
@@ -107,11 +109,6 @@ public class WaveDefenseActive {
 	private void open() {
 		ServerWorld world = this.world.getWorld();
 
-		// World border stuff
-		world.getWorldBorder().setCenter(0, 0);
-		world.getWorldBorder().setSize(config.borderSize);
-		world.getWorldBorder().setDamagePerBlock(0.5);
-
 		// We do this to ensure that the world's time is set... thanks, UnmodifiableLevelProperties
 		for (ServerWorld serverWorld : world.getServer().getWorlds()) {
 			serverWorld.setTimeOfDay(18000L);
@@ -121,12 +118,12 @@ public class WaveDefenseActive {
 			ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(playerId.getId());
 			if (player != null) {
 				this.spawnParticipant(player);
-				player.networkHandler.sendPacket(new WorldBorderS2CPacket(world.getWorldBorder(), WorldBorderS2CPacket.Type.SET_CENTER));
-				player.networkHandler.sendPacket(new WorldBorderS2CPacket(world.getWorldBorder(), WorldBorderS2CPacket.Type.SET_SIZE));
 
 				player.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(world.getTime(), 18000, false));
 			}
 		}
+
+		this.progress.start(world.getTime());
 	}
 
 	private void close() {
@@ -158,7 +155,10 @@ public class WaveDefenseActive {
 
 		if (time > gameCloseTick) {
 			this.world.close();
+			return;
 		}
+
+		this.progress.tick(world, time);
 
 		if (time > nextWaveTick) {
 			shouldSpawn = true;
