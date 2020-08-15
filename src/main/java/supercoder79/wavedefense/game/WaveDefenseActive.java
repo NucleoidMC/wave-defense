@@ -83,7 +83,7 @@ public final class WaveDefenseActive {
 	public static void open(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
 		WaveDefenseActive active = new WaveDefenseActive(world, map, config, new HashSet<>(world.getPlayers()));
 		active.oldDifficulty = world.getWorld().getDifficulty();
-		active.oldDoDayLightCycle = world.getWorld().getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE);
+		active.oldDoDayLightCycle = world.getWorld().getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).get();
 		active.oldTimeOfDay = world.getWorld().getTimeOfDay();
 
 		world.openGame(game -> {
