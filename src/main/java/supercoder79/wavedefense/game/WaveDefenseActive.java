@@ -1,28 +1,5 @@
 package supercoder79.wavedefense.game;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import supercoder79.wavedefense.map.WaveDefenseMap;
-import supercoder79.wavedefense.map.WaveDefenseProgress;
-import xyz.nucleoid.plasmid.game.GameWorld;
-import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
-import xyz.nucleoid.plasmid.game.event.GameCloseListener;
-import xyz.nucleoid.plasmid.game.event.GameOpenListener;
-import xyz.nucleoid.plasmid.game.event.GameTickListener;
-import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
-import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
-import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
-import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
-import xyz.nucleoid.plasmid.game.player.JoinResult;
-import xyz.nucleoid.plasmid.game.rule.GameRule;
-import xyz.nucleoid.plasmid.game.rule.RuleResult;
-import xyz.nucleoid.plasmid.util.ItemStackBuilder;
-import xyz.nucleoid.plasmid.util.PlayerRef;
-
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -44,12 +21,33 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import supercoder79.wavedefense.map.WaveDefenseMap;
+import supercoder79.wavedefense.map.WaveDefenseProgress;
+import xyz.nucleoid.plasmid.game.GameWorld;
+import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
+import xyz.nucleoid.plasmid.game.event.GameCloseListener;
+import xyz.nucleoid.plasmid.game.event.GameOpenListener;
+import xyz.nucleoid.plasmid.game.event.GameTickListener;
+import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
+import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
+import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
+import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
+import xyz.nucleoid.plasmid.game.player.JoinResult;
+import xyz.nucleoid.plasmid.game.rule.GameRule;
+import xyz.nucleoid.plasmid.game.rule.RuleResult;
+import xyz.nucleoid.plasmid.util.ItemStackBuilder;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public final class WaveDefenseActive {
 	private final GameWorld world;
 	private final WaveDefenseMap map;
 	private final WaveDefenseConfig config;
-	private final Set<PlayerRef> participants;
+	private final Set<ServerPlayerEntity> participants;
 	private final WaveDefenseSpawnLogic spawnLogic;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
 	private final WaveDefenseBar bar;
@@ -64,7 +62,7 @@ public final class WaveDefenseActive {
 
 	private final WaveDefenseProgress progress;
 
-	private WaveDefenseActive(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config, Set<PlayerRef> participants) {
+	private WaveDefenseActive(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config, Set<ServerPlayerEntity> participants) {
 		this.world = world;
 		this.map = map;
 		this.config = config;
@@ -76,11 +74,7 @@ public final class WaveDefenseActive {
 	}
 
 	public static void open(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
-		Set<PlayerRef> participants = world.getPlayers().stream()
-				.map(PlayerRef::of)
-				.collect(Collectors.toSet());
-
-		WaveDefenseActive active = new WaveDefenseActive(world, map, config, participants);
+		WaveDefenseActive active = new WaveDefenseActive(world, map, config, new HashSet<>(world.getPlayers()));
 		active.oldDifficulty = world.getWorld().getDifficulty();
 
 		world.openGame(game -> {
@@ -118,13 +112,10 @@ public final class WaveDefenseActive {
 			serverWorld.setTimeOfDay(18000L);
 		}
 
-		for (PlayerRef playerId : this.participants) {
-			ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(playerId.getId());
-			if (player != null) {
-				this.spawnParticipant(player);
+		for (ServerPlayerEntity player : this.participants) {
+			this.spawnParticipant(player);
 
-				player.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(world.getTime(), 18000, false));
-			}
+			player.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(world.getTime(), 18000, false));
 		}
 
 		this.progress.start(world.getTime());
@@ -139,23 +130,21 @@ public final class WaveDefenseActive {
 			serverWorld.setTimeOfDay(1000L);
 		}
 
-		for (PlayerRef playerId : this.participants) {
-			ServerPlayerEntity player = (ServerPlayerEntity) world.getPlayerByUuid(playerId.getId());
-			if (player != null) {
-				player.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(world.getTime(), 1000, false));
-			}
+		for (ServerPlayerEntity player : this.participants) {
+			player.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(world.getTime(), 1000, false));
 		}
 	}
 
 	private void addPlayer(ServerPlayerEntity player) {
 		this.bar.addPlayer(player);
 
-		if (!this.participants.contains(PlayerRef.of(player))) {
+		if (this.participants.add(player)) {
 			this.spawnSpectator(player);
 		}
 	}
 
 	private void removePlayer(ServerPlayerEntity player) {
+		this.participants.remove(player);
 		this.bar.removePlayer(player);
 	}
 
