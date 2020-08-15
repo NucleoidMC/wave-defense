@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
+import supercoder79.wavedefense.entity.SillyZombieEntity;
 import supercoder79.wavedefense.map.WaveDefenseMap;
 import supercoder79.wavedefense.map.WaveDefenseProgress;
 import xyz.nucleoid.plasmid.game.GameWorld;
@@ -179,7 +180,7 @@ public final class WaveDefenseActive {
 			shouldSpawn = false;
 
 			for (int i = 0; i < zombiesToSpawn; i++) {
-				ZombieEntity zombie = EntityType.ZOMBIE.create(world);
+				ZombieEntity zombie = new SillyZombieEntity(world);
 				BlockPos pos = WaveDefenseSpawnLogic.topPos(this.world, this.config);
 				zombie.refreshPositionAndAngles(pos, 0, 0);
 				// todo: zombie tiers
