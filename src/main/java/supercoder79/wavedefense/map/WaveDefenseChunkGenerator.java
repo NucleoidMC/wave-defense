@@ -21,14 +21,17 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 	private final OpenSimplexNoise detailNoise;
 
 	private final WaveDefenseMap map;
+	private final double pathRadius;
 
 	public WaveDefenseChunkGenerator(MinecraftServer server, WaveDefenseMap map) {
 		super(server);
 		Random random = new Random();
-		baseNoise = new OpenSimplexNoise(random.nextLong());
-		detailNoise = new OpenSimplexNoise(random.nextLong());
+		this.baseNoise = new OpenSimplexNoise(random.nextLong());
+		this.detailNoise = new OpenSimplexNoise(random.nextLong());
 
 		this.map = map;
+
+		this.pathRadius = map.config.pathConfig.pathWidth * map.config.pathConfig.pathWidth;
 	}
 
 	@Override
@@ -51,7 +54,7 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 				BlockState surface = Blocks.GRASS_BLOCK.getDefaultState();
 				mutable.set(x, 0, z);
-				if (this.map.path.distanceToPath2(mutable) < 4 * 4) {
+				if (this.map.path.distanceToPath2(mutable) < pathRadius) {
 					surface = Blocks.GRASS_PATH.getDefaultState();
 				}
 

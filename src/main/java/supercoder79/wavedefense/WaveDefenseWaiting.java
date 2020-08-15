@@ -50,7 +50,7 @@ public final class WaveDefenseWaiting {
 	public static CompletableFuture<Void> open(GameOpenContext<WaveDefenseConfig> context) {
 		WaveDefenseMapGenerator generator = new WaveDefenseMapGenerator();
 
-		return generator.create().thenAccept(map -> {
+		return generator.create(context.getConfig()).thenAccept(map -> {
 			BubbleWorldConfig worldConfig = new BubbleWorldConfig()
 					.setGenerator(map.chunkGenerator(context.getServer()))
 					.setDefaultGameMode(GameMode.SPECTATOR);

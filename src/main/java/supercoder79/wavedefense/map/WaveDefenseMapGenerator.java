@@ -4,13 +4,15 @@ import net.minecraft.util.Util;
 
 import java.util.concurrent.CompletableFuture;
 
+import supercoder79.wavedefense.WaveDefenseConfig;
+
 public class WaveDefenseMapGenerator {
-	public CompletableFuture<WaveDefenseMap> create() {
-		return CompletableFuture.supplyAsync(this::build, Util.getMainWorkerExecutor());
+	public CompletableFuture<WaveDefenseMap> create(WaveDefenseConfig config) {
+		return CompletableFuture.supplyAsync(() -> build(config), Util.getMainWorkerExecutor());
 	}
 
-	public WaveDefenseMap build() {
-		WaveDefensePath path = WaveDefensePath.generate(1024, 32);
-		return new WaveDefenseMap(path);
+	public WaveDefenseMap build(WaveDefenseConfig config) {
+		WaveDefensePath path = WaveDefensePath.generate(config.pathConfig.pathLength, config.pathConfig.pathSegmentLength);
+		return new WaveDefenseMap(path, config);
 	}
 }
