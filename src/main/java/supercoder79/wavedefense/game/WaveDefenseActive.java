@@ -16,7 +16,9 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
@@ -32,6 +34,7 @@ import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
 import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
 import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
 import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
+import xyz.nucleoid.plasmid.game.event.UseItemListener;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
@@ -84,6 +87,7 @@ public final class WaveDefenseActive {
 			game.setRule(GameRule.BLOCK_DROPS, RuleResult.ALLOW);
 			game.setRule(GameRule.FALL_DAMAGE, RuleResult.ALLOW);
 			game.setRule(GameRule.HUNGER, RuleResult.DENY);
+			game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
 
 			ServerWorld serverWorld = world.getWorld();
 			serverWorld.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(false, world.getWorld().getServer());
@@ -98,6 +102,7 @@ public final class WaveDefenseActive {
 			game.on(PlayerRemoveListener.EVENT, active::removePlayer);
 
 			game.on(GameTickListener.EVENT, active::tick);
+			game.on(UseItemListener.EVENT, active::onUseItem);
 
 			game.on(PlayerDeathListener.EVENT, active::onPlayerDeath);
 			game.on(EntityDeathListener.EVENT, active::onEntityDeath);
@@ -184,6 +189,16 @@ public final class WaveDefenseActive {
 		}
 	}
 
+	private TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {
+		ItemStack stack = player.getStackInHand(hand);
+		if (stack.getItem() == Items.COMPASS) {
+			player.openHandledScreen(WaveDefenseItemShop.create(player, this));
+			return TypedActionResult.success(stack);
+		}
+
+		return TypedActionResult.pass(stack);
+	}
+
 	private int zombieCount(int wave) {
 		return (int) ((0.24 * wave * wave) + (0.95 * wave) + 8);
 	}
@@ -236,10 +251,17 @@ public final class WaveDefenseActive {
 		this.spawnLogic.resetPlayer(player, GameMode.ADVENTURE);
 		this.spawnLogic.spawnPlayer(player);
 
-		ItemStackBuilder swordBuilder = ItemStackBuilder.of(Items.IRON_SWORD)
-				.setUnbreakable();
+		player.inventory.insertStack(0,
+				ItemStackBuilder.of(Items.IRON_SWORD)
+						.setUnbreakable()
+						.build()
+		);
 
-		player.inventory.insertStack(swordBuilder.build());
+		player.inventory.insertStack(8,
+				ItemStackBuilder.of(Items.COMPASS)
+						.setName(new LiteralText("Item Shop"))
+						.build()
+		);
 
 		player.inventory.armor.set(3, ItemStackBuilder.of(Items.CHAINMAIL_HELMET).setUnbreakable().build());
 		player.inventory.armor.set(2, ItemStackBuilder.of(Items.CHAINMAIL_CHESTPLATE).setUnbreakable().build());
