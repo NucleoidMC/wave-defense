@@ -27,6 +27,7 @@ import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
 import java.util.Random;
 
 public class WaveDefenseChunkGenerator extends GameChunkGenerator {
+	private final OpenSimplexNoise ridgeNoise;
 	private final OpenSimplexNoise baseNoise;
 	private final OpenSimplexNoise detailNoise;
 	private final OpenSimplexNoise pathNoise;
@@ -37,13 +38,15 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 	public WaveDefenseChunkGenerator(MinecraftServer server, WaveDefenseMap map) {
 		super(server);
+
 		Random random = new Random();
+		this.ridgeNoise = new OpenSimplexNoise(random.nextLong());
 		this.baseNoise = new OpenSimplexNoise(random.nextLong());
 		this.detailNoise = new OpenSimplexNoise(random.nextLong());
 		this.pathNoise = new OpenSimplexNoise(random.nextLong());
 
 		this.map = map;
-		this.pathRadius = map.config.pathConfig.pathWidth * map.config.pathConfig.pathWidth;
+		this.pathRadius = map.config.pathConfig.pathWidth;
 
 		this.biomeSource = new FakeBiomeSource(server.getRegistryManager().get(Registry.BIOME_KEY), random.nextLong());
 	}
@@ -63,6 +66,10 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 		for (int x = chunkX; x < chunkX + 16; x++) {
 			for (int z = chunkZ; z < chunkZ + 16; z++) {
+				mutable.set(x, 0, z);
+				int distanceToPath2 = this.map.path.distanceToPath2(mutable);
+				double distanceToPath = Math.sqrt(distanceToPath2);
+
 				// Create base terrain
 				double noise = baseNoise.eval(x / 256.0, z / 256.0);
 				noise *= noise > 0 ? 14 : 12;
@@ -70,12 +77,29 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 				// Add small details to make the terrain less rounded
 				noise += detailNoise.eval(x / 20.0, z / 20.0) * 3.25;
 
+				double ridgeEffect = Math.min(
+						Math.pow(distanceToPath / 64.0, 3.0),
+						1.0
+				);
+
+				if (ridgeEffect > 1e-2) {
+					double ridgeNoise = this.ridgeNoise.eval(x / 512.0, z / 512.0);
+					ridgeNoise = 1.0 - Math.abs(ridgeNoise);
+					ridgeNoise = Math.pow(ridgeNoise, 5.0);
+
+					noise += ridgeNoise * 64.0 * ridgeEffect;
+				}
+
 				int height = (int) (55 + noise);
 
+				// TODO: exposed stone on slopes
 				BlockState surface = Blocks.GRASS_BLOCK.getDefaultState();
+				BlockState subsoil = Blocks.DIRT.getDefaultState();
+
 				BlockState waterState = Blocks.WATER.getDefaultState();
-				mutable.set(x, 0, z);
-				if (this.map.path.distanceToPath2(mutable) < (pathRadius + (pathNoise.eval(x / 48.0, z / 48.0) * (pathRadius * 0.25)))) {
+
+				double pathRadius = (this.pathRadius + (pathNoise.eval(x / 48.0, z / 48.0) * (this.pathRadius * 0.25)));
+				if (distanceToPath < pathRadius) {
 					surface = Blocks.GRASS_PATH.getDefaultState();
 
 					// Use a very low frequency noise to basically be a more coherent random
@@ -96,10 +120,10 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 							state = surface;
 						} else {
 							// height and genHeight are different, so we're under water. Place dirt instead of grass.
-							state = Blocks.DIRT.getDefaultState();
+							state = subsoil;
 						}
 					} else if ((height - y) <= 3) { //TODO: biome controls under depth
-						state = Blocks.DIRT.getDefaultState();
+						state = subsoil;
 					} else if (y == 0) {
 						state = Blocks.BEDROCK.getDefaultState();
 					}
