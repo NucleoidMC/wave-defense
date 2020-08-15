@@ -53,9 +53,16 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 				int height = (int) (56 + noise);
 
 				BlockState surface = Blocks.GRASS_BLOCK.getDefaultState();
+				BlockState waterState = Blocks.WATER.getDefaultState();
 				mutable.set(x, 0, z);
 				if (this.map.path.distanceToPath2(mutable) < pathRadius) {
 					surface = Blocks.GRASS_PATH.getDefaultState();
+
+					// Use a very low frequency noise to basically be a more coherent random
+					// Technically we should be using a seperate noise here but the detail one can do for now :P
+					if (detailNoise.eval(x / 2.0, z / 2.0) > 0) {
+						waterState = Blocks.OAK_PLANKS.getDefaultState();
+					}
 				}
 
 				// Generation height ensures that the generator interates up to at least the water level.
@@ -79,7 +86,7 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 					// If the y is higher than the land height, then we must place water
 					if (y > height) {
-						state = Blocks.WATER.getDefaultState();
+						state = waterState;
 					}
 
 					// Set the state here
