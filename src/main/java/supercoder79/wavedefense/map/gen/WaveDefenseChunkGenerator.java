@@ -88,13 +88,13 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 				double pathRadius2 = pathRadius * pathRadius;
 
 				if (distanceToPath2 < pathRadius2) {
-					if (random.nextInt(32) != 0) {
+					if (random.nextInt(12) != 0) {
 						surface = Blocks.GRASS_PATH.getDefaultState();
 					}
 
 					// Use a very low frequency noise to basically be a more coherent random
-					// Technically we should be using a seperate noise here but the detail one can do for now :P
-					if (detailNoise.eval(x / 2.0, z / 2.0) > 0) {
+					// Technically we should be using separate noises here but this can do for now :P
+					if (detailNoise.eval(x / 2.0, z / 2.0) > 0 && pathNoise.eval(x / 12.0, z / 12.0) > 0) {
 						waterState = Blocks.OAK_PLANKS.getDefaultState();
 					}
 				}

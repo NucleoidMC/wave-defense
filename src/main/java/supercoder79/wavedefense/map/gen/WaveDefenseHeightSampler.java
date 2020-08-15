@@ -68,7 +68,7 @@ public final class WaveDefenseHeightSampler {
             noise += ridgeNoise * 64.0 * ridgeFactor;
         }
 
-        return 55.0 + noise;
+        return 54.0 + noise;
     }
 
     public double sampleSlope(int x, int z) {
