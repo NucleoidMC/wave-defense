@@ -38,14 +38,14 @@ public final class WaveDefensePath {
         return new WaveDefensePath(points);
     }
 
-    public int distanceToPath2(BlockPos pos) {
+    public int distanceToPath2(int x, int z) {
         int minDistance2 = Integer.MAX_VALUE;
 
         for (int i = 0; i < this.points.size() - 1; i++) {
             BlockPos start = this.points.get(i);
             BlockPos end = this.points.get(i + 1);
 
-            int distance2 = distanceToSegment2(pos, start, end);
+            int distance2 = distanceToSegment2(start, end, x, z);
             if (distance2 < minDistance2) {
                 minDistance2 = distance2;
             }
@@ -54,12 +54,12 @@ public final class WaveDefensePath {
         return minDistance2;
     }
 
-    private static int distanceToSegment2(BlockPos pos, BlockPos a, BlockPos b) {
+    private static int distanceToSegment2(BlockPos a, BlockPos b, int px, int pz) {
         int abx = b.getX() - a.getX();
         int abz = b.getZ() - a.getZ();
 
-        int pax = a.getX() - pos.getX();
-        int paz = a.getZ() - pos.getZ();
+        int pax = a.getX() - px;
+        int paz = a.getZ() - pz;
 
         int c = abx * pax + abz * paz;
         if (c > 0) {
@@ -67,8 +67,8 @@ public final class WaveDefensePath {
             return pax * pax + paz * paz;
         }
 
-        int pbx = pos.getX() - b.getX();
-        int pbz = pos.getZ() - b.getZ();
+        int pbx = px - b.getX();
+        int pbz = pz - b.getZ();
 
         if (abx * pbx + abz * pbz > 0) {
             // we are closest to b
