@@ -55,7 +55,10 @@ public final class WaveDefenseActive {
 	private final WaveDefenseSpawnLogic spawnLogic;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
 	private final WaveDefenseBar bar;
+
 	private Difficulty oldDifficulty;
+	private boolean oldDoDayLightCycle;
+	private long oldTimeOfDay;
 
 	private boolean shouldSpawn = false;
 	private int zombiesToSpawn = 0;
@@ -80,6 +83,8 @@ public final class WaveDefenseActive {
 	public static void open(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
 		WaveDefenseActive active = new WaveDefenseActive(world, map, config, new HashSet<>(world.getPlayers()));
 		active.oldDifficulty = world.getWorld().getDifficulty();
+		active.oldDoDayLightCycle = world.getWorld().getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE);
+		active.oldTimeOfDay = world.getWorld().getTimeOfDay();
 
 		world.openGame(game -> {
 			game.setRule(GameRule.CRAFTING, RuleResult.ALLOW);
@@ -129,11 +134,11 @@ public final class WaveDefenseActive {
 
 	private void close() {
 		ServerWorld world = this.world.getWorld();
-		world.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(true, world.getServer());
+		world.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(this.oldDoDayLightCycle, world.getServer());
 		world.getServer().setDifficulty(this.oldDifficulty, true);
 
 		for (ServerWorld serverWorld : world.getServer().getWorlds()) {
-			serverWorld.setTimeOfDay(1000L);
+			serverWorld.setTimeOfDay(this.oldTimeOfDay);
 		}
 
 		for (ServerPlayerEntity player : this.participants) {
