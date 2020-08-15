@@ -63,6 +63,7 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 		int chunkZ = chunk.getPos().z * 16;
 
 		BlockPos.Mutable mutable = new BlockPos.Mutable();
+		Random random = new Random();
 
 		for (int x = chunkX; x < chunkX + 16; x++) {
 			for (int z = chunkZ; z < chunkZ + 16; z++) {
@@ -100,7 +101,9 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 				double pathRadius = (this.pathRadius + (pathNoise.eval(x / 48.0, z / 48.0) * (this.pathRadius * 0.25)));
 				if (distanceToPath < pathRadius) {
-					surface = Blocks.GRASS_PATH.getDefaultState();
+					if (random.nextInt(32) != 0) {
+						surface = Blocks.GRASS_PATH.getDefaultState();
+					}
 
 					// Use a very low frequency noise to basically be a more coherent random
 					// Technically we should be using a seperate noise here but the detail one can do for now :P
