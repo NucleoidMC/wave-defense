@@ -28,6 +28,7 @@ import java.util.Random;
 public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 	private final OpenSimplexNoise baseNoise;
 	private final OpenSimplexNoise detailNoise;
+	private final OpenSimplexNoise pathNoise;
 
 	private final WaveDefenseMap map;
 	private final double pathRadius;
@@ -38,6 +39,7 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 		Random random = new Random();
 		this.baseNoise = new OpenSimplexNoise(random.nextLong());
 		this.detailNoise = new OpenSimplexNoise(random.nextLong());
+		this.pathNoise = new OpenSimplexNoise(random.nextLong());
 
 		this.map = map;
 		this.pathRadius = map.config.pathConfig.pathWidth * map.config.pathConfig.pathWidth;
@@ -67,12 +69,12 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 				// Add small details to make the terrain less rounded
 				noise += detailNoise.eval(x / 20.0, z / 20.0) * 3.25;
 
-				int height = (int) (56 + noise);
+				int height = (int) (55 + noise);
 
 				BlockState surface = Blocks.GRASS_BLOCK.getDefaultState();
 				BlockState waterState = Blocks.WATER.getDefaultState();
 				mutable.set(x, 0, z);
-				if (this.map.path.distanceToPath2(mutable) < pathRadius) {
+				if (this.map.path.distanceToPath2(mutable) < (pathRadius + (pathNoise.eval(x / 48.0, z / 48.0) * (pathRadius * 0.25)))) {
 					surface = Blocks.GRASS_PATH.getDefaultState();
 
 					// Use a very low frequency noise to basically be a more coherent random
