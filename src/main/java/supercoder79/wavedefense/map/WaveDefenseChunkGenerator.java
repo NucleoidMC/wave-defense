@@ -84,7 +84,7 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 					}
 				}
 
-				// Generation height ensures that the generator interates up to at least the water level.
+				// Generation height ensures that the generator iterates up to at least the water level.
 				int genHeight = Math.max(height, 48);
 				for (int y = 0; y <= genHeight; y++) {
 					// Simple surface building
