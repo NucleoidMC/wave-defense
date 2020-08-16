@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ServerWorldAccess;
 import xyz.nucleoid.plasmid.game.gen.MapGen;
 
-public class ImprovedDiskGen implements MapGen {
+public final class ImprovedDiskGen implements MapGen {
 	public static final ImprovedDiskGen INSTANCE = new ImprovedDiskGen();
 
 	private static final WeightedList<BlockState> STATES = new WeightedList<BlockState>()

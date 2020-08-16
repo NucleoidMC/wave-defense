@@ -12,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 
-public class SwampTreeGen implements MapGen {
+public final class SwampTreeGen implements MapGen {
 	public static final SwampTreeGen INSTANCE = new SwampTreeGen();
 	private static final BlockState LOG = Blocks.OAK_LOG.getDefaultState();
 	private static final BlockState LEAVES = Blocks.OAK_LEAVES.getDefaultState().with(Properties.DISTANCE_1_7, 1);

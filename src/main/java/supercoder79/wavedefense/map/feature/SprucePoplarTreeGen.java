@@ -10,7 +10,7 @@ import net.minecraft.world.ServerWorldAccess;
 import xyz.nucleoid.plasmid.game.gen.GenHelper;
 import xyz.nucleoid.plasmid.game.gen.MapGen;
 
-public class SprucePoplarTreeGen implements MapGen {
+public final class SprucePoplarTreeGen implements MapGen {
     public static final SprucePoplarTreeGen INSTANCE = new SprucePoplarTreeGen();
     private static final BlockState LOG = Blocks.SPRUCE_LOG.getDefaultState();
     private static final BlockState LEAVES = Blocks.SPRUCE_LEAVES.getDefaultState().with(Properties.DISTANCE_1_7, 1);

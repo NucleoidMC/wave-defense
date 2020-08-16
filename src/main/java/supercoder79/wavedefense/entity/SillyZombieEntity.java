@@ -30,6 +30,12 @@ public final class SillyZombieEntity extends ZombieEntity {
         this.targetSelector.add(2, new FollowTargetGoal<>(this, PlayerEntity.class, true));
     }
 
+    @Override
+    public boolean isPersistent() {
+        // Our zombie cannot despawn- check if this actually does work lol
+        return true;
+    }
+
     private class MoveTowardGameCenterGoal extends Goal {
         public MoveTowardGameCenterGoal() {
             this.setControls(EnumSet.of(Control.MOVE));

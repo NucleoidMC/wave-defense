@@ -4,6 +4,11 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import kdotjpg.opensimplex.OpenSimplexNoise;
+import supercoder79.wavedefense.map.biome.impl.ForestGen;
+import supercoder79.wavedefense.map.biome.impl.PlainsGen;
+import supercoder79.wavedefense.map.biome.impl.ShrublandGen;
+import supercoder79.wavedefense.map.biome.impl.SwampGen;
+import supercoder79.wavedefense.map.biome.impl.TaigaGen;
 
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryLookupCodec;

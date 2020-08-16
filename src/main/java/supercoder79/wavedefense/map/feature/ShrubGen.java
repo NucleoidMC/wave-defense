@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 
-public class ShrubGen implements MapGen {
+public final class ShrubGen implements MapGen {
 	public static final ShrubGen INSTANCE = new ShrubGen();
 	private static final BlockState LOG = Blocks.OAK_LOG.getDefaultState();
 	private static final BlockState LEAVES = Blocks.OAK_LEAVES.getDefaultState().with(Properties.DISTANCE_1_7, 1);

@@ -54,7 +54,10 @@ public final class WaveDefenseProgress {
                 LiteralText message = new LiteralText("You are too far from your fellow players!");
                 player.sendMessage(message.formatted(Formatting.RED), true);
 
-                player.damage(DamageSource.OUT_OF_WORLD, 2.0F);
+                // Don't damage creative or spectator players
+                if (!(player.isCreative() || player.isSpectator())) {
+                    player.damage(DamageSource.OUT_OF_WORLD, 2.0F);
+                }
             }
         }
     }

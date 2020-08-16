@@ -27,7 +27,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.gen.StructureAccessor;
 
-public class WaveDefenseChunkGenerator extends GameChunkGenerator {
+public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 	private final WaveDefenseHeightSampler heightSampler;
 	private final OpenSimplexNoise pathNoise;
 	private final OpenSimplexNoise detailNoise;
