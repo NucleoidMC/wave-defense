@@ -40,6 +40,7 @@ import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
+import xyz.nucleoid.plasmid.util.PlayerRef;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +55,8 @@ public final class WaveDefenseActive {
 	private final Set<ServerPlayerEntity> participants;
 	private final WaveDefenseSpawnLogic spawnLogic;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
+	private final Map<PlayerRef, Integer> sharpnessLevels = new HashMap<>();
+	private final Map<PlayerRef, Integer> protectionLevels = new HashMap<>();
 	private final WaveDefenseBar bar;
 
 	private Difficulty oldDifficulty;
@@ -282,8 +285,6 @@ public final class WaveDefenseActive {
 		this.broadcastMessage(message);
 		this.broadcastSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP);
 
-		ItemScatterer.spawn(this.world.getWorld(), player.getBlockPos(), player.inventory);
-
 		this.spawnSpectator(player);
 	}
 
@@ -302,5 +303,25 @@ public final class WaveDefenseActive {
 		for (ServerPlayerEntity player : this.world.getPlayers()) {
 			player.playSound(sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
 		}
+	}
+
+	public int getSharpnessLevel(ServerPlayerEntity player) {
+		return this.sharpnessLevels.computeIfAbsent(PlayerRef.of(player), ref -> 0);
+	}
+
+	public void increaseSharpness(ServerPlayerEntity player) {
+		PlayerRef ref = PlayerRef.of(player);
+		int level = this.sharpnessLevels.get(ref);
+		this.sharpnessLevels.put(ref, level + 1);
+	}
+
+	public int getProtectionLevel(ServerPlayerEntity player) {
+		return this.protectionLevels.computeIfAbsent(PlayerRef.of(player), ref -> 0);
+	}
+
+	public void increaseProtection(ServerPlayerEntity player) {
+		PlayerRef ref = PlayerRef.of(player);
+		int level = this.protectionLevels.get(ref);
+		this.protectionLevels.put(ref, level + 1);
 	}
 }
