@@ -45,6 +45,7 @@ public final class WaveDefenseActive {
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
 	private final Map<PlayerRef, Integer> sharpnessLevels = new HashMap<>();
 	private final Map<PlayerRef, Integer> protectionLevels = new HashMap<>();
+	private final Map<PlayerRef, Integer> powerLevels = new HashMap<>();
 	private final WaveDefenseBar bar;
 	private final Random random = new Random();
 
@@ -331,5 +332,15 @@ public final class WaveDefenseActive {
 		PlayerRef ref = PlayerRef.of(player);
 		int level = this.protectionLevels.get(ref);
 		this.protectionLevels.put(ref, level + 1);
+	}
+
+	public int getPowerLevel(ServerPlayerEntity player) {
+		return this.powerLevels.computeIfAbsent(PlayerRef.of(player), ref -> 0);
+	}
+
+	public void increasePower(ServerPlayerEntity player) {
+		PlayerRef ref = PlayerRef.of(player);
+		int level = this.powerLevels.get(ref);
+		this.powerLevels.put(ref, level + 1);
 	}
 }
