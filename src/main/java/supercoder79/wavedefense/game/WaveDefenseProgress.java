@@ -10,6 +10,7 @@ import supercoder79.wavedefense.map.WaveDefenseMap;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class WaveDefenseProgress {
     private final WaveDefenseConfig config;
@@ -63,12 +64,15 @@ public final class WaveDefenseProgress {
     }
 
     private Vec3d getMeanPos(Collection<ServerPlayerEntity> players) {
+        //TODO: non stream based solution because sc79 is lazy
+        Collection<ServerPlayerEntity> inGamePlayers = players.stream().filter(p -> !(p.isCreative() || p.isSpectator())).collect(Collectors.toList());
+
         double meanX = 0.0;
         double meanZ = 0.0;
 
-        double weightPerPlayer = 1.0 / players.size();
+        double weightPerPlayer = 1.0 / inGamePlayers.size();
 
-        for (ServerPlayerEntity player : players) {
+        for (ServerPlayerEntity player : inGamePlayers) {
             meanX += player.getX() * weightPerPlayer;
             meanZ += player.getZ() * weightPerPlayer;
         }
