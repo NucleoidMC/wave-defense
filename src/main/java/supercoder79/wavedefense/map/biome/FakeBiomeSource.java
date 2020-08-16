@@ -57,11 +57,13 @@ public final class FakeBiomeSource extends BiomeSource {
 		if (temperature > 0.6) {
 			if (rainfall < 0.4) {
 				return ShrublandGen.INSTANCE;
+			} else if (rainfall > 0.6) {
+				return SwampGen.INSTANCE;
 			} else {
 				return PlainsGen.INSTANCE;
 			}
 		} else {
-			if (rainfall > 0.6) {
+			if (rainfall > 0.575) {
 				return TaigaGen.INSTANCE;
 			} else {
 				return ForestGen.INSTANCE;
