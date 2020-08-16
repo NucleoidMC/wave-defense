@@ -9,6 +9,5 @@
     "path_segment_length": 32,
     "path_width": 4.0
   },
-  "spawn_radius": 64,
-  "ticks_per_block": 10
+  "spawn_radius": 64
 }
