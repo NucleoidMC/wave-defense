@@ -1,12 +1,12 @@
 package supercoder79.wavedefense.map.gen;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public final class WaveDefensePath {
     private final List<BlockPos> points;

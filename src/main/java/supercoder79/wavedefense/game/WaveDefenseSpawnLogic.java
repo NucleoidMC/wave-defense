@@ -1,9 +1,5 @@
 package supercoder79.wavedefense.game;
 
-import java.util.Random;
-
-import xyz.nucleoid.plasmid.game.GameWorld;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
@@ -11,6 +7,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.GameMode;
+import xyz.nucleoid.plasmid.game.GameWorld;
+
+import java.util.Random;
 
 public final class WaveDefenseSpawnLogic {
     private final GameWorld world;
@@ -50,8 +49,8 @@ public final class WaveDefenseSpawnLogic {
         boolean foundPos = false;
         while (!foundPos) {
             Random random = world.getRandom();
-            int x = random.nextInt(config.borderSize) - (config.borderSize / 2);
-            int z = random.nextInt(config.borderSize) - (config.borderSize / 2);
+            int x = random.nextInt(config.spawnRadius) - (config.spawnRadius / 2);
+            int z = random.nextInt(config.spawnRadius) - (config.spawnRadius / 2);
             pos = new BlockPos(x, 60, z);
 
             // Get the y position by using this amazing hack

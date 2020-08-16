@@ -1,9 +1,8 @@
-package supercoder79.wavedefense.map;
-
-import supercoder79.wavedefense.game.WaveDefenseConfig;
+package supercoder79.wavedefense.game;
 
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
+import supercoder79.wavedefense.map.WaveDefenseMap;
 
 public final class WaveDefenseProgress {
     private final WaveDefenseConfig config;
