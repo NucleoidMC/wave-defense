@@ -1,6 +1,7 @@
 package supercoder79.wavedefense.game;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.ZombieEntity;
@@ -19,6 +20,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -44,6 +46,7 @@ public final class WaveDefenseActive {
 	private final Map<PlayerRef, Integer> sharpnessLevels = new HashMap<>();
 	private final Map<PlayerRef, Integer> protectionLevels = new HashMap<>();
 	private final WaveDefenseBar bar;
+	private final Random random = new Random();
 
 	private Difficulty oldDifficulty;
 	private boolean oldDoDayLightCycle;
@@ -178,10 +181,22 @@ public final class WaveDefenseActive {
 
 				BlockPos pos = WaveDefenseSpawnLogic.topPos(progress.getCenterPos(), this.world, this.config);
 				zombie.refreshPositionAndAngles(pos, 0, 0);
-				// todo: zombie tiers
-				zombie.setCustomName(new LiteralText("T1 Zombie"));
+				setupZombie(zombie);
+
 				world.spawnEntity(zombie);
 			}
+		}
+	}
+
+	private void setupZombie(ZombieEntity zombie) {
+		double t2Chance = MathHelper.clamp((0.1 * currentWave) - 1, 0, 1);
+		if (random.nextDouble() < t2Chance) {
+			zombie.setCustomName(new LiteralText("T2 Zombie"));
+			zombie.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.WOODEN_SWORD));
+			zombie.equipStack(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
+			zombie.equipStack(EquipmentSlot.LEGS, new ItemStack(Items.LEATHER_LEGGINGS));
+		} else {
+			zombie.setCustomName(new LiteralText("T1 Zombie"));
 		}
 	}
 
@@ -205,7 +220,13 @@ public final class WaveDefenseActive {
 
 			if (source.getAttacker() instanceof ServerPlayerEntity) {
 				ServerPlayerEntity player = (ServerPlayerEntity) source.getAttacker();
-				player.inventory.insertStack(new ItemStack(Items.IRON_INGOT));
+				int ironCount = 1;
+
+				if (entity.getCustomName() != null && entity.getCustomName().asString().equals("T2 Zombie")) {
+					ironCount = 2;
+				}
+
+				player.inventory.insertStack(new ItemStack(Items.IRON_INGOT, ironCount));
 			}
 
 			if (killedZombies == zombiesToSpawn) {
