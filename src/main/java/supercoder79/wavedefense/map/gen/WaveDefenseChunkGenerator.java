@@ -6,10 +6,9 @@ import kdotjpg.opensimplex.OpenSimplexNoise;
 import supercoder79.wavedefense.map.WaveDefenseMap;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
+import supercoder79.wavedefense.map.feature.ImprovedDiskGen;
 import supercoder79.wavedefense.map.feature.ShrubGen;
-import xyz.nucleoid.plasmid.game.gen.feature.DiskGen;
 import xyz.nucleoid.plasmid.game.gen.feature.GrassGen;
-import xyz.nucleoid.plasmid.game.gen.feature.PoplarTreeGen;
 import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
 
 import net.minecraft.block.BlockState;
@@ -173,7 +172,7 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 			int y = region.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
 
 			if (y <= 48) {
-				DiskGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+				ImprovedDiskGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
 			}
 		}
 	}
