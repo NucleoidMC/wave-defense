@@ -1,16 +1,16 @@
 package supercoder79.wavedefense.game;
 
-import java.util.Random;
-
-import xyz.nucleoid.plasmid.game.GameWorld;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
+import xyz.nucleoid.plasmid.game.GameWorld;
+
+import java.util.Random;
 
 public final class WaveDefenseSpawnLogic {
     private final GameWorld world;
@@ -36,22 +36,22 @@ public final class WaveDefenseSpawnLogic {
     public void spawnPlayer(ServerPlayerEntity player) {
         ServerWorld world = this.world.getWorld();
 
-        BlockPos pos = topPos(this.world, this.config);
+        BlockPos pos = topPos(Vec3d.ZERO, this.world, this.config);
         ChunkPos chunkPos = new ChunkPos(pos);
         world.getChunkManager().addTicket(ChunkTicketType.field_19347, chunkPos, 1, player.getEntityId());
 
         player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0F, 0.0F);
     }
 
-    public static BlockPos topPos(GameWorld gameWorld, WaveDefenseConfig config) {
+    public static BlockPos topPos(Vec3d centerPos, GameWorld gameWorld, WaveDefenseConfig config) {
         ServerWorld world = gameWorld.getWorld();
 
         BlockPos pos = new BlockPos(0, 60, 0);
         boolean foundPos = false;
         while (!foundPos) {
             Random random = world.getRandom();
-            int x = random.nextInt(config.borderSize) - (config.borderSize / 2);
-            int z = random.nextInt(config.borderSize) - (config.borderSize / 2);
+            double x = centerPos.x + random.nextInt(config.spawnRadius) - random.nextInt(config.spawnRadius);
+            double z = centerPos.z + random.nextInt(config.spawnRadius) - random.nextInt(config.spawnRadius);
             pos = new BlockPos(x, 60, z);
 
             // Get the y position by using this amazing hack

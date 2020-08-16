@@ -8,20 +8,17 @@ public final class WaveDefenseConfig {
 	public static final Codec<WaveDefenseConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			PlayerConfig.CODEC.fieldOf("players").forGetter(config -> config.playerConfig),
 			PathConfig.CODEC.fieldOf("path").forGetter(config -> config.pathConfig),
-			Codec.INT.fieldOf("border_size").forGetter(config -> config.borderSize),
-			Codec.INT.fieldOf("ticks_per_block").forGetter(config -> config.ticksPerBlock)
+			Codec.INT.fieldOf("spawn_radius").forGetter(config -> config.spawnRadius)
 	).apply(instance, WaveDefenseConfig::new));
 
 	public final PlayerConfig playerConfig;
 	public final PathConfig pathConfig;
-	public final int borderSize;
-	public final int ticksPerBlock;
+	public final int spawnRadius;
 
-	public WaveDefenseConfig(PlayerConfig playerConfig, PathConfig pathConfig, int borderSize, int ticksPerBlock) {
+	public WaveDefenseConfig(PlayerConfig playerConfig, PathConfig pathConfig, int spawnRadius) {
 		this.playerConfig = playerConfig;
 		this.pathConfig = pathConfig;
-		this.borderSize = borderSize;
-		this.ticksPerBlock = ticksPerBlock;
+		this.spawnRadius = spawnRadius;
 	}
 
 	public static final class PathConfig {

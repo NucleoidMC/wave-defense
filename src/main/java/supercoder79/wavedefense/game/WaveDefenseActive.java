@@ -17,7 +17,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Difficulty;
@@ -25,33 +24,20 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
 import supercoder79.wavedefense.entity.SillyZombieEntity;
 import supercoder79.wavedefense.map.WaveDefenseMap;
-import supercoder79.wavedefense.map.WaveDefenseProgress;
 import xyz.nucleoid.plasmid.game.GameWorld;
-import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
-import xyz.nucleoid.plasmid.game.event.GameCloseListener;
-import xyz.nucleoid.plasmid.game.event.GameOpenListener;
-import xyz.nucleoid.plasmid.game.event.GameTickListener;
-import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
-import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
-import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
-import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
-import xyz.nucleoid.plasmid.game.event.UseItemListener;
+import xyz.nucleoid.plasmid.game.event.*;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 import xyz.nucleoid.plasmid.util.PlayerRef;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public final class WaveDefenseActive {
 	private final GameWorld world;
 	private final WaveDefenseMap map;
-	private final WaveDefenseConfig config;
+	public final WaveDefenseConfig config;
 	private final Set<ServerPlayerEntity> participants;
 	private final WaveDefenseSpawnLogic spawnLogic;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
@@ -70,7 +56,7 @@ public final class WaveDefenseActive {
 	private long nextWaveTick = -1;
 	private long gameCloseTick = Long.MAX_VALUE;
 
-	private final WaveDefenseProgress progress;
+	public final WaveDefenseProgress progress;
 
 	private WaveDefenseActive(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config, Set<ServerPlayerEntity> participants) {
 		this.world = world;
@@ -131,8 +117,6 @@ public final class WaveDefenseActive {
 
 			player.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(world.getTime(), 18000, false));
 		}
-
-		this.progress.start(world.getTime());
 	}
 
 	private void close() {
@@ -180,6 +164,7 @@ public final class WaveDefenseActive {
 		}
 
 		this.progress.tick(world, time);
+
 		if (time % 4 == 0) {
 			this.bar.tick(currentWave, zombiesToSpawn, killedZombies);
 		}
@@ -188,8 +173,10 @@ public final class WaveDefenseActive {
 			shouldSpawn = false;
 
 			for (int i = 0; i < zombiesToSpawn; i++) {
-				ZombieEntity zombie = new SillyZombieEntity(world);
-				BlockPos pos = WaveDefenseSpawnLogic.topPos(this.world, this.config);
+				ZombieEntity zombie = new SillyZombieEntity(world, this);
+				zombie.setPersistent();
+
+				BlockPos pos = WaveDefenseSpawnLogic.topPos(progress.getCenterPos(), this.world, this.config);
 				zombie.refreshPositionAndAngles(pos, 0, 0);
 				// todo: zombie tiers
 				zombie.setCustomName(new LiteralText("T1 Zombie"));
