@@ -146,7 +146,7 @@ public class WaveDefenseChunkGenerator extends GameChunkGenerator {
 			int z = chunkZ + random.nextInt(16);
 			int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
-			PoplarTreeGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+			biome.tree(x, z, random).generate(region, mutable.set(x, y, z).toImmutable(), random);
 		}
 
 		int shrubAmt = biome.shrubAmt(random);

@@ -50,8 +50,6 @@ public final class WaveDefenseItemShop {
             shop.addItem(ItemStackBuilder.of(Items.IRON_AXE).setUnbreakable().build(), Cost.ofIron(32));
             shop.addItem(ItemStackBuilder.of(Items.BOW).setUnbreakable().build(), Cost.ofIron(32));
             shop.addItem(ItemStackBuilder.of(Items.ARROW).setCount(8).build(), Cost.ofIron(2));
-
-
         });
     }
 
