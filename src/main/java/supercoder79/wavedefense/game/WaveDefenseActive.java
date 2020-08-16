@@ -19,7 +19,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -38,7 +37,7 @@ import java.util.*;
 public final class WaveDefenseActive {
 	private final GameWorld world;
 	private final WaveDefenseMap map;
-	private final WaveDefenseConfig config;
+	public final WaveDefenseConfig config;
 	private final Set<ServerPlayerEntity> participants;
 	private final WaveDefenseSpawnLogic spawnLogic;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
@@ -57,7 +56,7 @@ public final class WaveDefenseActive {
 	private long nextWaveTick = -1;
 	private long gameCloseTick = Long.MAX_VALUE;
 
-	private final WaveDefenseProgress progress;
+	public final WaveDefenseProgress progress;
 
 	private WaveDefenseActive(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config, Set<ServerPlayerEntity> participants) {
 		this.world = world;
@@ -164,7 +163,7 @@ public final class WaveDefenseActive {
 			broadcastMessage(new LiteralText("Starting wave " + currentWave + " with " + zombiesToSpawn + " zombies!"));
 		}
 
-		Vec3d centerPos = this.progress.tick(world, time);
+		this.progress.tick(world, time);
 
 		if (time % 4 == 0) {
 			this.bar.tick(currentWave, zombiesToSpawn, killedZombies);
@@ -174,10 +173,10 @@ public final class WaveDefenseActive {
 			shouldSpawn = false;
 
 			for (int i = 0; i < zombiesToSpawn; i++) {
-				ZombieEntity zombie = new SillyZombieEntity(world);
+				ZombieEntity zombie = new SillyZombieEntity(world, this);
 				zombie.setPersistent();
 
-				BlockPos pos = WaveDefenseSpawnLogic.topPos(centerPos, this.world, this.config);
+				BlockPos pos = WaveDefenseSpawnLogic.topPos(progress.getCenterPos(), this.world, this.config);
 				zombie.refreshPositionAndAngles(pos, 0, 0);
 				// todo: zombie tiers
 				zombie.setCustomName(new LiteralText("T1 Zombie"));

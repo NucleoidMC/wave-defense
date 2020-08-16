@@ -15,7 +15,7 @@ public final class WaveDefenseProgress {
     private final WaveDefenseConfig config;
     private final WaveDefenseMap map;
 
-    private Vec3d centerPos;
+    private Vec3d centerPos = Vec3d.ZERO;
     private double progress;
 
     public WaveDefenseProgress(WaveDefenseConfig config, WaveDefenseMap map) {
@@ -23,7 +23,7 @@ public final class WaveDefenseProgress {
         this.map = map;
     }
 
-    public Vec3d tick(ServerWorld world, long time) {
+    public void tick(ServerWorld world, long time) {
         if (time % 20 == 0 || this.centerPos == null) {
             Vec3d meanPos = this.getMeanPos(world.getPlayers());
             double meanProgress = this.map.path.distanceAlongPath(meanPos.x, meanPos.z);
@@ -36,7 +36,9 @@ public final class WaveDefenseProgress {
 
             this.damageFarPlayers(world);
         }
+    }
 
+    public Vec3d getCenterPos() {
         return this.centerPos;
     }
 
