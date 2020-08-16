@@ -49,13 +49,13 @@ public final class FakeBiomeSource extends BiomeSource {
 	}
 
 	public BiomeGen getRealBiome(int x, int z) {
-		double temperature = (temperatureNoise.eval(x / 260.0, z / 260.0) + 1) / 2;
+		double temperature = (temperatureNoise.eval(x / 320.0, z / 320.0) + 1) / 2;
 		temperature = temperature * 0.9 + (((roughnessNoise.eval(x / 72.0, z / 72.0) + 1) / 2) * 0.1);
 
-		double rainfall = (rainfallNoise.eval(x / 260.0, z / 260.0) + 1) / 2;
+		double rainfall = (rainfallNoise.eval(x / 320.0, z / 320.0) + 1) / 2;
 
 		if (temperature > 0.6) {
-			if (rainfall < 0.5) {
+			if (rainfall < 0.4) {
 				return ShrublandGen.INSTANCE;
 			} else {
 				return PlainsGen.INSTANCE;
@@ -64,7 +64,7 @@ public final class FakeBiomeSource extends BiomeSource {
 			if (rainfall > 0.6) {
 				return TaigaGen.INSTANCE;
 			} else {
-				return PlainsGen.INSTANCE;
+				return ForestGen.INSTANCE;
 			}
 		}
 	}
