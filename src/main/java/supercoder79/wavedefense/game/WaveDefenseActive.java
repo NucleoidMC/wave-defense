@@ -7,7 +7,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -21,9 +20,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.GameRules;
 import supercoder79.wavedefense.entity.SillyZombieEntity;
 import supercoder79.wavedefense.map.WaveDefenseMap;
 import xyz.nucleoid.plasmid.game.GameWorld;
@@ -49,10 +46,6 @@ public final class WaveDefenseActive {
 	private final WaveDefenseBar bar;
 	private final Random random = new Random();
 
-	private Difficulty oldDifficulty;
-	private boolean oldDoDayLightCycle;
-	private long oldTimeOfDay;
-
 	private boolean shouldSpawn = false;
 	private int zombiesToSpawn = 0;
 	private int killedZombies = 0;
@@ -75,9 +68,6 @@ public final class WaveDefenseActive {
 
 	public static void open(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
 		WaveDefenseActive active = new WaveDefenseActive(world, map, config, new HashSet<>(world.getPlayers()));
-		active.oldDifficulty = world.getWorld().getDifficulty();
-		active.oldDoDayLightCycle = world.getWorld().getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).get();
-		active.oldTimeOfDay = world.getWorld().getTimeOfDay();
 
 		world.openGame(game -> {
 			game.setRule(GameRule.CRAFTING, RuleResult.ALLOW);
@@ -88,14 +78,7 @@ public final class WaveDefenseActive {
 			game.setRule(GameRule.HUNGER, RuleResult.DENY);
 			game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
 
-			ServerWorld serverWorld = world.getWorld();
-			serverWorld.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(false, world.getWorld().getServer());
-
-			serverWorld.getServer().setDifficulty(Difficulty.NORMAL, true);
-
 			game.on(GameOpenListener.EVENT, active::open);
-			game.on(GameCloseListener.EVENT, active::close);
-
 			game.on(OfferPlayerListener.EVENT, player -> JoinResult.ok());
 			game.on(PlayerAddListener.EVENT, active::addPlayer);
 			game.on(PlayerRemoveListener.EVENT, active::removePlayer);
@@ -109,31 +92,8 @@ public final class WaveDefenseActive {
 	}
 
 	private void open() {
-		ServerWorld world = this.world.getWorld();
-
-		// We do this to ensure that the world's time is set... thanks, UnmodifiableLevelProperties
-		for (ServerWorld serverWorld : world.getServer().getWorlds()) {
-			serverWorld.setTimeOfDay(18000L);
-		}
-
 		for (ServerPlayerEntity player : this.participants) {
 			this.spawnParticipant(player);
-
-			player.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(world.getTime(), 18000, false));
-		}
-	}
-
-	private void close() {
-		ServerWorld world = this.world.getWorld();
-		world.getGameRules().get(GameRules.DO_DAYLIGHT_CYCLE).set(this.oldDoDayLightCycle, world.getServer());
-		world.getServer().setDifficulty(this.oldDifficulty, true);
-
-		for (ServerWorld serverWorld : world.getServer().getWorlds()) {
-			serverWorld.setTimeOfDay(this.oldTimeOfDay);
-		}
-
-		for (ServerPlayerEntity player : this.participants) {
-			player.networkHandler.sendPacket(new WorldTimeUpdateS2CPacket(world.getTime(), 1000, false));
 		}
 	}
 
