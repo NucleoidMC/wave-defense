@@ -6,6 +6,7 @@ import kdotjpg.opensimplex.OpenSimplexNoise;
 import supercoder79.wavedefense.map.WaveDefenseMap;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
+import supercoder79.wavedefense.map.feature.CactusGen;
 import supercoder79.wavedefense.map.feature.ImprovedDiskGen;
 import supercoder79.wavedefense.map.feature.ShrubGen;
 import xyz.nucleoid.plasmid.game.gen.feature.GrassGen;
@@ -69,15 +70,18 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 			for (int z = chunkZ; z < chunkZ + 16; z++) {
 				mutable.set(x, 0, z);
 
+				BiomeGen biome = biomeSource.getRealBiome(x, z);
+
 				int height = MathHelper.floor(this.heightSampler.sampleHeight(x, z));
 				double slope = this.heightSampler.sampleSlope(x, z);
 
-				BlockState surface = Blocks.GRASS_BLOCK.getDefaultState();
-				BlockState subsoil = Blocks.DIRT.getDefaultState();
+				BlockState surface = biome.topState(random);
+				BlockState subsoil = biome.underState();
+				BlockState underwater = biome.underWaterState();
 
 				double erosionThreshold = 1.8 + this.erosionNoise.eval(x / 2.0, z / 2.0) * 0.5;
 				if (slope > erosionThreshold) {
-					surface = subsoil = Blocks.STONE.getDefaultState();
+					surface = underwater = subsoil = Blocks.STONE.getDefaultState();
 				}
 
 				BlockState waterState = Blocks.WATER.getDefaultState();
@@ -88,7 +92,7 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 				if (distanceToPath2 < pathRadius2) {
 					if (random.nextInt(12) != 0) {
-						surface = Blocks.GRASS_PATH.getDefaultState();
+						surface = biome.pathState();
 					}
 
 					// Use a very low frequency noise to basically be a more coherent random
@@ -109,7 +113,7 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 							state = surface;
 						} else {
 							// height and genHeight are different, so we're under water. Place dirt instead of grass.
-							state = subsoil;
+							state = underwater;
 						}
 					} else if ((height - y) <= 3) { //TODO: biome controls under depth
 						state = subsoil;
@@ -174,6 +178,15 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 			if (y <= 48) {
 				ImprovedDiskGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
 			}
+		}
+
+		int cactusAmt = biome.cactusAmt(random);
+		for (int i = 0; i < cactusAmt; i++) {
+			int x = chunkX + random.nextInt(16);
+			int z = chunkZ + random.nextInt(16);
+			int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+
+			CactusGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
 		}
 	}
 }

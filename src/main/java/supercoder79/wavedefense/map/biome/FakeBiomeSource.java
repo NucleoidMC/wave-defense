@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import kdotjpg.opensimplex.OpenSimplexNoise;
+import supercoder79.wavedefense.map.biome.impl.DesertGen;
 import supercoder79.wavedefense.map.biome.impl.ForestGen;
 import supercoder79.wavedefense.map.biome.impl.PlainsGen;
 import supercoder79.wavedefense.map.biome.impl.ShrublandGen;
@@ -59,8 +60,12 @@ public final class FakeBiomeSource extends BiomeSource {
 
 		double rainfall = (rainfallNoise.eval(x / 320.0, z / 320.0) + 1) / 2;
 
-		if (temperature > 0.6) {
-			if (rainfall < 0.4) {
+		if (temperature > 0.8) {
+			return DesertGen.INSTANCE;
+		} else if (temperature > 0.5) {
+			if (rainfall < 0.35) {
+				return DesertGen.INSTANCE;
+			} else if (rainfall < 0.5) {
 				return ShrublandGen.INSTANCE;
 			} else if (rainfall > 0.6) {
 				return SwampGen.INSTANCE;
