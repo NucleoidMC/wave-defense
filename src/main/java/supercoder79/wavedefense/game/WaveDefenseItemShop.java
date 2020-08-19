@@ -24,7 +24,7 @@ import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 public final class WaveDefenseItemShop {
     public static ShopUi create(ServerPlayerEntity player, WaveDefenseActive game) {
         return ShopUi.create(new LiteralText("Item Shop"), shop -> {
-            int sharpnessLevel = game.getSharpnessLevel(player);
+            int sharpnessLevel = game.getEnchantmentLevel(game.sharpnessLevels, player);
             Cost sharpnessCost = sharpnessLevel >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(2, sharpnessLevel) * 16));
 
             shop.add(ShopEntry.ofIcon(Items.IRON_SWORD)
@@ -32,12 +32,12 @@ public final class WaveDefenseItemShop {
                     .addLore(new LiteralText("Increases the sharpness level of your sword."))
                     .withCost(sharpnessCost)
                     .onBuy(p -> {
-                        game.increaseSharpness(player);
+                        game.increaseEnchantment(game.sharpnessLevels, player);
                         applyEnchantments(player, stack -> stack.getItem().isIn(FabricToolTags.SWORDS), Enchantments.SHARPNESS, sharpnessLevel + 1);
                     })
             );
 
-            int protectionLevel = game.getProtectionLevel(player);
+            int protectionLevel = game.getEnchantmentLevel(game.protectionLevels, player);
             Cost protectionCost = protectionLevel >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(2, protectionLevel) * 16));
 
             shop.add(ShopEntry.ofIcon(Items.IRON_CHESTPLATE)
@@ -45,12 +45,12 @@ public final class WaveDefenseItemShop {
                     .addLore(new LiteralText("Increases the protection level of your armor."))
                     .withCost(protectionCost)
                     .onBuy(p -> {
-                        game.increaseProtection(player);
+                        game.increaseEnchantment(game.protectionLevels, player);
                         applyEnchantments(player, stack -> stack.getItem() instanceof ArmorItem, Enchantments.PROTECTION, protectionLevel + 1);
                     })
             );
 
-            int powerLevel = game.getPowerLevel(player);
+            int powerLevel = game.getEnchantmentLevel(game.powerLevels, player);
             Cost powerCost = powerLevel >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(2, powerLevel) * 16));
 
             shop.add(ShopEntry.ofIcon(Items.CROSSBOW)
@@ -61,7 +61,7 @@ public final class WaveDefenseItemShop {
                     .addLore(new LiteralText("otherwise you will run into bugs!").formatted(Formatting.RED))
                     .withCost(powerCost)
                     .onBuy(p -> {
-                        game.increasePower(player);
+                        game.increaseEnchantment(game.powerLevels, player);
                         applyEnchantments(player, stack -> stack.getItem() instanceof BowItem, Enchantments.POWER, powerLevel + 1);
                     })
             );

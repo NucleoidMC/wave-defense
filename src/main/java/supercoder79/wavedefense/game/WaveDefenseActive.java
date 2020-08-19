@@ -41,9 +41,9 @@ public final class WaveDefenseActive {
 	private final Set<ServerPlayerEntity> participants;
 	private final WaveDefenseSpawnLogic spawnLogic;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
-	private final Map<PlayerRef, Integer> sharpnessLevels = new HashMap<>();
-	private final Map<PlayerRef, Integer> protectionLevels = new HashMap<>();
-	private final Map<PlayerRef, Integer> powerLevels = new HashMap<>();
+	public final Map<PlayerRef, Integer> sharpnessLevels = new HashMap<>();
+	public final Map<PlayerRef, Integer> protectionLevels = new HashMap<>();
+	public final Map<PlayerRef, Integer> powerLevels = new HashMap<>();
 	private final WaveDefenseBar bar;
 	private final Random random = new Random();
 
@@ -265,33 +265,13 @@ public final class WaveDefenseActive {
 		this.world.getPlayerSet().sendMessage(message);
 	}
 
-	public int getSharpnessLevel(ServerPlayerEntity player) {
-		return this.sharpnessLevels.computeIfAbsent(PlayerRef.of(player), ref -> 0);
+	public int getEnchantmentLevel(Map<PlayerRef, Integer> map, ServerPlayerEntity player) {
+		return map.computeIfAbsent(PlayerRef.of(player), ref -> 0);
 	}
 
-	public void increaseSharpness(ServerPlayerEntity player) {
+	public void increaseEnchantment(Map<PlayerRef, Integer> map, ServerPlayerEntity player) {
 		PlayerRef ref = PlayerRef.of(player);
-		int level = this.sharpnessLevels.get(ref);
-		this.sharpnessLevels.put(ref, level + 1);
-	}
-
-	public int getProtectionLevel(ServerPlayerEntity player) {
-		return this.protectionLevels.computeIfAbsent(PlayerRef.of(player), ref -> 0);
-	}
-
-	public void increaseProtection(ServerPlayerEntity player) {
-		PlayerRef ref = PlayerRef.of(player);
-		int level = this.protectionLevels.get(ref);
-		this.protectionLevels.put(ref, level + 1);
-	}
-
-	public int getPowerLevel(ServerPlayerEntity player) {
-		return this.powerLevels.computeIfAbsent(PlayerRef.of(player), ref -> 0);
-	}
-
-	public void increasePower(ServerPlayerEntity player) {
-		PlayerRef ref = PlayerRef.of(player);
-		int level = this.powerLevels.get(ref);
-		this.powerLevels.put(ref, level + 1);
+		int level = map.get(ref);
+		map.put(ref, level + 1);
 	}
 }
