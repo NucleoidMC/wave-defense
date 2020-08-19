@@ -50,6 +50,7 @@ public final class DesertGen implements BiomeGen {
 		if (random.nextInt(16) == 0) {
 			return Blocks.GRASS_BLOCK.getDefaultState();
 		}
+
 		return Blocks.SAND.getDefaultState();
 	}
 

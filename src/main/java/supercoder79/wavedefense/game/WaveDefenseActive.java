@@ -26,6 +26,7 @@ import supercoder79.wavedefense.map.WaveDefenseMap;
 import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.event.*;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
+import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
@@ -63,7 +64,7 @@ public final class WaveDefenseActive {
 
 		this.spawnLogic = new WaveDefenseSpawnLogic(world, config);
 		this.progress = new WaveDefenseProgress(config, map);
-		this.bar = new WaveDefenseBar();
+		this.bar = world.addResource(new WaveDefenseBar(world));
 	}
 
 	public static void open(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
@@ -98,8 +99,6 @@ public final class WaveDefenseActive {
 	}
 
 	private void addPlayer(ServerPlayerEntity player) {
-		this.bar.addPlayer(player);
-
 		if (this.participants.add(player)) {
 			this.spawnSpectator(player);
 		}
@@ -107,7 +106,6 @@ public final class WaveDefenseActive {
 
 	private void removePlayer(ServerPlayerEntity player) {
 		this.participants.remove(player);
-		this.bar.removePlayer(player);
 	}
 
 	private void tick() {
@@ -251,8 +249,9 @@ public final class WaveDefenseActive {
 		Text message = player.getDisplayName().shallowCopy().append(" succumbed to the zombies....")
 				.formatted(Formatting.RED);
 
-		this.broadcastMessage(message);
-		this.broadcastSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP);
+		PlayerSet players = this.world.getPlayerSet();
+		players.sendMessage(message);
+		players.sendSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP);
 
 		this.spawnSpectator(player);
 	}
@@ -263,15 +262,7 @@ public final class WaveDefenseActive {
 	}
 
 	private void broadcastMessage(Text message) {
-		for (ServerPlayerEntity player : this.world.getPlayers()) {
-			player.sendMessage(message, false);
-		}
-	}
-
-	private void broadcastSound(SoundEvent sound) {
-		for (ServerPlayerEntity player : this.world.getPlayers()) {
-			player.playSound(sound, SoundCategory.PLAYERS, 1.0F, 1.0F);
-		}
+		this.world.getPlayerSet().sendMessage(message);
 	}
 
 	public int getSharpnessLevel(ServerPlayerEntity player) {
