@@ -7,14 +7,14 @@ import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import supercoder79.wavedefense.game.WaveDefenseActive;
+import supercoder79.wavedefense.game.WdActive;
 
 import java.util.EnumSet;
 
 public final class SillyZombieEntity extends ZombieEntity {
-    private final WaveDefenseActive game;
+    private final WdActive game;
 
-    public SillyZombieEntity(World world, WaveDefenseActive game) {
+    public SillyZombieEntity(World world, WdActive game) {
         super(world);
         this.game = game;
     }
@@ -43,7 +43,7 @@ public final class SillyZombieEntity extends ZombieEntity {
         @Override
         public boolean canStart() {
             if (SillyZombieEntity.this.navigation.isIdle()) {
-                WaveDefenseActive game = SillyZombieEntity.this.game;
+                WdActive game = SillyZombieEntity.this.game;
                 double distance2 = SillyZombieEntity.this.squaredDistanceTo(game.progress.getCenterPos());
                 return distance2 > game.config.spawnRadius * game.config.spawnRadius;
             }

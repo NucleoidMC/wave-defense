@@ -16,8 +16,8 @@ import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.gen.StructureAccessor;
-import supercoder79.wavedefense.game.WaveDefenseConfig;
-import supercoder79.wavedefense.map.WaveDefenseMap;
+import supercoder79.wavedefense.game.WdConfig;
+import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
 import supercoder79.wavedefense.map.feature.CactusGen;
@@ -28,21 +28,21 @@ import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
 
 import java.util.Random;
 
-public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
-	private final WaveDefenseHeightSampler heightSampler;
+public final class WdChunkGenerator extends GameChunkGenerator {
+	private final WdHeightSampler heightSampler;
 	private final OpenSimplexNoise pathNoise;
 	private final OpenSimplexNoise detailNoise;
 	private final OpenSimplexNoise erosionNoise;
 
-	private final WaveDefenseConfig config;
-	private final WaveDefenseMap map;
+	private final WdConfig config;
+	private final WdMap map;
 	private final double pathRadius;
 	private final FakeBiomeSource biomeSource;
 
 	private final int minBarrierRadius2;
 	private final int maxBarrierRadius2;
 
-	public WaveDefenseChunkGenerator(MinecraftServer server, WaveDefenseConfig config, WaveDefenseMap map) {
+	public WdChunkGenerator(MinecraftServer server, WdConfig config, WdMap map) {
 		super(server);
 		this.config = config;
 
@@ -53,7 +53,7 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 		Random random = new Random();
 		this.biomeSource = new FakeBiomeSource(server.getRegistryManager().get(Registry.BIOME_KEY), random.nextLong());
-		this.heightSampler = new WaveDefenseHeightSampler(map.path, biomeSource, random.nextLong());
+		this.heightSampler = new WdHeightSampler(map.path, biomeSource, random.nextLong());
 		this.pathNoise = new OpenSimplexNoise(random.nextLong());
 		this.detailNoise = new OpenSimplexNoise(random.nextLong());
 		this.erosionNoise = new OpenSimplexNoise(random.nextLong());

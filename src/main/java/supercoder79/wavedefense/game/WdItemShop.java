@@ -21,8 +21,8 @@ import xyz.nucleoid.plasmid.util.ItemUtil;
 
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 
-public final class WaveDefenseItemShop {
-    public static ShopUi create(ServerPlayerEntity player, WaveDefenseActive game) {
+public final class WdItemShop {
+    public static ShopUi create(ServerPlayerEntity player, WdActive game) {
         return ShopUi.create(new LiteralText("Item Shop"), shop -> {
             int sharpnessLevel = game.getEnchantmentLevel(game.sharpnessLevels, player);
             Cost sharpnessCost = sharpnessLevel >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(2, sharpnessLevel) * 16));

@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.SillyZombieEntity;
-import supercoder79.wavedefense.map.WaveDefenseMap;
+import supercoder79.wavedefense.map.WdMap;
 import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.event.*;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
@@ -32,18 +32,18 @@ import xyz.nucleoid.plasmid.util.PlayerRef;
 
 import java.util.*;
 
-public final class WaveDefenseActive {
+public final class WdActive {
 	private final GameWorld world;
-	private final WaveDefenseMap map;
-	public final WaveDefenseConfig config;
+	private final WdMap map;
+	public final WdConfig config;
 	private final Set<ServerPlayerEntity> participants;
-	private final WaveDefenseSpawnLogic spawnLogic;
-	private final WaveDefenseWaveStarter waveStarter;
+	private final WdSpawnLogic spawnLogic;
+	private final WdWaveStarter waveStarter;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
 	public final Map<PlayerRef, Integer> sharpnessLevels = new HashMap<>();
 	public final Map<PlayerRef, Integer> protectionLevels = new HashMap<>();
 	public final Map<PlayerRef, Integer> powerLevels = new HashMap<>();
-	private final WaveDefenseBar bar;
+	private final WdBar bar;
 	private final Random random = new Random();
 
 	private int zombiesToSpawn = 0;
@@ -51,22 +51,22 @@ public final class WaveDefenseActive {
 	private int currentWave = 1;
 	private long gameCloseTick = Long.MAX_VALUE;
 
-	public final WaveDefenseProgress progress;
+	public final WdProgress progress;
 
-	private WaveDefenseActive(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config, Set<ServerPlayerEntity> participants) {
+	private WdActive(GameWorld world, WdMap map, WdConfig config, Set<ServerPlayerEntity> participants) {
 		this.world = world;
 		this.map = map;
 		this.config = config;
 		this.participants = participants;
 
-		this.spawnLogic = new WaveDefenseSpawnLogic(world, config);
-		this.waveStarter = new WaveDefenseWaveStarter(map);
-		this.progress = new WaveDefenseProgress(config, map);
-		this.bar = world.addResource(new WaveDefenseBar(world));
+		this.spawnLogic = new WdSpawnLogic(world, config);
+		this.waveStarter = new WdWaveStarter(map);
+		this.progress = new WdProgress(config, map);
+		this.bar = world.addResource(new WdBar(world));
 	}
 
-	public static void open(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
-		WaveDefenseActive active = new WaveDefenseActive(world, map, config, new HashSet<>(world.getPlayers()));
+	public static void open(GameWorld world, WdMap map, WdConfig config) {
+		WdActive active = new WdActive(world, map, config, new HashSet<>(world.getPlayers()));
 
 		world.openGame(game -> {
 			game.setRule(GameRule.CRAFTING, RuleResult.ALLOW);
@@ -128,7 +128,7 @@ public final class WaveDefenseActive {
 				ZombieEntity zombie = new SillyZombieEntity(world, this);
 				zombie.setPersistent();
 
-				BlockPos pos = WaveDefenseSpawnLogic.findSurfaceAround(progress.getCenterPos(), this.world, this.config);
+				BlockPos pos = WdSpawnLogic.findSurfaceAround(progress.getCenterPos(), this.world, this.config);
 				zombie.refreshPositionAndAngles(pos, 0, 0);
 				setupZombie(zombie);
 
@@ -152,7 +152,7 @@ public final class WaveDefenseActive {
 	private TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {
 		ItemStack stack = player.getStackInHand(hand);
 		if (stack.getItem() == Items.COMPASS) {
-			player.openHandledScreen(WaveDefenseItemShop.create(player, this));
+			player.openHandledScreen(WdItemShop.create(player, this));
 			return TypedActionResult.success(stack);
 		}
 

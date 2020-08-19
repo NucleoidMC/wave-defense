@@ -5,18 +5,18 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
-import supercoder79.wavedefense.map.WaveDefenseMap;
+import supercoder79.wavedefense.map.WdMap;
 
 import java.util.Collection;
 
-public final class WaveDefenseProgress {
-    private final WaveDefenseConfig config;
-    private final WaveDefenseMap map;
+public final class WdProgress {
+    private final WdConfig config;
+    private final WdMap map;
 
     private Vec3d centerPos = Vec3d.ZERO;
     private double progress;
 
-    public WaveDefenseProgress(WaveDefenseConfig config, WaveDefenseMap map) {
+    public WdProgress(WdConfig config, WdMap map) {
         this.config = config;
         this.map = map;
     }

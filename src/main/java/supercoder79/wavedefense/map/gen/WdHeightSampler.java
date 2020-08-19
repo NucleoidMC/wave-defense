@@ -6,15 +6,15 @@ import kdotjpg.opensimplex.OpenSimplexNoise;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
 
-public final class WaveDefenseHeightSampler {
+public final class WdHeightSampler {
     private final OpenSimplexNoise ridgeNoise;
     private final OpenSimplexNoise baseNoise;
     private final OpenSimplexNoise detailNoise;
 
-    private final WaveDefensePath path;
+    private final WdPath path;
     private final FakeBiomeSource source;
 
-    public WaveDefenseHeightSampler(WaveDefensePath path, FakeBiomeSource source, long seed) {
+    public WdHeightSampler(WdPath path, FakeBiomeSource source, long seed) {
         this.path = path;
         this.source = source;
 

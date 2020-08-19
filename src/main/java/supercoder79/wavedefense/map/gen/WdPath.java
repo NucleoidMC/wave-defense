@@ -10,18 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public final class WaveDefensePath {
+public final class WdPath {
     private final List<BlockPos> points;
     private final DoubleList pointDistances;
     private final double length;
 
-    WaveDefensePath(List<BlockPos> points, DoubleList pointDistances, double length) {
+    WdPath(List<BlockPos> points, DoubleList pointDistances, double length) {
         this.points = points;
         this.pointDistances = pointDistances;
         this.length = length;
     }
 
-    public static WaveDefensePath generate(int totalLength, int segmentLength) {
+    public static WdPath generate(int totalLength, int segmentLength) {
         Random random = new Random();
 
         BlockPos point = BlockPos.ORIGIN;
@@ -47,7 +47,7 @@ public final class WaveDefensePath {
             pointDistances.add(currentLength);
         }
 
-        return new WaveDefensePath(points, pointDistances, currentLength);
+        return new WdPath(points, pointDistances, currentLength);
     }
 
     public int distanceToPath2(int x, int z) {

@@ -8,10 +8,10 @@ import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 
-public final class WaveDefenseBar implements AutoCloseable {
+public final class WdBar implements AutoCloseable {
 	private final BossBarWidget bar;
 
-	public WaveDefenseBar(GameWorld world) {
+	public WdBar(GameWorld world) {
 		LiteralText title = new LiteralText("x Zombies remaining");
 
 		this.bar = BossBarWidget.open(world.getPlayerSet(), title, BossBar.Color.GREEN, BossBar.Style.PROGRESS);

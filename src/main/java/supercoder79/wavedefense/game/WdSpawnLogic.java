@@ -15,11 +15,11 @@ import xyz.nucleoid.plasmid.game.GameWorld;
 
 import java.util.Random;
 
-public final class WaveDefenseSpawnLogic {
+public final class WdSpawnLogic {
     private final GameWorld world;
-    private final WaveDefenseConfig config;
+    private final WdConfig config;
 
-    public WaveDefenseSpawnLogic(GameWorld world, WaveDefenseConfig config) {
+    public WdSpawnLogic(GameWorld world, WdConfig config) {
         this.world = world;
         this.config = config;
     }
@@ -46,7 +46,7 @@ public final class WaveDefenseSpawnLogic {
         player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0F, 0.0F);
     }
 
-    public static BlockPos findSurfaceAround(Vec3d centerPos, GameWorld gameWorld, WaveDefenseConfig config) {
+    public static BlockPos findSurfaceAround(Vec3d centerPos, GameWorld gameWorld, WdConfig config) {
         ServerWorld world = gameWorld.getWorld();
 
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();

@@ -3,19 +3,19 @@ package supercoder79.wavedefense.map;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.util.Util;
-import supercoder79.wavedefense.game.WaveDefenseConfig;
-import supercoder79.wavedefense.map.gen.WaveDefensePath;
+import supercoder79.wavedefense.game.WdConfig;
+import supercoder79.wavedefense.map.gen.WdPath;
 
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
-public final class WaveDefenseMapGenerator {
-    public CompletableFuture<WaveDefenseMap> create(WaveDefenseConfig config) {
+public final class WdMapGenerator {
+    public CompletableFuture<WdMap> create(WdConfig config) {
         return CompletableFuture.supplyAsync(() -> build(config), Util.getMainWorkerExecutor());
     }
 
-    public WaveDefenseMap build(WaveDefenseConfig config) {
-        WaveDefensePath path = WaveDefensePath.generate(config.path.length, config.path.segmentLength);
+    public WdMap build(WdConfig config) {
+        WdPath path = WdPath.generate(config.path.length, config.path.segmentLength);
 
         DoubleList waveStarts = new DoubleArrayList();
         double maxSpacing = config.maxWaveSpacing;
@@ -29,6 +29,6 @@ public final class WaveDefenseMapGenerator {
             distance -= random.nextDouble() * (maxSpacing - minSpacing) + minSpacing;
         }
 
-        return new WaveDefenseMap(path, config, waveStarts);
+        return new WdMap(path, config, waveStarts);
     }
 }

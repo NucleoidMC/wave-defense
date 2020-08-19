@@ -11,8 +11,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
-import supercoder79.wavedefense.map.WaveDefenseMap;
-import supercoder79.wavedefense.map.WaveDefenseMapGenerator;
+import supercoder79.wavedefense.map.WdMap;
+import supercoder79.wavedefense.map.WdMapGenerator;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
 import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.StartResult;
@@ -25,23 +25,23 @@ import xyz.nucleoid.plasmid.world.bubble.BubbleWorldSpawner;
 
 import java.util.concurrent.CompletableFuture;
 
-public final class WaveDefenseWaiting {
+public final class WdWaiting {
 	private final GameWorld world;
-	private final WaveDefenseMap map;
-	private final WaveDefenseConfig config;
+	private final WdMap map;
+	private final WdConfig config;
 
-	private final WaveDefenseSpawnLogic spawnLogic;
+	private final WdSpawnLogic spawnLogic;
 
-	private WaveDefenseWaiting(GameWorld world, WaveDefenseMap map, WaveDefenseConfig config) {
+	private WdWaiting(GameWorld world, WdMap map, WdConfig config) {
 		this.world = world;
 		this.map = map;
 		this.config = config;
 
-		this.spawnLogic = new WaveDefenseSpawnLogic(world, config);
+		this.spawnLogic = new WdSpawnLogic(world, config);
 	}
 
-	public static CompletableFuture<GameWorld> open(GameOpenContext<WaveDefenseConfig> context) {
-		WaveDefenseMapGenerator generator = new WaveDefenseMapGenerator();
+	public static CompletableFuture<GameWorld> open(GameOpenContext<WdConfig> context) {
+		WdMapGenerator generator = new WdMapGenerator();
 
 		return generator.create(context.getConfig())
 				.thenCompose(map -> {
@@ -53,7 +53,7 @@ public final class WaveDefenseWaiting {
 							.setDifficulty(Difficulty.NORMAL);
 
 					return context.openWorld(worldConfig).thenApply(gameWorld -> {
-						WaveDefenseWaiting waiting = new WaveDefenseWaiting(gameWorld, map, context.getConfig());
+						WdWaiting waiting = new WdWaiting(gameWorld, map, context.getConfig());
 
 						gameWorld.openGame(game -> {
 							game.setRule(GameRule.CRAFTING, RuleResult.DENY);
@@ -102,7 +102,7 @@ public final class WaveDefenseWaiting {
 			return StartResult.NOT_ENOUGH_PLAYERS;
 		}
 
-		WaveDefenseActive.open(this.world, this.map, this.config);
+		WdActive.open(this.world, this.map, this.config);
 
 		return StartResult.OK;
 	}

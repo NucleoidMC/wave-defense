@@ -1,12 +1,12 @@
 package supercoder79.wavedefense.game;
 
-import supercoder79.wavedefense.map.WaveDefenseMap;
+import supercoder79.wavedefense.map.WdMap;
 
-public final class WaveDefenseWaveStarter {
-    private final WaveDefenseMap map;
+public final class WdWaveStarter {
+    private final WdMap map;
     private int nextWaveIndex;
 
-    WaveDefenseWaveStarter(WaveDefenseMap map) {
+    WdWaveStarter(WdMap map) {
         this.map = map;
     }
 
