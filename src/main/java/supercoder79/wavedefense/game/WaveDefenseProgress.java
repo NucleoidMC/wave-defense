@@ -52,12 +52,12 @@ public final class WaveDefenseProgress {
             double deltaZ = player.getZ() - this.centerPos.getZ();
 
             if (deltaX * deltaX + deltaZ * deltaZ > maxDistance2) {
-                LiteralText message = new LiteralText("You are too far from your fellow players!");
-                player.sendMessage(message.formatted(Formatting.RED), true);
-
-                // Don't damage creative or spectator players
+                // Don't touch creative or spectator players
                 if (!(player.isCreative() || player.isSpectator())) {
-                    player.damage(DamageSource.OUT_OF_WORLD, 2.0F);
+                    LiteralText message = new LiteralText("You are too far from your fellow players!");
+                    player.sendMessage(message.formatted(Formatting.RED), true);
+
+                    player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
                 }
             }
         }
