@@ -4,6 +4,7 @@ import kdotjpg.opensimplex.OpenSimplexNoise;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -95,6 +96,8 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 				}
 
 				BlockState waterState = Blocks.WATER.getDefaultState();
+				BlockState topWaterState = Blocks.WATER.getDefaultState();
+				BlockState underWaterState = Blocks.WATER.getDefaultState();
 
 				int distanceToPath2 = this.map.path.distanceToPath2(x, z);
 				double pathRadius = (this.pathRadius + (this.pathNoise.eval(x / 48.0, z / 48.0) * (this.pathRadius * 0.25)));
@@ -105,11 +108,18 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 						surface = biome.pathState();
 					}
 
+					underWaterState = Blocks.OAK_PLANKS.getDefaultState();
+
 					// Use a very low frequency noise to basically be a more coherent random
 					// Technically we should be using separate noises here but this can do for now :P
 					double damageNoise = detailNoise.eval(x / 2.0, z / 2.0) + pathNoise.eval(x / 12.0, z / 12.0);
 					if (damageNoise > -0.5) {
-						waterState = Blocks.OAK_PLANKS.getDefaultState();
+						topWaterState = Blocks.OAK_PLANKS.getDefaultState();
+
+						// Randomly place support blocks for bridge
+						if (random.nextInt(8) == 0) {
+							waterState = Blocks.OAK_FENCE.getDefaultState().with(Properties.WATERLOGGED, Boolean.TRUE);
+						}
 					}
 				}
 
@@ -142,6 +152,12 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 						}
 					} else if (y <= seaLevel) {
 						state = waterState;
+
+						if (y == genHeight) { // Top layer of water can sometimes be a bridge
+							state = topWaterState;
+						} else if (y == (genHeight - 1)) { // Second to top layer is always a bridge
+							state = underWaterState;
+						}
 					}
 
 					// Set the state here
