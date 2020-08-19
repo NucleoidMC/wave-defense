@@ -16,6 +16,7 @@ import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.gen.StructureAccessor;
+import supercoder79.wavedefense.game.WaveDefenseConfig;
 import supercoder79.wavedefense.map.WaveDefenseMap;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
@@ -33,12 +34,22 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 	private final OpenSimplexNoise detailNoise;
 	private final OpenSimplexNoise erosionNoise;
 
+	private final WaveDefenseConfig config;
 	private final WaveDefenseMap map;
 	private final double pathRadius;
 	private final FakeBiomeSource biomeSource;
 
-	public WaveDefenseChunkGenerator(MinecraftServer server, WaveDefenseMap map) {
+	private final int minBarrierRadius2;
+	private final int maxBarrierRadius2;
+
+	public WaveDefenseChunkGenerator(MinecraftServer server, WaveDefenseConfig config, WaveDefenseMap map) {
 		super(server);
+		this.config = config;
+
+		int minBarrierRadius = config.spawnRadius + 5;
+		int maxBarrierRadius = minBarrierRadius + 1;
+		this.minBarrierRadius2 = minBarrierRadius * minBarrierRadius;
+		this.maxBarrierRadius2 = maxBarrierRadius * maxBarrierRadius;
 
 		Random random = new Random();
 		this.biomeSource = new FakeBiomeSource(server.getRegistryManager().get(Registry.BIOME_KEY), random.nextLong());
@@ -71,7 +82,7 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 				BiomeGen biome = biomeSource.getRealBiome(x, z);
 
-				int height = MathHelper.floor(this.heightSampler.sampleHeight(x, z));
+				int terrainHeight = MathHelper.floor(this.heightSampler.sampleHeight(x, z));
 				double slope = this.heightSampler.sampleSlope(x, z);
 
 				BlockState surface = biome.topState(random);
@@ -103,26 +114,33 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 				}
 
 				// Generation height ensures that the generator iterates up to at least the water level.
-				int genHeight = Math.max(height, 48);
+				int seaLevel = 48;
+				BlockState air = Blocks.AIR.getDefaultState();
+				BlockState stone = Blocks.STONE.getDefaultState();
+
+				int genHeight = Math.max(terrainHeight, seaLevel);
+				if (distanceToPath2 >= this.minBarrierRadius2 && distanceToPath2 <= this.maxBarrierRadius2) {
+					genHeight = 255;
+					air = waterState = Blocks.BARRIER.getDefaultState();
+				}
+
 				for (int y = 0; y <= genHeight; y++) {
 					// Simple surface building
-					BlockState state = Blocks.STONE.getDefaultState();
-					if (y == height) {
-						// If the height and the generation height are the same, it means that we're on land
-						if (height == genHeight) {
-							state = surface;
-						} else {
-							// height and genHeight are different, so we're under water. Place dirt instead of grass.
-							state = underwater;
-						}
-					} else if ((height - y) <= 3) { //TODO: biome controls under depth
-						state = subsoil;
-					} else if (y == 0) {
-						state = Blocks.BEDROCK.getDefaultState();
-					}
+					BlockState state = air;
 
-					// If the y is higher than the land height, then we must place water
-					if (y > height) {
+					if (y <= terrainHeight) {
+						int depth = terrainHeight - y;
+						if (y < seaLevel) {
+							state = underwater;
+						} else if (depth == 0) {
+							state = surface;
+						} else if (depth <= 3) {
+							//TODO: biome controls under depth
+							state = subsoil;
+						} else {
+							state = stone;
+						}
+					} else if (y <= seaLevel) {
 						state = waterState;
 					}
 

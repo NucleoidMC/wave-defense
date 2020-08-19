@@ -17,6 +17,6 @@ public final class WaveDefenseMap {
 	}
 
 	public ChunkGenerator chunkGenerator(MinecraftServer server) {
-		return new WaveDefenseChunkGenerator(server, this);
+		return new WaveDefenseChunkGenerator(server, config, this);
 	}
 }

@@ -57,6 +57,7 @@ public final class WaveDefenseSpawnLogic {
             double z = centerPos.z + random.nextInt(config.spawnRadius) - random.nextInt(config.spawnRadius);
             mutablePos.set(x, 0, z);
 
+            world.getChunk(mutablePos);
             int topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING, mutablePos.getX(), mutablePos.getZ());
             mutablePos.setY(topY - 1);
 

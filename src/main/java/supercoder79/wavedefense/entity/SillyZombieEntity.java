@@ -23,7 +23,6 @@ public final class SillyZombieEntity extends ZombieEntity {
     protected void initGoals() {
         this.goalSelector.add(1, new ZombieAttackGoal(this, 1.0, false));
         this.goalSelector.add(2, new MoveTowardGameCenterGoal());
-        this.goalSelector.add(2, new WanderAroundFarGoal(this, 1.0));
         this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
         this.goalSelector.add(4, new LookAroundGoal(this));
         this.targetSelector.add(1, new RevengeGoal(this).setGroupRevenge(ZombifiedPiglinEntity.class));
