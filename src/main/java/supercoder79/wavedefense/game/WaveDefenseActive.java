@@ -38,6 +38,7 @@ public final class WaveDefenseActive {
 	public final WaveDefenseConfig config;
 	private final Set<ServerPlayerEntity> participants;
 	private final WaveDefenseSpawnLogic spawnLogic;
+	private final WaveDefenseWaveStarter waveStarter;
 	private final Map<UUID, Integer> playerKillAmounts = new HashMap<>();
 	public final Map<PlayerRef, Integer> sharpnessLevels = new HashMap<>();
 	public final Map<PlayerRef, Integer> protectionLevels = new HashMap<>();
@@ -45,11 +46,9 @@ public final class WaveDefenseActive {
 	private final WaveDefenseBar bar;
 	private final Random random = new Random();
 
-	private boolean shouldSpawn = false;
 	private int zombiesToSpawn = 0;
 	private int killedZombies = 0;
 	private int currentWave = 1;
-	private long nextWaveTick = -1;
 	private long gameCloseTick = Long.MAX_VALUE;
 
 	public final WaveDefenseProgress progress;
@@ -61,6 +60,7 @@ public final class WaveDefenseActive {
 		this.participants = participants;
 
 		this.spawnLogic = new WaveDefenseSpawnLogic(world, config);
+		this.waveStarter = new WaveDefenseWaveStarter(map);
 		this.progress = new WaveDefenseProgress(config, map);
 		this.bar = world.addResource(new WaveDefenseBar(world));
 	}
@@ -113,22 +113,16 @@ public final class WaveDefenseActive {
 			return;
 		}
 
-		if (time > nextWaveTick) {
-			shouldSpawn = true;
-			killedZombies = 0;
-			nextWaveTick = Long.MAX_VALUE;
-			zombiesToSpawn = zombieCount(currentWave);
-			broadcastMessage(new LiteralText("Starting wave " + currentWave + " with " + zombiesToSpawn + " zombies!"));
-		}
-
 		this.progress.tick(time, participants);
 
 		if (time % 4 == 0) {
 			this.bar.tick(currentWave, zombiesToSpawn, killedZombies);
 		}
 
-		if (shouldSpawn) {
-			shouldSpawn = false;
+		if (waveStarter.tick(progress.getProgressBlocks())) {
+			killedZombies = 0;
+			zombiesToSpawn = zombieCount(currentWave);
+			broadcastMessage(new LiteralText("A wave " + currentWave + " with " + zombiesToSpawn + " zombies is coming!"));
 
 			for (int i = 0; i < zombiesToSpawn; i++) {
 				ZombieEntity zombie = new SillyZombieEntity(world, this);
@@ -184,11 +178,9 @@ public final class WaveDefenseActive {
 				player.inventory.insertStack(new ItemStack(Items.IRON_INGOT, ironCount));
 			}
 
-			if (killedZombies == zombiesToSpawn) {
-				broadcastMessage(new LiteralText("Wave ended! Next wave starting in 15 seconds."));
+			if (killedZombies >= zombiesToSpawn) {
+				broadcastMessage(new LiteralText("The wave has ended!"));
 				currentWave++;
-
-				nextWaveTick = world.getWorld().getTime() + (15 * 20);
 			}
 
 			return ActionResult.FAIL;

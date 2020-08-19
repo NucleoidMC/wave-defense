@@ -40,8 +40,17 @@ public final class WaveDefenseProgress {
         return this.centerPos;
     }
 
+    public double getProgressBlocks() {
+        return this.progress * this.map.path.getLength();
+    }
+
+    public double getProgress() {
+        return progress;
+    }
+
     private void damageFarPlayers(Collection<ServerPlayerEntity> players) {
-        double maxDistance2 = this.config.spawnRadius * this.config.spawnRadius;
+        int maxDistance = this.config.spawnRadius + 5;
+        double maxDistance2 = maxDistance * maxDistance;
         for (ServerPlayerEntity player : players) {
             double deltaX = player.getX() - this.centerPos.getX();
             double deltaZ = player.getZ() - this.centerPos.getZ();

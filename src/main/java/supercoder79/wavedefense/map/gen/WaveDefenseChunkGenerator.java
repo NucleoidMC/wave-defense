@@ -46,7 +46,7 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 		super(server);
 		this.config = config;
 
-		int minBarrierRadius = config.spawnRadius + 5;
+		int minBarrierRadius = config.spawnRadius + 1;
 		int maxBarrierRadius = minBarrierRadius + 1;
 		this.minBarrierRadius2 = minBarrierRadius * minBarrierRadius;
 		this.maxBarrierRadius2 = maxBarrierRadius * maxBarrierRadius;
@@ -59,7 +59,7 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 		this.erosionNoise = new OpenSimplexNoise(random.nextLong());
 
 		this.map = map;
-		this.pathRadius = map.config.pathConfig.pathWidth;
+		this.pathRadius = map.config.path.radius;
 	}
 
 	@Override
