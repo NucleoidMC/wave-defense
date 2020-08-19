@@ -1,17 +1,6 @@
 package supercoder79.wavedefense.map.gen;
 
-import java.util.Random;
-
 import kdotjpg.opensimplex.OpenSimplexNoise;
-import supercoder79.wavedefense.map.WaveDefenseMap;
-import supercoder79.wavedefense.map.biome.BiomeGen;
-import supercoder79.wavedefense.map.biome.FakeBiomeSource;
-import supercoder79.wavedefense.map.feature.CactusGen;
-import supercoder79.wavedefense.map.feature.ImprovedDiskGen;
-import supercoder79.wavedefense.map.feature.ShrubGen;
-import xyz.nucleoid.plasmid.game.gen.feature.GrassGen;
-import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
@@ -27,6 +16,16 @@ import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.gen.StructureAccessor;
+import supercoder79.wavedefense.map.WaveDefenseMap;
+import supercoder79.wavedefense.map.biome.BiomeGen;
+import supercoder79.wavedefense.map.biome.FakeBiomeSource;
+import supercoder79.wavedefense.map.feature.CactusGen;
+import supercoder79.wavedefense.map.feature.ImprovedDiskGen;
+import supercoder79.wavedefense.map.feature.ShrubGen;
+import xyz.nucleoid.plasmid.game.gen.feature.GrassGen;
+import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
+
+import java.util.Random;
 
 public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 	private final WaveDefenseHeightSampler heightSampler;
@@ -97,7 +96,8 @@ public final class WaveDefenseChunkGenerator extends GameChunkGenerator {
 
 					// Use a very low frequency noise to basically be a more coherent random
 					// Technically we should be using separate noises here but this can do for now :P
-					if (detailNoise.eval(x / 2.0, z / 2.0) > 0 && pathNoise.eval(x / 12.0, z / 12.0) > 0) {
+					double damageNoise = detailNoise.eval(x / 2.0, z / 2.0) + pathNoise.eval(x / 12.0, z / 12.0);
+					if (damageNoise > -0.5) {
 						waterState = Blocks.OAK_PLANKS.getDefaultState();
 					}
 				}

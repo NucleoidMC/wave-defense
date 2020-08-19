@@ -9,8 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -99,9 +97,7 @@ public final class WaveDefenseActive {
 	}
 
 	private void addPlayer(ServerPlayerEntity player) {
-		if (this.participants.add(player)) {
-			this.spawnSpectator(player);
-		}
+		this.spawnSpectator(player);
 	}
 
 	private void removePlayer(ServerPlayerEntity player) {
@@ -125,7 +121,7 @@ public final class WaveDefenseActive {
 			broadcastMessage(new LiteralText("Starting wave " + currentWave + " with " + zombiesToSpawn + " zombies!"));
 		}
 
-		this.progress.tick(world, time);
+		this.progress.tick(time, participants);
 
 		if (time % 4 == 0) {
 			this.bar.tick(currentWave, zombiesToSpawn, killedZombies);
@@ -138,7 +134,7 @@ public final class WaveDefenseActive {
 				ZombieEntity zombie = new SillyZombieEntity(world, this);
 				zombie.setPersistent();
 
-				BlockPos pos = WaveDefenseSpawnLogic.topPos(progress.getCenterPos(), this.world, this.config);
+				BlockPos pos = WaveDefenseSpawnLogic.findSurfaceAround(progress.getCenterPos(), this.world, this.config);
 				zombie.refreshPositionAndAngles(pos, 0, 0);
 				setupZombie(zombie);
 
@@ -246,6 +242,10 @@ public final class WaveDefenseActive {
 	}
 
 	private void eliminatePlayer(ServerPlayerEntity player) {
+		if (!participants.remove(player)) {
+			return;
+		}
+
 		Text message = player.getDisplayName().shallowCopy().append(" succumbed to the zombies....")
 				.formatted(Formatting.RED);
 
