@@ -25,8 +25,8 @@ public final class WdProgress {
     public void tick(long time, Collection<ServerPlayerEntity> players) {
         if (time % 20 == 0 || this.centerPos == null) {
             Vec3d meanPos = this.getMeanPos(players);
-            WdPath.Progress meanProgress = this.map.path.getProgressAt(meanPos.x, meanPos.z);
 
+            WdPath.Progress meanProgress = this.map.path.getProgressAt(meanPos.x, meanPos.z);
             if (meanProgress.percent > this.progress) {
                 this.progress = meanProgress.percent;
                 this.centerPos = meanProgress.center;

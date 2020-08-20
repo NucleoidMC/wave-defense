@@ -46,7 +46,7 @@ public final class WdActive {
 	public final Object2IntMap<PlayerRef> powerLevels = new Object2IntOpenHashMap<>();
 	public final WdBar bar;
 
-	private final WdBeacon beacon = new WdBeacon(this);
+	private final WdBeacon beacon;
 
 	private long gameCloseTick = Long.MAX_VALUE;
 
@@ -62,6 +62,8 @@ public final class WdActive {
 		this.waveManager = new WdWaveManager(this);
 		this.progress = new WdProgress(config, map);
 		this.bar = world.addResource(new WdBar(world));
+
+		this.beacon = new WdBeacon(this);
 	}
 
 	public static void open(GameWorld world, WdMap map, WdConfig config) {
