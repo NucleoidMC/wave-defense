@@ -6,6 +6,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import supercoder79.wavedefense.map.WdMap;
+import supercoder79.wavedefense.map.gen.WdPath;
 
 import java.util.Collection;
 
@@ -24,13 +25,12 @@ public final class WdProgress {
     public void tick(long time, Collection<ServerPlayerEntity> players) {
         if (time % 20 == 0 || this.centerPos == null) {
             Vec3d meanPos = this.getMeanPos(players);
-            double meanProgress = this.map.path.distanceAlongPath(meanPos.x, meanPos.z);
+            WdPath.Progress meanProgress = this.map.path.getProgressAt(meanPos.x, meanPos.z);
 
-            if (meanProgress > this.progress) {
-                this.progress = meanProgress;
+            if (meanProgress.percent > this.progress) {
+                this.progress = meanProgress.percent;
+                this.centerPos = meanProgress.center;
             }
-
-            this.centerPos = this.map.path.getPointAlong(this.progress);
 
             this.damageFarPlayers(players);
         }
@@ -57,12 +57,14 @@ public final class WdProgress {
 
             if (deltaX * deltaX + deltaZ * deltaZ > maxDistance2) {
                 // Don't touch creative or spectator players
-                if (!(player.isCreative() || player.isSpectator())) {
-                    LiteralText message = new LiteralText("You are too far from your fellow players!");
-                    player.sendMessage(message.formatted(Formatting.RED), true);
-
-                    player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
+                if (player.isCreative() || player.isSpectator()) {
+                    continue;
                 }
+
+                LiteralText message = new LiteralText("You are too far from your beacon!");
+                player.sendMessage(message.formatted(Formatting.RED), true);
+
+                player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
             }
         }
     }

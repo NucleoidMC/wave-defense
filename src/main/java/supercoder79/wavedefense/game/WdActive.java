@@ -15,6 +15,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.map.WdMap;
@@ -43,6 +45,8 @@ public final class WdActive {
 	public final Object2IntMap<PlayerRef> protectionLevels = new Object2IntOpenHashMap<>();
 	public final Object2IntMap<PlayerRef> powerLevels = new Object2IntOpenHashMap<>();
 	public final WdBar bar;
+
+	private final WdBeacon beacon = new WdBeacon(this);
 
 	private long gameCloseTick = Long.MAX_VALUE;
 
@@ -113,6 +117,9 @@ public final class WdActive {
 		this.waveManager.tick(time, progress.getProgressBlocks());
 
 		this.bar.tick(waveManager.getActiveWave());
+
+		Vec3d centerPos = this.progress.getCenterPos();
+		this.beacon.moveTo(MathHelper.floor(centerPos.getX()), MathHelper.floor(centerPos.getZ()));
 	}
 
 	private TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {

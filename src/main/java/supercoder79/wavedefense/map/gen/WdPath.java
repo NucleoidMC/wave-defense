@@ -66,7 +66,28 @@ public final class WdPath {
         return minDistance2;
     }
 
-    public double distanceAlongPath(double x, double z) {
+    public Progress getProgressAt(double x, double z) {
+        int segmentIndex = getClosestSegment(x, z);
+
+        BlockPos start = this.points.get(segmentIndex);
+        BlockPos end = this.points.get(segmentIndex + 1);
+        double distance = this.pointDistances.getDouble(segmentIndex);
+        double length = this.pointDistances.getDouble(segmentIndex + 1) - distance;
+
+        double progressAlongSegment = progressAlongSegment(start, end, x, z);
+        double distanceAlongSegment = progressAlongSegment * length;
+        double percent = (distance + distanceAlongSegment) / this.length;
+
+        Vec3d center = new Vec3d(
+                start.getX() + (end.getX() - start.getX()) * progressAlongSegment,
+                0.0,
+                start.getZ() + (end.getZ() - start.getZ()) * progressAlongSegment
+        );
+
+        return new Progress(center, percent);
+    }
+
+    private int getClosestSegment(double x, double z) {
         int minDistance2 = Integer.MAX_VALUE;
         int segmentIndex = -1;
 
@@ -84,11 +105,7 @@ public final class WdPath {
             }
         }
 
-        BlockPos start = this.points.get(segmentIndex);
-        BlockPos end = this.points.get(segmentIndex + 1);
-        double distance = this.pointDistances.getDouble(segmentIndex);
-
-        return (distance + distanceAlongSegment(start, end, x, z)) / this.length;
+        return segmentIndex;
     }
 
     private static int distanceToSegment2(BlockPos a, BlockPos b, int px, int pz) {
@@ -128,44 +145,34 @@ public final class WdPath {
         return dx * dx + dz * dz;
     }
 
-    private static double distanceAlongSegment(BlockPos a, BlockPos b, double px, double pz) {
+    private static double progressAlongSegment(BlockPos a, BlockPos b, double px, double pz) {
         int mx = b.getX() - a.getX();
         int mz = b.getZ() - a.getZ();
 
         double vx = px - a.getX();
         double vz = pz - a.getZ();
 
-        // distance along line segment in range [0; m]
-        return Math.sqrt(vx * mx + vz * mz);
+        int m2 = mx * mx + mz * mz;
+
+        // distance along line segment in range [0; 1]
+        return (vx * mx + vz * mz) / m2;
     }
 
     public List<BlockPos> getPoints() {
         return this.points;
     }
 
-    public Vec3d getPointAlong(double progress) {
-        double x = progress * this.points.size();
-
-        int index = MathHelper.floor(x);
-        if (index < 0) {
-            return Vec3d.ofCenter(this.points.get(0));
-        } else if (index >= this.points.size() - 1) {
-            return Vec3d.ofCenter(this.points.get(this.points.size() - 1));
-        }
-
-        double mid = x - index;
-
-        BlockPos start = this.points.get(index);
-        BlockPos end = this.points.get(index + 1);
-
-        return new Vec3d(
-                start.getX() + (end.getX() - start.getX()) * mid,
-                0.0,
-                start.getZ() + (end.getZ() - start.getZ()) * mid
-        );
-    }
-
     public double getLength() {
         return this.length;
+    }
+
+    public static class Progress {
+        public final Vec3d center;
+        public final double percent;
+
+        Progress(Vec3d center, double percent) {
+            this.center = center;
+            this.percent = percent;
+        }
     }
 }
