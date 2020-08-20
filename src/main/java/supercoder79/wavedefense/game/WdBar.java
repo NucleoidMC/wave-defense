@@ -1,29 +1,38 @@
 package supercoder79.wavedefense.game;
 
+import net.minecraft.entity.boss.BossBar;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.plasmid.game.GameWorld;
+import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.widget.BossBarWidget;
 
-import net.minecraft.entity.boss.BossBar;
-import net.minecraft.entity.boss.ServerBossBar;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
-
 public final class WdBar implements AutoCloseable {
-	private final BossBarWidget bar;
+    private final BossBarWidget bar;
+    private final LiteralText idleTitle = new LiteralText("Wave Defense");
 
-	public WdBar(GameWorld world) {
-		LiteralText title = new LiteralText("x Zombies remaining");
+    public WdBar(GameWorld world) {
+        PlayerSet players = world.getPlayerSet();
+        this.bar = BossBarWidget.open(players, idleTitle, BossBar.Color.GREEN, BossBar.Style.PROGRESS);
+    }
 
-		this.bar = BossBarWidget.open(world.getPlayerSet(), title, BossBar.Color.GREEN, BossBar.Style.PROGRESS);
-	}
+    public void tick(@Nullable WdWave wave) {
+        if (wave != null) {
+            this.bar.setTitle(this.titleForWave(wave));
+            this.bar.setProgress(wave.remainingZombies / (float) wave.totalZombies);
+        } else {
+            this.bar.setTitle(idleTitle);
+            this.bar.setProgress(0.0F);
+        }
+    }
 
-	public void tick(int waveNum, int totalZombies, int killedZombies) {
-		this.bar.setTitle(new LiteralText("Wave " + waveNum + ": " + (totalZombies - killedZombies) + " zombies remain."));
-		this.bar.setProgress((totalZombies - killedZombies) / (float) totalZombies);
-	}
+    private Text titleForWave(WdWave wave) {
+        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingZombies + " zombies remain.");
+    }
 
-	@Override
-	public void close() {
-		this.bar.close();
-	}
+    @Override
+    public void close() {
+        this.bar.close();
+    }
 }

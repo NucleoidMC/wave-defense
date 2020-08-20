@@ -135,11 +135,8 @@ public final class WdPath {
         double vx = px - a.getX();
         double vz = pz - a.getZ();
 
-        // squared length of the line segment
-        int m2 = mx * mx + mz * mz;
-
-        // distance along line segment in range [0; 1]
-        return (vx * mx + vz * mz) / m2;
+        // distance along line segment in range [0; m]
+        return Math.sqrt(vx * mx + vz * mz);
     }
 
     public List<BlockPos> getPoints() {

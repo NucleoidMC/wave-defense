@@ -9,7 +9,7 @@
     "segment_length": 32,
     "radius": 4.0
   },
-  "min_wave_spacing": 10.0,
-  "max_wave_spacing": 20.0,
+  "min_wave_spacing": 30.0,
+  "max_wave_spacing": 60.0,
   "spawn_radius": 48
 }

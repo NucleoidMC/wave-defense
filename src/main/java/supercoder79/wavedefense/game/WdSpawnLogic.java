@@ -39,16 +39,14 @@ public final class WdSpawnLogic {
     public void spawnPlayer(ServerPlayerEntity player) {
         ServerWorld world = this.world.getWorld();
 
-        BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.world, this.config);
+        BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.world.getWorld(), this.config);
         ChunkPos chunkPos = new ChunkPos(pos);
         world.getChunkManager().addTicket(ChunkTicketType.field_19347, chunkPos, 1, player.getEntityId());
 
         player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0F, 0.0F);
     }
 
-    public static BlockPos findSurfaceAround(Vec3d centerPos, GameWorld gameWorld, WdConfig config) {
-        ServerWorld world = gameWorld.getWorld();
-
+    public static BlockPos findSurfaceAround(Vec3d centerPos, ServerWorld world, WdConfig config) {
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
 
         while (true) {
