@@ -59,7 +59,8 @@ public final class WdWaveManager {
     }
 
     private WdWave createWave(int index) {
-        return new WdWave(index + 1, zombieCount(index));
+        int ordinal = index + 1;
+        return new WdWave(ordinal, zombieCount(ordinal));
     }
 
     @Nullable
@@ -79,7 +80,8 @@ public final class WdWaveManager {
         return game.map.waveStarts.getDouble(Math.min(nextWaveIndex, game.map.waveStarts.size() - 1));
     }
 
-    private static int zombieCount(int wave) {
-        return MathHelper.floor((0.24 * wave * wave) + (0.95 * wave) + 8);
+    private int zombieCount(int ordinal) {
+        double zombiesPerPlayer = (0.1 * ordinal * ordinal) + (0.8 * ordinal) + 1.5;
+        return MathHelper.floor(game.groupSize * zombiesPerPlayer);
     }
 }

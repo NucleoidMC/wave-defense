@@ -49,6 +49,8 @@ public final class WdActive {
 
 	private long gameCloseTick = Long.MAX_VALUE;
 
+	public final int groupSize;
+
 	private WdActive(GameWorld world, WdMap map, WdConfig config, Set<ServerPlayerEntity> participants) {
 		this.world = world;
 		this.map = map;
@@ -60,6 +62,8 @@ public final class WdActive {
 		this.bar = world.addResource(new WdBar(world));
 
 		this.guide = new WdGuide(this);
+
+		this.groupSize = participants.size();
 	}
 
 	public static void open(GameWorld world, WdMap map, WdConfig config) {
