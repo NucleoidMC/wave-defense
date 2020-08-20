@@ -1,7 +1,6 @@
 package supercoder79.wavedefense.game;
 
-import java.util.function.Predicate;
-
+import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
@@ -12,14 +11,13 @@ import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
-
 import xyz.nucleoid.plasmid.shop.Cost;
 import xyz.nucleoid.plasmid.shop.ShopEntry;
 import xyz.nucleoid.plasmid.shop.ShopUi;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 import xyz.nucleoid.plasmid.util.ItemUtil;
 
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
+import java.util.function.Predicate;
 
 public final class WdItemShop {
     public static ShopUi create(ServerPlayerEntity player, WdActive game) {
@@ -41,7 +39,7 @@ public final class WdItemShop {
             Cost protectionCost = protectionLevel >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(2, protectionLevel) * 16));
 
             shop.add(ShopEntry.ofIcon(Items.IRON_CHESTPLATE)
-                    .withName(new LiteralText("Sword Sharpness " + (protectionLevel + 1)))
+                    .withName(new LiteralText("Armor Protection " + (protectionLevel + 1)))
                     .addLore(new LiteralText("Increases the protection level of your armor."))
                     .withCost(protectionCost)
                     .onBuy(p -> {
