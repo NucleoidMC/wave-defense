@@ -5,17 +5,22 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
+import net.minecraft.structure.StructureManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
+import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
 import supercoder79.wavedefense.game.WdConfig;
 import supercoder79.wavedefense.map.WdMap;
@@ -223,4 +228,16 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 			CactusGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
 		}
 	}
+
+    @Override
+    public void carve(long seed, BiomeAccess biomes, Chunk chunk, GenerationStep.Carver carver) {
+    }
+
+    @Override
+    public void setStructureStarts(DynamicRegistryManager registryManager, StructureAccessor accessor, Chunk chunk, StructureManager manager, long seed) {
+    }
+
+    @Override
+    public void addStructureReferences(StructureWorldAccess world, StructureAccessor accessor, Chunk chunk) {
+    }
 }

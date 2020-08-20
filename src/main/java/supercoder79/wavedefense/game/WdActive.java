@@ -75,7 +75,7 @@ public final class WdActive {
 			game.setRule(GameRule.PVP, RuleResult.DENY);
 			game.setRule(GameRule.BLOCK_DROPS, RuleResult.ALLOW);
 			game.setRule(GameRule.FALL_DAMAGE, RuleResult.ALLOW);
-			game.setRule(GameRule.HUNGER, RuleResult.DENY);
+			game.setRule(GameRule.HUNGER, RuleResult.ALLOW);
 			game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
 
 			game.on(GameOpenListener.EVENT, active::open);

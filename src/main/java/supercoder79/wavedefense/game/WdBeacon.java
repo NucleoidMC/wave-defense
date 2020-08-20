@@ -20,7 +20,12 @@ public final class WdBeacon implements PlayerSet.Listener {
     WdBeacon(WdActive game) {
         this.game = game;
 
-        game.world.getPlayerSet().addListener(this);
+        PlayerSet players = game.world.getPlayerSet();
+        players.addListener(this);
+
+        for (ServerPlayerEntity player : players) {
+            this.onAddPlayer(player);
+        }
     }
 
     public void moveTo(int x, int z) {
@@ -58,7 +63,7 @@ public final class WdBeacon implements PlayerSet.Listener {
     }
 
     private WorldBorder getWorldBorder() {
-        WorldBorder worldBorder = game.world.getWorld().getWorldBorder();
+        WorldBorder worldBorder = new WorldBorder();
 
         int x = 0;
         int z = 0;
