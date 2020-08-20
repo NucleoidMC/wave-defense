@@ -30,10 +30,22 @@ public final class SillyZombieEntity extends ZombieEntity implements WaveEntity 
     private void applyTier(int tier) {
         this.setCustomName(new LiteralText("T" + (tier + 1) + " Zombie"));
 
-        if (tier >= 1) {
+        if (tier == 1) {
             this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.WOODEN_SWORD));
             this.equipStack(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
             this.equipStack(EquipmentSlot.LEGS, new ItemStack(Items.LEATHER_LEGGINGS));
+        } if (tier == 2) {
+            this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.STONE_SWORD));
+            this.equipStack(EquipmentSlot.HEAD, new ItemStack(Items.CHAINMAIL_HELMET));
+            this.equipStack(EquipmentSlot.CHEST, new ItemStack(Items.CHAINMAIL_CHESTPLATE));
+            this.equipStack(EquipmentSlot.LEGS, new ItemStack(Items.CHAINMAIL_LEGGINGS));
+            this.equipStack(EquipmentSlot.FEET, new ItemStack(Items.CHAINMAIL_BOOTS));
+        } if (tier == 3) {
+            this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+            this.equipStack(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            this.equipStack(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+            this.equipStack(EquipmentSlot.LEGS, new ItemStack(Items.IRON_LEGGINGS));
+            this.equipStack(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
         }
     }
 

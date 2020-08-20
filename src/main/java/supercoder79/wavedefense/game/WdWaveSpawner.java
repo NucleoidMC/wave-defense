@@ -1,5 +1,7 @@
 package supercoder79.wavedefense.game;
 
+import java.util.Random;
+
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -45,7 +47,7 @@ public final class WdWaveSpawner {
     }
 
     private boolean spawnZombie(ServerWorld world, BlockPos pos) {
-        ZombieEntity zombie = new SillyZombieEntity(world, game, getRandomTier(wave.ordinal));
+        ZombieEntity zombie = new SillyZombieEntity(world, game, getRandomTier(world.getRandom(), wave.ordinal));
         zombie.setPersistent();
 
         zombie.refreshPositionAndAngles(pos, 0, 0);
@@ -53,9 +55,22 @@ public final class WdWaveSpawner {
         return world.spawnEntity(zombie);
     }
 
-    private int getRandomTier(int waveOrdinal) {
+    private int getRandomTier(Random random, int waveOrdinal) {
+        // T2: waves 10 - 20
         double t2Chance = MathHelper.clamp((0.1 * waveOrdinal) - 1, 0, 1);
-        if (Math.random() < t2Chance) {
+        // T3: waves 20 - 30
+        double t3Chance = MathHelper.clamp((0.1 * waveOrdinal) - 2, 0, 1);
+
+        if (Math.random() < t3Chance) {
+            // Instead of T3, T4s will have an increasing chance to spawn.
+            double t4Chance = 500.0 / (waveOrdinal - 15);
+
+            if (random.nextInt((int) t4Chance) == 0) {
+                return 3;
+            }
+
+            return 2;
+        } else if (Math.random() < t2Chance) {
             return 1;
         } else {
             return 0;
