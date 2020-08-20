@@ -67,7 +67,7 @@ public final class SillyZombieEntity extends ZombieEntity implements WaveEntity 
         public boolean canStart() {
             if (SillyZombieEntity.this.navigation.isIdle()) {
                 WdActive game = SillyZombieEntity.this.game;
-                double distance2 = SillyZombieEntity.this.squaredDistanceTo(game.progress.getCenterPos());
+                double distance2 = SillyZombieEntity.this.squaredDistanceTo(game.guide.getCenterPos());
                 return distance2 > game.config.spawnRadius * game.config.spawnRadius;
             }
             return false;
@@ -75,7 +75,7 @@ public final class SillyZombieEntity extends ZombieEntity implements WaveEntity 
 
         @Override
         public void start() {
-            Vec3d center = SillyZombieEntity.this.game.progress.getCenterPos();
+            Vec3d center = SillyZombieEntity.this.game.guide.getCenterPos();
             Vec3d target = TargetFinder.findTargetTowards(SillyZombieEntity.this, 15, 15, center);
 
             if (target != null) {

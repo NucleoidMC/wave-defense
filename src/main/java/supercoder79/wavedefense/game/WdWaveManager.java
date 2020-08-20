@@ -6,11 +6,8 @@ import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 
 public final class WdWaveManager {
-    private static final long WAVE_COOLDOWN_TICKS = 20 * 15;
-
     private final WdActive game;
     private int nextWaveIndex;
-    private long waveCooldownTime;
 
     private WdWave activeWave;
     private WdWaveSpawner waveSpawner;
@@ -23,7 +20,7 @@ public final class WdWaveManager {
         if (activeWave != null) {
             tickActive(time, activeWave);
         } else {
-            tickInactive(time, progressBlocks);
+            tickInactive(progressBlocks);
         }
     }
 
@@ -39,17 +36,15 @@ public final class WdWaveManager {
             players.sendMessage(new LiteralText("The wave has ended!"));
 
             activeWave = null;
-            waveCooldownTime = time + WAVE_COOLDOWN_TICKS;
         }
     }
 
-    private void tickInactive(long time, double progressBlocks) {
-        if (time < waveCooldownTime || nextWaveIndex >= game.map.waveStarts.size()) {
+    private void tickInactive(double progressBlocks) {
+        if (nextWaveIndex >= game.map.waveStarts.size()) {
             return;
         }
 
-        double nextWaveDistance = game.map.waveStarts.getDouble(nextWaveIndex);
-        if (progressBlocks >= nextWaveDistance) {
+        if (progressBlocks >= getNextWaveDistance()) {
             WdWave wave = createWave(nextWaveIndex++);
             openWave(wave);
         }
@@ -74,6 +69,14 @@ public final class WdWaveManager {
 
     public int getWaveOrdinal() {
         return nextWaveIndex;
+    }
+
+    public boolean isActive() {
+        return activeWave != null;
+    }
+
+    public double getNextWaveDistance() {
+        return game.map.waveStarts.getDouble(Math.min(nextWaveIndex, game.map.waveStarts.size() - 1));
     }
 
     private static int zombieCount(int wave) {

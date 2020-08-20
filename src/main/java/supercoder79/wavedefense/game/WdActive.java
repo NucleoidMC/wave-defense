@@ -15,7 +15,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
@@ -46,11 +45,9 @@ public final class WdActive {
 	public final Object2IntMap<PlayerRef> powerLevels = new Object2IntOpenHashMap<>();
 	public final WdBar bar;
 
-	private final WdBeacon beacon;
+	public final WdGuide guide;
 
 	private long gameCloseTick = Long.MAX_VALUE;
-
-	public final WdProgress progress;
 
 	private WdActive(GameWorld world, WdMap map, WdConfig config, Set<ServerPlayerEntity> participants) {
 		this.world = world;
@@ -60,10 +57,9 @@ public final class WdActive {
 
 		this.spawnLogic = new WdSpawnLogic(world, config);
 		this.waveManager = new WdWaveManager(this);
-		this.progress = new WdProgress(config, map);
 		this.bar = world.addResource(new WdBar(world));
 
-		this.beacon = new WdBeacon(this);
+		this.guide = new WdGuide(this);
 	}
 
 	public static void open(GameWorld world, WdMap map, WdConfig config) {
@@ -114,14 +110,12 @@ public final class WdActive {
 			return;
 		}
 
-		this.progress.tick(time, participants);
+		this.guide.tick(time, waveManager.isActive());
+		this.waveManager.tick(time, guide.getProgressBlocks());
 
-		this.waveManager.tick(time, progress.getProgressBlocks());
+		this.damageFarPlayers(guide.getCenterPos());
 
 		this.bar.tick(waveManager.getActiveWave());
-
-		Vec3d centerPos = this.progress.getCenterPos();
-		this.beacon.moveTo(MathHelper.floor(centerPos.getX()), MathHelper.floor(centerPos.getZ()));
 	}
 
 	private TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {
@@ -220,5 +214,27 @@ public final class WdActive {
 		PlayerRef ref = PlayerRef.of(player);
 		int level = map.getOrDefault(ref, 0);
 		map.put(ref, level + 1);
+	}
+
+	private void damageFarPlayers(Vec3d centerPos) {
+		int maxDistance = this.config.spawnRadius + 5;
+		double maxDistance2 = maxDistance * maxDistance;
+
+		for (ServerPlayerEntity player : participants) {
+			double deltaX = player.getX() - centerPos.getX();
+			double deltaZ = player.getZ() - centerPos.getZ();
+
+			if (deltaX * deltaX + deltaZ * deltaZ > maxDistance2) {
+				// Don't touch creative or spectator players
+				if (player.isCreative() || player.isSpectator()) {
+					continue;
+				}
+
+				LiteralText message = new LiteralText("You are too far away from your villager!");
+				player.sendMessage(message.formatted(Formatting.RED), true);
+
+				player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
+			}
+		}
 	}
 }

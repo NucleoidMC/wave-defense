@@ -29,7 +29,7 @@ public final class WdWaveSpawner {
 
         if (targetZombies > spawnedZombies) {
             ServerWorld world = game.world.getWorld();
-            Vec3d centerPos = game.progress.getCenterPos();
+            Vec3d centerPos = game.guide.getCenterPos();
 
             for (int i = spawnedZombies; i < targetZombies; i++) {
                 BlockPos pos = WdSpawnLogic.findSurfaceAround(centerPos, world, game.config);
