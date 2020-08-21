@@ -1,14 +1,13 @@
 package supercoder79.wavedefense.map.biome;
 
-import java.util.Random;
-
-import xyz.nucleoid.plasmid.game.gen.MapGen;
-import xyz.nucleoid.plasmid.game.gen.feature.PoplarTreeGen;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
+import xyz.nucleoid.plasmid.game.gen.MapGen;
+import xyz.nucleoid.plasmid.game.gen.feature.tree.PoplarTreeGen;
+
+import java.util.Random;
 
 public interface BiomeGen {
 	default double upperNoiseFactor() {
