@@ -14,10 +14,10 @@ import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.WdMapGenerator;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
+import xyz.nucleoid.plasmid.game.GameWaitingLobby;
 import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.StartResult;
 import xyz.nucleoid.plasmid.game.event.*;
-import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.world.bubble.BubbleWorldConfig;
@@ -42,8 +42,9 @@ public final class WdWaiting {
 
 	public static CompletableFuture<GameWorld> open(GameOpenContext<WdConfig> context) {
 		WdMapGenerator generator = new WdMapGenerator();
+		WdConfig config = context.getConfig();
 
-		return generator.create(context.getConfig())
+		return generator.create(config)
 				.thenCompose(map -> {
 					BubbleWorldConfig worldConfig = new BubbleWorldConfig()
 							.setGenerator(map.chunkGenerator(context.getServer()))
@@ -53,9 +54,9 @@ public final class WdWaiting {
 							.setDifficulty(Difficulty.NORMAL);
 
 					return context.openWorld(worldConfig).thenApply(gameWorld -> {
-						WdWaiting waiting = new WdWaiting(gameWorld, map, context.getConfig());
+						WdWaiting waiting = new WdWaiting(gameWorld, map, config);
 
-						gameWorld.openGame(game -> {
+						return GameWaitingLobby.open(gameWorld, config.playerConfig, game -> {
 							game.setRule(GameRule.CRAFTING, RuleResult.DENY);
 							game.setRule(GameRule.PORTALS, RuleResult.DENY);
 							game.setRule(GameRule.PVP, RuleResult.DENY);
@@ -63,7 +64,6 @@ public final class WdWaiting {
 							game.setRule(GameRule.HUNGER, RuleResult.DENY);
 
 							game.on(RequestStartListener.EVENT, waiting::requestStart);
-							game.on(OfferPlayerListener.EVENT, waiting::offerPlayer);
 
 							game.on(PlayerAddListener.EVENT, waiting::addPlayer);
 							game.on(PlayerDeathListener.EVENT, waiting::onPlayerDeath);
@@ -71,8 +71,6 @@ public final class WdWaiting {
 							game.on(UseBlockListener.EVENT, waiting::onUseBlock);
 							game.on(UseItemListener.EVENT, waiting::onUseItem);
 						});
-
-						return gameWorld;
 					});
 				});
 	}
@@ -89,21 +87,8 @@ public final class WdWaiting {
 		return TypedActionResult.success(player.getStackInHand(hand));
 	}
 
-	private JoinResult offerPlayer(ServerPlayerEntity player) {
-		if (this.world.getPlayerCount() >= this.config.playerConfig.getMaxPlayers()) {
-			return JoinResult.gameFull();
-		}
-
-		return JoinResult.ok();
-	}
-
 	private StartResult requestStart() {
-		if (this.world.getPlayerCount() < this.config.playerConfig.getMinPlayers()) {
-			return StartResult.NOT_ENOUGH_PLAYERS;
-		}
-
 		WdActive.open(this.world, this.map, this.config);
-
 		return StartResult.OK;
 	}
 

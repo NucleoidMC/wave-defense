@@ -1,16 +1,15 @@
 package supercoder79.wavedefense.map.biome.impl;
 
-import java.util.Random;
-
-import supercoder79.wavedefense.map.biome.BiomeGen;
-import supercoder79.wavedefense.map.feature.DeadTreeGen;
-import xyz.nucleoid.plasmid.game.gen.MapGen;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BuiltinBiomes;
+import supercoder79.wavedefense.map.biome.BiomeGen;
+import supercoder79.wavedefense.map.feature.DeadTreeGen;
+import xyz.nucleoid.plasmid.game.gen.MapGen;
+
+import java.util.Random;
 
 public final class DesertGen implements BiomeGen {
 	public static final DesertGen INSTANCE = new DesertGen();
@@ -32,7 +31,10 @@ public final class DesertGen implements BiomeGen {
 
 	@Override
 	public int treeAmt(Random random) {
-		return random.nextInt(2);
+		if (random.nextInt(3) == 0) {
+			return 1;
+		}
+		return 0;
 	}
 
 	@Override
