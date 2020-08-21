@@ -2,7 +2,8 @@
   "type": "wavedefense:wavedefense",
   "players": {
     "min": 1,
-    "max": 100
+    "max": 100,
+    "threshold": 3
   },
   "path": {
     "length": 1024,
