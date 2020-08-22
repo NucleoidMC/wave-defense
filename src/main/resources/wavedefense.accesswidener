@@ -1,0 +1,4 @@
+accessWidener v1 named
+
+accessible class net/minecraft/entity/mob/DrownedEntity$DrownedAttackGoal
+accessible class net/minecraft/entity/mob/DrownedEntity$TargetAboveWaterGoal

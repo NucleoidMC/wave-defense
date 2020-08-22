@@ -20,6 +20,7 @@
   "mixins": [
     "wavedefense.mixins.json"
   ],
+  "accessWidener": "wavedefense.accesswidener",
   "depends": {
     "fabricloader": ">=0.9.1+build.205",
     "fabric": "*",

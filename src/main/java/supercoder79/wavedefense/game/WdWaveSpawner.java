@@ -1,13 +1,15 @@
 package supercoder79.wavedefense.game;
 
-import java.util.Random;
-
-import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import supercoder79.wavedefense.entity.SillyZombieEntity;
+import supercoder79.wavedefense.entity.WaveDrownedEntity;
+import supercoder79.wavedefense.entity.WaveZombieEntity;
+
+import java.util.Random;
 
 public final class WdWaveSpawner {
     private static final long SPAWN_TICKS = 20 * 5;
@@ -47,10 +49,17 @@ public final class WdWaveSpawner {
     }
 
     private boolean spawnZombie(ServerWorld world, BlockPos pos) {
-        ZombieEntity zombie = new SillyZombieEntity(world, game, getRandomTier(world.getRandom(), wave.ordinal));
-        zombie.setPersistent();
+        int tier = getRandomTier(world.getRandom(), wave.ordinal);
+
+        MobEntity zombie;
+        if (world.containsFluid(new Box(pos).expand(1.0))) {
+            zombie = new WaveDrownedEntity(world, game, tier);
+        } else {
+            zombie = new WaveZombieEntity(world, game, tier);
+        }
 
         zombie.refreshPositionAndAngles(pos, 0, 0);
+        zombie.setPersistent();
 
         return world.spawnEntity(zombie);
     }

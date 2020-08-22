@@ -31,7 +31,7 @@ public final class DesertGen implements BiomeGen {
 
 	@Override
 	public int treeAmt(Random random) {
-		if (random.nextInt(3) == 0) {
+		if (random.nextInt(6) == 0) {
 			return 1;
 		}
 		return 0;
