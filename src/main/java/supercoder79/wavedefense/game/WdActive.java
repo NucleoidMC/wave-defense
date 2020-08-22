@@ -1,5 +1,11 @@
 package supercoder79.wavedefense.game;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.entity.LivingEntity;
@@ -20,17 +26,20 @@ import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.map.WdMap;
 import xyz.nucleoid.plasmid.game.GameWorld;
-import xyz.nucleoid.plasmid.game.event.*;
+import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
+import xyz.nucleoid.plasmid.game.event.GameOpenListener;
+import xyz.nucleoid.plasmid.game.event.GameTickListener;
+import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
+import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
+import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
+import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
+import xyz.nucleoid.plasmid.game.event.UseItemListener;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 import xyz.nucleoid.plasmid.util.PlayerRef;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public final class WdActive {
 	public final GameWorld world;
@@ -224,21 +233,24 @@ public final class WdActive {
 		int maxDistance = this.config.spawnRadius + 5;
 		double maxDistance2 = maxDistance * maxDistance;
 
+		List<ServerPlayerEntity> farPlayers = new ArrayList<>();
+
 		for (ServerPlayerEntity player : participants) {
 			double deltaX = player.getX() - centerPos.getX();
 			double deltaZ = player.getZ() - centerPos.getZ();
 
 			if (deltaX * deltaX + deltaZ * deltaZ > maxDistance2) {
-				// Don't touch creative or spectator players
-				if (player.isCreative() || player.isSpectator()) {
-					continue;
+				if (!player.isCreative() && !player.isSpectator()) {
+					farPlayers.add(player);
 				}
-
-				LiteralText message = new LiteralText("You are too far away from your villager!");
-				player.sendMessage(message.formatted(Formatting.RED), true);
-
-				player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
 			}
+		}
+
+		for (ServerPlayerEntity player : farPlayers) {
+			LiteralText message = new LiteralText("You are too far away from your villager!");
+			player.sendMessage(message.formatted(Formatting.RED), true);
+
+			player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
 		}
 	}
 }
