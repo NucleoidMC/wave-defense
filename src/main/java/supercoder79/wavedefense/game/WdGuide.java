@@ -28,9 +28,6 @@ public final class WdGuide implements PlayerSet.Listener {
     private Vec3d centerPos = Vec3d.ZERO;
     private double progressPercent;
 
-    private double lastBorderX;
-    private double lastBorderZ;
-
     private long pauseTime = -1;
 
     private int currentTargetIndex;
@@ -120,15 +117,17 @@ public final class WdGuide implements PlayerSet.Listener {
 
     private void updateWorldBorder() {
         WorldBorder worldBorder = getWorldBorder();
-        double deltaX = worldBorder.getCenterX() - lastBorderX;
-        double deltaZ = worldBorder.getCenterZ() - lastBorderZ;
+        double size = worldBorder.getSize();
 
-        if (deltaX * deltaX + deltaZ * deltaZ >= 0.25 * 0.25) {
-            PlayerSet players = game.world.getPlayerSet();
-            players.sendPacket(new WorldBorderS2CPacket(worldBorder, WorldBorderS2CPacket.Type.SET_CENTER));
+        for (ServerPlayerEntity player : game.world.getPlayerSet()) {
+            double deltaX = player.getX() - worldBorder.getCenterX();
+            double deltaZ = player.getZ() - worldBorder.getCenterZ();
 
-            lastBorderX = worldBorder.getCenterX();
-            lastBorderZ = worldBorder.getCenterZ();
+            boolean hidden = deltaX * deltaX + deltaZ * deltaZ < 1.5 * 1.5;
+            worldBorder.setSize(hidden ? 20000.0 : size);
+
+            player.networkHandler.sendPacket(new WorldBorderS2CPacket(worldBorder, WorldBorderS2CPacket.Type.SET_CENTER));
+            player.networkHandler.sendPacket(new WorldBorderS2CPacket(worldBorder, WorldBorderS2CPacket.Type.SET_SIZE));
         }
     }
 
@@ -143,7 +142,7 @@ public final class WdGuide implements PlayerSet.Listener {
         }
 
         worldBorder.setCenter(x, z);
-        worldBorder.setSize(0.5);
+        worldBorder.setSize(0.25);
         worldBorder.setDamagePerBlock(0.0);
         worldBorder.setWarningBlocks(-100000);
         worldBorder.setWarningTime(-100000);
