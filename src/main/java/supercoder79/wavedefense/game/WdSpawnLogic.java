@@ -30,6 +30,7 @@ public final class WdSpawnLogic {
         player.clearStatusEffects();
         player.setHealth(20.0F);
         player.getHungerManager().setFoodLevel(20);
+        player.getHungerManager().add(5, 0.5F);
         player.fallDistance = 0.0F;
         player.setGameMode(gameMode);
         player.setExperienceLevel(0);
