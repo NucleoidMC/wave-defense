@@ -6,6 +6,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+
+import supercoder79.wavedefense.entity.ZombieType;
 import supercoder79.wavedefense.entity.WaveDrownedEntity;
 import supercoder79.wavedefense.entity.WaveZombieEntity;
 
@@ -50,12 +52,13 @@ public final class WdWaveSpawner {
 
     private boolean spawnZombie(ServerWorld world, BlockPos pos) {
         int tier = getRandomTier(world.getRandom(), wave.ordinal);
+        ZombieType type = getZombieType(world.getRandom()); //TODO: scale based on ordinal
 
         MobEntity zombie;
         if (world.containsFluid(new Box(pos).expand(1.0))) {
-            zombie = new WaveDrownedEntity(world, game, tier);
+            zombie = new WaveDrownedEntity(world, game, type, tier);
         } else {
-            zombie = new WaveZombieEntity(world, game, tier);
+            zombie = new WaveZombieEntity(world, game, type, tier);
         }
 
         zombie.refreshPositionAndAngles(pos, 0, 0);
@@ -84,5 +87,19 @@ public final class WdWaveSpawner {
         } else {
             return 0;
         }
+    }
+
+    private ZombieType getZombieType(Random random) {
+        int r = random.nextInt(50);
+
+        if (r <= 1) { // 4% chance of withering
+            return ZombieType.WITHER;
+        } else if (r <= 5) { // 8% chance of poison
+            return ZombieType.POISON;
+        } else if (r <= 10) { // 10% chance of weakness
+            return ZombieType.WEAKNESS;
+        }
+
+        return ZombieType.NORMAL;
     }
 }

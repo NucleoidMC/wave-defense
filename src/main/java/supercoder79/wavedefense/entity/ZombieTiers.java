@@ -7,8 +7,8 @@ import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 
 public final class ZombieTiers {
-    public static void apply(ZombieEntity entity, int tier) {
-        entity.setCustomName(new LiteralText("T" + (tier + 1) + " Zombie"));
+    public static void apply(ZombieEntity entity, ZombieType type, int tier) {
+        entity.setCustomName(new LiteralText(type.prefix + "T" + (tier + 1) + " Zombie"));
 
         if (tier == 1) {
             entity.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.WOODEN_SWORD));
