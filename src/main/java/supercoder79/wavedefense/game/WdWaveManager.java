@@ -81,7 +81,6 @@ public final class WdWaveManager {
     }
 
     private int zombieCount(int ordinal) {
-        double zombiesPerPlayer = (0.1 * ordinal * ordinal) + (0.8 * ordinal) + 1.5;
-        return MathHelper.floor(game.groupSize * zombiesPerPlayer);
+        return MathHelper.floor((game.groupSize / 2.0) * (1.15 * ordinal));
     }
 }
