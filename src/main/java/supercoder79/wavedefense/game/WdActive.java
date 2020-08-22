@@ -1,11 +1,5 @@
 package supercoder79.wavedefense.game;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.entity.LivingEntity;
@@ -26,20 +20,15 @@ import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.map.WdMap;
 import xyz.nucleoid.plasmid.game.GameWorld;
-import xyz.nucleoid.plasmid.game.event.EntityDeathListener;
-import xyz.nucleoid.plasmid.game.event.GameOpenListener;
-import xyz.nucleoid.plasmid.game.event.GameTickListener;
-import xyz.nucleoid.plasmid.game.event.OfferPlayerListener;
-import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
-import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
-import xyz.nucleoid.plasmid.game.event.PlayerRemoveListener;
-import xyz.nucleoid.plasmid.game.event.UseItemListener;
+import xyz.nucleoid.plasmid.game.event.*;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 import xyz.nucleoid.plasmid.util.PlayerRef;
+
+import java.util.*;
 
 public final class WdActive {
 	public final GameWorld world;
