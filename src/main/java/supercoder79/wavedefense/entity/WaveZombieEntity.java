@@ -13,16 +13,16 @@ import supercoder79.wavedefense.game.WdActive;
 
 public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
     private final WdActive game;
-    private final ZombieType type;
-    private final int tier;
+    private final ZombieModifier mod;
+    private final ZombieClass zombieClass;
 
-    public WaveZombieEntity(World world, WdActive game, ZombieType type, int tier) {
+    public WaveZombieEntity(World world, WdActive game, ZombieModifier mod, ZombieClass zombieClass) {
         super(world);
         this.game = game;
-        this.type = type;
-        this.tier = tier;
+        this.mod = mod;
+        this.zombieClass = zombieClass;
 
-        ZombieTiers.apply(this, type, tier);
+        zombieClass.apply(this, mod);
     }
 
     @Override
@@ -40,8 +40,8 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
         boolean didAttack = super.tryAttack(target);
 
         if (didAttack) {
-            if (target instanceof LivingEntity && type.effect != null) {
-                ((LivingEntity)target).addStatusEffect(type.effect);
+            if (target instanceof LivingEntity && mod.effect != null) {
+                ((LivingEntity)target).addStatusEffect(mod.effect);
             }
         }
 
@@ -49,8 +49,8 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
     }
 
     @Override
-    public int getTier() {
-        return tier;
+    public int ironCount() {
+        return zombieClass.ironCount();
     }
 
     @Override

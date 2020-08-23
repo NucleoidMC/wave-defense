@@ -4,7 +4,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
 // Types of special zombies
-public enum ZombieType {
+public enum ZombieModifier {
 	NORMAL("", null),
 	POISON("Poisoning ", new StatusEffectInstance(StatusEffects.POISON, 100)),
 	WEAKNESS("Weakening ", new StatusEffectInstance(StatusEffects.WEAKNESS, 200)),
@@ -13,8 +13,7 @@ public enum ZombieType {
 	public final String prefix;
 	public final StatusEffectInstance effect;
 
-	ZombieType(String prefix, StatusEffectInstance effect) {
-
+	ZombieModifier(String prefix, StatusEffectInstance effect) {
 		this.prefix = prefix;
 		this.effect = effect;
 	}

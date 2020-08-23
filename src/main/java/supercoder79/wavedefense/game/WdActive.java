@@ -139,8 +139,7 @@ public final class WdActive {
 				if (source.getAttacker() instanceof ServerPlayerEntity) {
 					ServerPlayerEntity player = (ServerPlayerEntity) source.getAttacker();
 
-					int tier = ((WaveEntity) entity).getTier();
-					player.inventory.insertStack(new ItemStack(Items.IRON_INGOT, tier + 1));
+					player.inventory.insertStack(new ItemStack(Items.IRON_INGOT, ((WaveEntity) entity).ironCount()));
 				}
 			}
 

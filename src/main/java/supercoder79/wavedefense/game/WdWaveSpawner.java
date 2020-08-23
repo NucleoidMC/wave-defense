@@ -7,7 +7,9 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-import supercoder79.wavedefense.entity.ZombieType;
+import supercoder79.wavedefense.entity.ZombieClass;
+import supercoder79.wavedefense.entity.ZombieClasses;
+import supercoder79.wavedefense.entity.ZombieModifier;
 import supercoder79.wavedefense.entity.WaveDrownedEntity;
 import supercoder79.wavedefense.entity.WaveZombieEntity;
 
@@ -51,14 +53,14 @@ public final class WdWaveSpawner {
     }
 
     private boolean spawnZombie(ServerWorld world, BlockPos pos) {
-        int tier = getRandomTier(world.getRandom(), wave.ordinal);
-        ZombieType type = getZombieType(world.getRandom()); //TODO: scale based on ordinal
+        ZombieClass zombieClass = getZombieClass(world.getRandom(), wave.ordinal);
+        ZombieModifier mod = getZombieModifier(world.getRandom()); //TODO: scale based on ordinal
 
         MobEntity zombie;
         if (world.containsFluid(new Box(pos).expand(1.0))) {
-            zombie = new WaveDrownedEntity(world, game, type, tier);
+            zombie = new WaveDrownedEntity(world, game, mod, ZombieClasses.DROWNED);
         } else {
-            zombie = new WaveZombieEntity(world, game, type, tier);
+            zombie = new WaveZombieEntity(world, game, mod, zombieClass);
         }
 
         zombie.refreshPositionAndAngles(pos, 0, 0);
@@ -67,39 +69,25 @@ public final class WdWaveSpawner {
         return world.spawnEntity(zombie);
     }
 
-    private int getRandomTier(Random random, int waveOrdinal) {
-        // T2: waves 10 - 20
-        double t2Chance = MathHelper.clamp((0.1 * waveOrdinal) - 1, 0, 1);
-        // T3: waves 20 - 30
-        double t3Chance = MathHelper.clamp((0.1 * waveOrdinal) - 2, 0, 1);
-
-        if (Math.random() < t3Chance) {
-            // Instead of T3, T4s will have an increasing chance to spawn.
-            double t4Chance = 500.0 / (waveOrdinal - 15);
-
-            if (random.nextInt((int) t4Chance) == 0) {
-                return 3;
-            }
-
-            return 2;
-        } else if (Math.random() < t2Chance) {
-            return 1;
-        } else {
-            return 0;
+    private ZombieClass getZombieClass(Random random, int waveOrdinal) {
+        if (waveOrdinal > 5 && random.nextInt((int) (500.0 / (waveOrdinal - 5))) == 0) {
+            return ZombieClasses.KNIGHT;
         }
+
+        return ZombieClasses.DEFAULT;
     }
 
-    private ZombieType getZombieType(Random random) {
+    private ZombieModifier getZombieModifier(Random random) {
         int r = random.nextInt(50);
 
         if (r <= 1) { // 4% chance of withering
-            return ZombieType.WITHER;
+            return ZombieModifier.WITHER;
         } else if (r <= 5) { // 8% chance of poison
-            return ZombieType.POISON;
+            return ZombieModifier.POISON;
         } else if (r <= 10) { // 10% chance of weakness
-            return ZombieType.WEAKNESS;
+            return ZombieModifier.WEAKNESS;
         }
 
-        return ZombieType.NORMAL;
+        return ZombieModifier.NORMAL;
     }
 }
