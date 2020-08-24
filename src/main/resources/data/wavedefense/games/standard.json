@@ -10,7 +10,60 @@
     "segment_length": 32,
     "radius": 4.0
   },
+  "enemies": [
+    {
+      "name": "Horde Zombie",
+      "reward": 1,
+      "danger": 16.0,
+      "class": {
+        "type": "wavedefense:zombie"
+      }
+    },
+    {
+      "name": "Knight Zombie",
+      "reward": 3,
+      "danger": 32.0,
+      "class": {
+        "type": "wavedefense:zombie",
+        "equipment": {
+          "hand": "minecraft:iron_sword",
+          "head": "minecraft:iron_helmet",
+          "chest": "minecraft:iron_chestplate",
+          "legs": "minecraft:iron_leggings",
+          "feet": "minecraft:iron_boots"
+        }
+      }
+    },
+    {
+      "name": "Withering Horde Zombie",
+      "reward": 1,
+      "danger": 24.0,
+      "class": {
+        "type": "wavedefense:zombie",
+        "modifiers": [
+          {
+            "type": "minecraft:wither",
+            "duration": 100
+          }
+        ]
+      }
+    },
+    {
+      "name": "Drowned",
+      "reward": 1,
+      "danger": 16.0,
+      "class": {
+        "type": "wavedefense:drowned"
+      }
+    }
+  ],
   "min_wave_spacing": 30.0,
   "max_wave_spacing": 60.0,
-  "spawn_radius": 32
+  "play_radius": 32,
+  "spawn_radius": 8,
+  "danger": {
+    "idle_start": 20.0,
+    "idle_end": 100.0,
+    "stray_scale": 1.0
+  }
 }

@@ -18,6 +18,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
+import supercoder79.wavedefense.entity.config.EnemyConfig;
 import supercoder79.wavedefense.map.WdMap;
 import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.event.*;
@@ -34,16 +35,15 @@ public final class WdActive {
 	public final GameWorld world;
 	public final WdMap map;
 	public final WdConfig config;
-	private final Set<ServerPlayerEntity> participants;
+	public final Set<ServerPlayerEntity> participants;
 	private final WdSpawnLogic spawnLogic;
-	public final WdWaveManager waveManager;
 	private final Object2IntMap<UUID> playerKillAmounts = new Object2IntOpenHashMap<>();
 	public final Object2IntMap<PlayerRef> sharpnessLevels = new Object2IntOpenHashMap<>();
 	public final Object2IntMap<PlayerRef> protectionLevels = new Object2IntOpenHashMap<>();
 	public final Object2IntMap<PlayerRef> powerLevels = new Object2IntOpenHashMap<>();
-	public final WdBar bar;
 
-	public final WdGuide guide;
+	public final WdEnemySpawner enemySpawner;
+	public final DangerField dangerField;
 
 	private long gameCloseTick = Long.MAX_VALUE;
 
@@ -56,10 +56,9 @@ public final class WdActive {
 		this.participants = participants;
 
 		this.spawnLogic = new WdSpawnLogic(world, config);
-		this.waveManager = new WdWaveManager(this);
-		this.bar = world.addResource(new WdBar(world));
 
-		this.guide = new WdGuide(this);
+		this.enemySpawner = new WdEnemySpawner(this);
+		this.dangerField = new DangerField(config);
 
 		this.groupSize = participants.size();
 	}
@@ -112,12 +111,8 @@ public final class WdActive {
 			return;
 		}
 
-		this.guide.tick(time, waveManager.isActive());
-		this.waveManager.tick(time, guide.getProgressBlocks());
-
-		this.damageFarPlayers(guide.getCenterPos());
-
-		this.bar.tick(waveManager.getActiveWave());
+		this.dangerField.update(Vec3d.ZERO, config.danger.idleStart);
+		this.enemySpawner.tick(time);
 	}
 
 	private TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {
@@ -132,14 +127,14 @@ public final class WdActive {
 
 	private ActionResult onEntityDeath(LivingEntity entity, DamageSource source) {
 		if (entity instanceof WaveEntity) {
-			WdWave activeWave = waveManager.getActiveWave();
-			if (activeWave != null) {
-				activeWave.onZombieKilled();
+			dangerField.removeEntity((WaveEntity) entity);
 
-				if (source.getAttacker() instanceof ServerPlayerEntity) {
-					ServerPlayerEntity player = (ServerPlayerEntity) source.getAttacker();
+			if (source.getAttacker() instanceof ServerPlayerEntity) {
+				ServerPlayerEntity player = (ServerPlayerEntity) source.getAttacker();
 
-					player.inventory.insertStack(new ItemStack(Items.IRON_INGOT, ((WaveEntity) entity).ironCount()));
+				EnemyConfig enemyConfig = ((WaveEntity) entity).getEnemyConfig();
+				if (enemyConfig.reward > 0) {
+					player.inventory.insertStack(new ItemStack(Items.IRON_INGOT, enemyConfig.reward));
 				}
 			}
 
@@ -155,8 +150,7 @@ public final class WdActive {
 		if (participants.isEmpty()) {
 			// Display win results
 			PlayerSet players = world.getPlayerSet();
-			players.sendMessage(new LiteralText("All players died....").formatted(Formatting.DARK_RED));
-			players.sendMessage(new LiteralText("You made it to wave " + waveManager.getWaveOrdinal() + ".").formatted(Formatting.DARK_RED));
+			players.sendMessage(new LiteralText("All players died...").formatted(Formatting.DARK_RED));
 
 			// Close game in 10 secs
 			gameCloseTick = this.world.getWorld().getTime() + (10 * 20);
@@ -215,30 +209,5 @@ public final class WdActive {
 		PlayerRef ref = PlayerRef.of(player);
 		int level = map.getOrDefault(ref, 0);
 		map.put(ref, level + 1);
-	}
-
-	private void damageFarPlayers(Vec3d centerPos) {
-		int maxDistance = this.config.spawnRadius + 5;
-		double maxDistance2 = maxDistance * maxDistance;
-
-		List<ServerPlayerEntity> farPlayers = new ArrayList<>();
-
-		for (ServerPlayerEntity player : participants) {
-			double deltaX = player.getX() - centerPos.getX();
-			double deltaZ = player.getZ() - centerPos.getZ();
-
-			if (deltaX * deltaX + deltaZ * deltaZ > maxDistance2) {
-				if (!player.isCreative() && !player.isSpectator()) {
-					farPlayers.add(player);
-				}
-			}
-		}
-
-		for (ServerPlayerEntity player : farPlayers) {
-			LiteralText message = new LiteralText("You are too far away from your villager!");
-			player.sendMessage(message.formatted(Formatting.RED), true);
-
-			player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
-		}
 	}
 }

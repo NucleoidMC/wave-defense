@@ -8,21 +8,23 @@ import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
+import supercoder79.wavedefense.entity.config.EnemyConfig;
+import supercoder79.wavedefense.entity.config.ZombieClass;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
 import supercoder79.wavedefense.game.WdActive;
 
 public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
     private final WdActive game;
-    private final ZombieModifier mod;
+    private final EnemyConfig enemyConfig;
     private final ZombieClass zombieClass;
 
-    public WaveZombieEntity(World world, WdActive game, ZombieModifier mod, ZombieClass zombieClass) {
+    public WaveZombieEntity(World world, WdActive game, EnemyConfig enemyConfig, ZombieClass zombieClass) {
         super(world);
         this.game = game;
-        this.mod = mod;
+        this.enemyConfig = enemyConfig;
         this.zombieClass = zombieClass;
 
-        zombieClass.apply(this, mod);
+        this.zombieClass.equipment.applyTo(this);
     }
 
     @Override
@@ -38,19 +40,16 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
     @Override
     public boolean tryAttack(Entity target) {
         boolean didAttack = super.tryAttack(target);
-
-        if (didAttack) {
-            if (target instanceof LivingEntity && mod.effect != null) {
-                ((LivingEntity)target).addStatusEffect(mod.effect);
-            }
+        if (didAttack && target instanceof LivingEntity) {
+            this.zombieClass.modifiers.applyTo((LivingEntity) target);
         }
 
         return didAttack;
     }
 
     @Override
-    public int ironCount() {
-        return zombieClass.ironCount();
+    public EnemyConfig getEnemyConfig() {
+        return this.enemyConfig;
     }
 
     @Override

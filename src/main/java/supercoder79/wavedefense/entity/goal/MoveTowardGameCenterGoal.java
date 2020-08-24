@@ -22,7 +22,7 @@ public final class MoveTowardGameCenterGoal<T extends PathAwareEntity & WaveEnti
         if (entity.getNavigation().isIdle()) {
             WdActive game = entity.getGame();
             double distance2 = entity.squaredDistanceTo(game.guide.getCenterPos());
-            return distance2 > game.config.spawnRadius * game.config.spawnRadius;
+            return distance2 > game.config.playRadius * game.config.playRadius;
         }
         return false;
     }

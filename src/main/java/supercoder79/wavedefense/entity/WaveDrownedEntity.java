@@ -9,21 +9,23 @@ import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
+import supercoder79.wavedefense.entity.config.DrownedClass;
+import supercoder79.wavedefense.entity.config.EnemyConfig;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
 import supercoder79.wavedefense.game.WdActive;
 
 public final class WaveDrownedEntity extends DrownedEntity implements WaveEntity {
     private final WdActive game;
-    private final ZombieModifier mod;
-    private final ZombieClass zombieClass;
+    private final EnemyConfig enemyConfig;
+    private final DrownedClass drownedClass;
 
-    public WaveDrownedEntity(World world, WdActive game, ZombieModifier mod, ZombieClass zombieClass) {
+    public WaveDrownedEntity(World world, WdActive game, EnemyConfig enemyConfig, DrownedClass drownedClass) {
         super(EntityType.DROWNED, world);
         this.game = game;
-        this.mod = mod;
-        this.zombieClass = zombieClass;
+        this.enemyConfig = enemyConfig;
+        this.drownedClass = drownedClass;
 
-        zombieClass.apply(this, mod);
+        this.drownedClass.equipment.applyTo(this);
     }
 
     @Override
@@ -39,19 +41,16 @@ public final class WaveDrownedEntity extends DrownedEntity implements WaveEntity
     @Override
     public boolean tryAttack(Entity target) {
         boolean didAttack = super.tryAttack(target);
-
-        if (didAttack) {
-            if (target instanceof LivingEntity && mod.effect != null) {
-                ((LivingEntity)target).addStatusEffect(mod.effect);
-            }
+        if (didAttack && target instanceof LivingEntity) {
+            this.drownedClass.modifiers.applyTo((LivingEntity) target);
         }
 
         return didAttack;
     }
 
     @Override
-    public int ironCount() {
-        return zombieClass.ironCount();
+    public EnemyConfig getEnemyConfig() {
+        return enemyConfig;
     }
 
     @Override

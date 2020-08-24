@@ -11,6 +11,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
+import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.plasmid.game.GameWorld;
 
 import java.util.Random;
@@ -47,26 +48,37 @@ public final class WdSpawnLogic {
         player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0F, 0.0F);
     }
 
+    @Nullable
+    public static BlockPos findSurfaceAt(ServerWorld world, BlockPos pos) {
+        BlockPos.Mutable mutablePos = pos.mutableCopy();
+
+        int topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING, pos.getX(), pos.getZ());
+        mutablePos.setY(topY - 1);
+
+        BlockState ground = world.getBlockState(mutablePos);
+        if (ground.getBlock().isIn(BlockTags.LEAVES)) {
+            return null;
+        }
+
+        mutablePos.move(Direction.UP);
+        return mutablePos.toImmutable();
+    }
+
     public static BlockPos findSurfaceAround(Vec3d centerPos, ServerWorld world, WdConfig config) {
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
 
         while (true) {
             Random random = world.getRandom();
-            double x = centerPos.x + random.nextInt(config.spawnRadius) - random.nextInt(config.spawnRadius);
-            double z = centerPos.z + random.nextInt(config.spawnRadius) - random.nextInt(config.spawnRadius);
+            double x = centerPos.x + random.nextInt(config.playRadius) - random.nextInt(config.playRadius);
+            double z = centerPos.z + random.nextInt(config.playRadius) - random.nextInt(config.playRadius);
             mutablePos.set(x, 0, z);
 
             world.getChunk(mutablePos);
-            int topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING, mutablePos.getX(), mutablePos.getZ());
-            mutablePos.setY(topY - 1);
 
-            BlockState ground = world.getBlockState(mutablePos);
-            if (ground.getBlock().isIn(BlockTags.LEAVES)) {
-                continue;
+            BlockPos surface = findSurfaceAt(world, mutablePos);
+            if (surface != null) {
+                return surface;
             }
-
-            mutablePos.move(Direction.UP);
-            return mutablePos.toImmutable();
         }
     }
 }

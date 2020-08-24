@@ -52,7 +52,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 		super(server);
 		this.config = config;
 
-		int minBarrierRadius = config.spawnRadius + 1;
+		int minBarrierRadius = config.playRadius + 1;
 		int maxBarrierRadius = minBarrierRadius + 1;
 		this.minBarrierRadius2 = minBarrierRadius * minBarrierRadius;
 		this.maxBarrierRadius2 = maxBarrierRadius * maxBarrierRadius;
