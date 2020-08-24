@@ -17,11 +17,16 @@ public final class MoveTowardGameCenterGoal<T extends PathAwareEntity & WaveEnti
         this.setControls(EnumSet.of(Control.MOVE));
     }
 
+    private Vec3d getGameCenter() {
+        // TODO
+        return Vec3d.ZERO;
+    }
+
     @Override
     public boolean canStart() {
         if (entity.getNavigation().isIdle()) {
             WdActive game = entity.getGame();
-            double distance2 = entity.squaredDistanceTo(game.guide.getCenterPos());
+            double distance2 = entity.squaredDistanceTo(getGameCenter());
             return distance2 > game.config.playRadius * game.config.playRadius;
         }
         return false;
@@ -29,9 +34,7 @@ public final class MoveTowardGameCenterGoal<T extends PathAwareEntity & WaveEnti
 
     @Override
     public void start() {
-        WdActive game = entity.getGame();
-        Vec3d center = game.guide.getCenterPos();
-        Vec3d target = TargetFinder.findTargetTowards(entity, 15, 15, center);
+        Vec3d target = TargetFinder.findTargetTowards(entity, 15, 15, getGameCenter());
 
         if (target != null) {
             entity.getNavigation().startMovingTo(target.x, target.y, target.z, 1.0);
