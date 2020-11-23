@@ -96,7 +96,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 				BlockState underwater = biome.underWaterState();
 
 				double erosionThreshold = 1.8 + this.erosionNoise.eval(x / 2.0, z / 2.0) * 0.5;
-				if (slope > erosionThreshold) {
+				if (slope * slope > erosionThreshold * erosionThreshold) {
 					surface = underwater = subsoil = Blocks.STONE.getDefaultState();
 				}
 

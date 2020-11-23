@@ -27,7 +27,7 @@ public final class WdHeightSampler {
 
         double dx = cache.getHeight(x - 1, z) - cache.getHeight(x + 1, z);
         double dz = cache.getHeight(x, z - 1) - cache.getHeight(x, z + 1);
-        return Math.sqrt(dx * dx + dz * dz);
+        return dx * dx + dz * dz;
     }
 
     // Gets the height at a position from the cache, if possible.
