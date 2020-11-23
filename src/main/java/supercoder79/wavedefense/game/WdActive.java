@@ -241,4 +241,8 @@ public final class WdActive {
 			player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
 		}
 	}
+
+	public Set<ServerPlayerEntity> getParticipants() {
+		return participants;
+	}
 }
