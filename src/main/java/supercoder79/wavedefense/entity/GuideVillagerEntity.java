@@ -2,6 +2,7 @@ package supercoder79.wavedefense.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -26,6 +27,7 @@ public final class GuideVillagerEntity extends VillagerEntity {
 
     @Override
     protected void initGoals() {
+        this.goalSelector.add(0, new SwimGoal(this));
     }
 
     @Override
