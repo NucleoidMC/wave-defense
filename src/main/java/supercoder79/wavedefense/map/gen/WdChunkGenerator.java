@@ -27,6 +27,7 @@ import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
 import supercoder79.wavedefense.map.feature.CactusGen;
+import supercoder79.wavedefense.map.feature.ChestGen;
 import supercoder79.wavedefense.map.feature.ImprovedDiskGen;
 import supercoder79.wavedefense.map.feature.ShrubGen;
 import xyz.nucleoid.plasmid.game.gen.feature.GrassGen;
@@ -48,6 +49,8 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 	private final int minBarrierRadius2;
 	private final int maxBarrierRadius2;
 
+	private final ChestGen chestGen;
+
 	public WdChunkGenerator(MinecraftServer server, WdConfig config, WdMap map) {
 		super(server);
 		this.config = config;
@@ -66,6 +69,8 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 
 		this.map = map;
 		this.pathRadius = map.config.path.radius;
+
+		this.chestGen = new ChestGen(map.path);
 	}
 
 	@Override
@@ -226,6 +231,14 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 			int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
 			CactusGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+		}
+
+		if (random.nextInt(6) == 0) {
+			int x = chunkX + random.nextInt(16);
+			int z = chunkZ + random.nextInt(16);
+			int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+
+			chestGen.generate(region, mutable.set(x, y, z).toImmutable(), random);
 		}
 	}
 

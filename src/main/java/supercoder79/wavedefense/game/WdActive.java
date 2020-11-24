@@ -2,6 +2,8 @@ package supercoder79.wavedefense.game;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
@@ -15,6 +17,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
@@ -41,6 +45,7 @@ public final class WdActive {
 	public final Object2IntMap<PlayerRef> sharpnessLevels = new Object2IntOpenHashMap<>();
 	public final Object2IntMap<PlayerRef> protectionLevels = new Object2IntOpenHashMap<>();
 	public final Object2IntMap<PlayerRef> powerLevels = new Object2IntOpenHashMap<>();
+	private final Set<BlockPos> openedChests = new HashSet<>();
 	public final WdBar bar;
 
 	public final WdGuide guide;
@@ -75,6 +80,7 @@ public final class WdActive {
 			game.setRule(GameRule.FALL_DAMAGE, RuleResult.ALLOW);
 			game.setRule(GameRule.HUNGER, RuleResult.ALLOW);
 			game.setRule(GameRule.THROW_ITEMS, RuleResult.DENY);
+			game.setRule(GameRule.INTERACTION, RuleResult.ALLOW);
 
 			game.on(GameOpenListener.EVENT, active::open);
 			game.on(OfferPlayerListener.EVENT, player -> JoinResult.ok());
@@ -86,6 +92,7 @@ public final class WdActive {
 
 			game.on(PlayerDeathListener.EVENT, active::onPlayerDeath);
 			game.on(EntityDeathListener.EVENT, active::onEntityDeath);
+			game.on(UseBlockListener.EVENT, active::onUseBlock);
 		});
 	}
 
@@ -163,6 +170,24 @@ public final class WdActive {
 		}
 
 		return ActionResult.FAIL;
+	}
+
+	private ActionResult onUseBlock(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
+		if (this.world.getWorld().getBlockState(hitResult.getBlockPos()).isOf(Blocks.CHEST)) {
+			if (!this.openedChests.contains(hitResult.getBlockPos())) {
+				for (ServerPlayerEntity participant : this.participants) {
+					participant.sendMessage(new LiteralText(player.getDisplayName() + " has found a loot chest!"), false);
+					participant.sendMessage(new LiteralText("You recieved 12 iron."), false);
+					participant.inventory.insertStack(new ItemStack(Items.IRON_INGOT, 12));
+				}
+
+				this.openedChests.add(hitResult.getBlockPos());
+			}
+
+			return ActionResult.FAIL;
+		}
+
+		return ActionResult.PASS;
 	}
 
 	private void spawnParticipant(ServerPlayerEntity player) {
