@@ -14,7 +14,7 @@ import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import java.util.List;
 import java.util.Random;
 
-public final class WdGuide implements PlayerSet.Listener {
+public final class WdGuide {
     private static final float PAUSE_CHANCE = 1.0F / (20.0F * 15.0F);
     private static final long PAUSE_DURATION = 20 * 3;
 
@@ -36,8 +36,7 @@ public final class WdGuide implements PlayerSet.Listener {
         this.game = game;
         this.world = game.space.getWorld();
 
-        PlayerSet players = game.space.getPlayerSet();
-        players.addListener(this);
+        PlayerSet players = game.space.getPlayers();
 
         for (ServerPlayerEntity player : players) {
             this.onAddPlayer(player);
@@ -109,7 +108,6 @@ public final class WdGuide implements PlayerSet.Listener {
         return false;
     }
 
-    @Override
     public void onAddPlayer(ServerPlayerEntity player) {
         WorldBorder worldBorder = getWorldBorder();
         player.networkHandler.sendPacket(new WorldBorderS2CPacket(worldBorder, WorldBorderS2CPacket.Type.INITIALIZE));
@@ -119,7 +117,7 @@ public final class WdGuide implements PlayerSet.Listener {
         WorldBorder worldBorder = getWorldBorder();
         double size = worldBorder.getSize();
 
-        for (ServerPlayerEntity player : game.space.getPlayerSet()) {
+        for (ServerPlayerEntity player : game.space.getPlayers()) {
             double deltaX = player.getX() - worldBorder.getCenterX();
             double deltaZ = player.getZ() - worldBorder.getCenterZ();
 

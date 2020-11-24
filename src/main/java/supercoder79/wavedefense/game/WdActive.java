@@ -24,7 +24,6 @@ import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.map.WdMap;
 import xyz.nucleoid.plasmid.game.GameSpace;
-import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.event.*;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
@@ -108,7 +107,7 @@ public final class WdActive {
 	}
 
 	private void removePlayer(ServerPlayerEntity player) {
-		// TODO: reiimplement
+		// TODO: reimplement
 	}
 
 	private void tick() {
@@ -194,6 +193,7 @@ public final class WdActive {
 	private void spawnParticipant(ServerPlayerEntity player) {
 		this.spawnLogic.resetPlayer(player, GameMode.ADVENTURE);
 		this.spawnLogic.spawnPlayer(player);
+		this.guide.onAddPlayer(player);
 
 		player.inventory.insertStack(0,
 				ItemStackBuilder.of(Items.IRON_SWORD)
@@ -214,9 +214,10 @@ public final class WdActive {
 	}
 
 	private void eliminatePlayer(ServerPlayerEntity player) {
-		if (!participants.remove(player)) {
-			return;
-		}
+		// TODO: reimplement
+//		if (!participants.remove(player)) {
+//			return;
+//		}
 
 		Text message = player.getDisplayName().shallowCopy().append(" succumbed to the zombies....")
 				.formatted(Formatting.RED);
@@ -268,7 +269,7 @@ public final class WdActive {
 		}
 	}
 
-	public Set<ServerPlayerEntity> getParticipants() {
+	public PlayerSet getParticipants() {
 		return participants;
 	}
 }
