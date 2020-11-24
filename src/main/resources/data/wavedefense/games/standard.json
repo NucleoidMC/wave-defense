@@ -1,5 +1,6 @@
 {
   "type": "wavedefense:wavedefense",
+  "name": "Wave Defense",
   "players": {
     "min": 1,
     "max": 100,

@@ -29,14 +29,10 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "xyz.nucleoid:plasmid:0.3.4"
+    modImplementation "xyz.nucleoid:plasmid:0.4.0"
 
     implementation "kdotjpg:open-simplex:2.0"
     include "kdotjpg:open-simplex:2.0"
-
-//    modRuntime ("com.github.jellysquid3:sodium-fabric:b9c2ad3c38b16275cf2f1a81dcfb2fee1563905b")
-//    modRuntime ("com.github.jellysquid3:phosphor-fabric:0749029a498e8f6574643285bae7aecb2eda76b8")
-//    modRuntime ("com.github.jellysquid3:lithium-fabric:6e33b68cd309ca13c661dedd98670729419ff56c")
 
     modRuntime ("com.github.SuperCoder7979:databreaker:0.2.6") {
         exclude module : "fabric-loader"

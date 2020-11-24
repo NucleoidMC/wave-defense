@@ -32,7 +32,7 @@ public final class WdWaveManager {
         }
 
         if (waveSpawner == null && wave.remainingZombies <= 0) {
-            PlayerSet players = game.world.getPlayerSet();
+            PlayerSet players = game.space.getPlayerSet();
             players.sendMessage(new LiteralText("The wave has ended!"));
 
             activeWave = null;
@@ -54,7 +54,7 @@ public final class WdWaveManager {
         activeWave = wave;
         waveSpawner = new WdWaveSpawner(game, wave);
 
-        PlayerSet players = game.world.getPlayerSet();
+        PlayerSet players = game.space.getPlayerSet();
         players.sendMessage(new LiteralText("Wave #" + wave.ordinal + " with " + wave.totalZombies + " zombies is coming!"));
     }
 

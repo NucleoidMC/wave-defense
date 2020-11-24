@@ -34,9 +34,9 @@ public final class WdGuide implements PlayerSet.Listener {
 
     public WdGuide(WdActive game) {
         this.game = game;
-        this.world = game.world.getWorld();
+        this.world = game.space.getWorld();
 
-        PlayerSet players = game.world.getPlayerSet();
+        PlayerSet players = game.space.getPlayerSet();
         players.addListener(this);
 
         for (ServerPlayerEntity player : players) {
@@ -119,7 +119,7 @@ public final class WdGuide implements PlayerSet.Listener {
         WorldBorder worldBorder = getWorldBorder();
         double size = worldBorder.getSize();
 
-        for (ServerPlayerEntity player : game.world.getPlayerSet()) {
+        for (ServerPlayerEntity player : game.space.getPlayerSet()) {
             double deltaX = player.getX() - worldBorder.getCenterX();
             double deltaZ = player.getZ() - worldBorder.getCenterZ();
 

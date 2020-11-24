@@ -4,7 +4,7 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.plasmid.game.GameWorld;
+import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.widget.BossBarWidget;
 
@@ -12,9 +12,9 @@ public final class WdBar implements AutoCloseable {
     private final BossBarWidget bar;
     private final LiteralText idleTitle = new LiteralText("Wave Defense");
 
-    public WdBar(GameWorld world) {
-        PlayerSet players = world.getPlayerSet();
-        this.bar = BossBarWidget.open(players, idleTitle, BossBar.Color.GREEN, BossBar.Style.PROGRESS);
+    public WdBar(GameSpace space) {
+        PlayerSet players = space.getPlayers();
+        this.bar = new BossBarWidget(space, idleTitle, BossBar.Color.GREEN, BossBar.Style.PROGRESS);
     }
 
     public void tick(@Nullable WdWave wave) {

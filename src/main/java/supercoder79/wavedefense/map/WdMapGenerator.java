@@ -10,10 +10,6 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 public final class WdMapGenerator {
-    public CompletableFuture<WdMap> create(WdConfig config) {
-        return CompletableFuture.supplyAsync(() -> build(config), Util.getMainWorkerExecutor());
-    }
-
     public WdMap build(WdConfig config) {
         WdPath path = WdPath.generate(config.path.length, config.path.segmentLength);
 

@@ -23,6 +23,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.map.WdMap;
+import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.event.*;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
@@ -35,10 +36,10 @@ import xyz.nucleoid.plasmid.util.PlayerRef;
 import java.util.*;
 
 public final class WdActive {
-	public final GameWorld world;
+	public final GameSpace space;
 	public final WdMap map;
 	public final WdConfig config;
-	private final Set<ServerPlayerEntity> participants;
+	private final PlayerSet participants;
 	private final WdSpawnLogic spawnLogic;
 	public final WdWaveManager waveManager;
 	private final Object2IntMap<UUID> playerKillAmounts = new Object2IntOpenHashMap<>();
@@ -54,23 +55,23 @@ public final class WdActive {
 
 	public final int groupSize;
 
-	private WdActive(GameWorld world, WdMap map, WdConfig config, Set<ServerPlayerEntity> participants) {
-		this.world = world;
+	private WdActive(GameSpace space, WdMap map, WdConfig config, PlayerSet participants) {
+		this.space = space;
 		this.map = map;
 		this.config = config;
 		this.participants = participants;
 
-		this.spawnLogic = new WdSpawnLogic(world, config);
+		this.spawnLogic = new WdSpawnLogic(this.space, config);
 		this.waveManager = new WdWaveManager(this);
-		this.bar = world.addResource(new WdBar(world));
+		this.bar = this.space.addResource(new WdBar(this.space));
 
 		this.guide = new WdGuide(this);
 
 		this.groupSize = participants.size();
 	}
 
-	public static void open(GameWorld world, WdMap map, WdConfig config) {
-		WdActive active = new WdActive(world, map, config, new HashSet<>(world.getPlayers()));
+	public static void open(GameSpace world, WdMap map, WdConfig config) {
+		WdActive active = new WdActive(world, map, config, world.getPlayers());
 
 		world.openGame(game -> {
 			game.setRule(GameRule.CRAFTING, RuleResult.ALLOW);
@@ -107,15 +108,15 @@ public final class WdActive {
 	}
 
 	private void removePlayer(ServerPlayerEntity player) {
-		this.participants.remove(player);
+		// TODO: reiimplement
 	}
 
 	private void tick() {
-		ServerWorld world = this.world.getWorld();
+		ServerWorld world = this.space.getWorld();
 		long time = world.getTime();
 
 		if (time > gameCloseTick) {
-			this.world.close();
+			this.space.close();
 			return;
 		}
 
@@ -161,19 +162,19 @@ public final class WdActive {
 
 		if (participants.isEmpty()) {
 			// Display win results
-			PlayerSet players = world.getPlayerSet();
+			PlayerSet players = space.getPlayers();
 			players.sendMessage(new LiteralText("All players died....").formatted(Formatting.DARK_RED));
 			players.sendMessage(new LiteralText("You made it to wave " + waveManager.getWaveOrdinal() + ".").formatted(Formatting.DARK_RED));
 
 			// Close game in 10 secs
-			gameCloseTick = this.world.getWorld().getTime() + (10 * 20);
+			gameCloseTick = this.space.getWorld().getTime() + (10 * 20);
 		}
 
 		return ActionResult.FAIL;
 	}
 
 	private ActionResult onUseBlock(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
-		if (this.world.getWorld().getBlockState(hitResult.getBlockPos()).isOf(Blocks.CHEST)) {
+		if (this.space.getWorld().getBlockState(hitResult.getBlockPos()).isOf(Blocks.CHEST)) {
 			if (!this.openedChests.contains(hitResult.getBlockPos())) {
 				for (ServerPlayerEntity participant : this.participants) {
 					participant.sendMessage(new LiteralText(player.getDisplayName() + " has found a loot chest!"), false);
@@ -220,7 +221,7 @@ public final class WdActive {
 		Text message = player.getDisplayName().shallowCopy().append(" succumbed to the zombies....")
 				.formatted(Formatting.RED);
 
-		PlayerSet players = this.world.getPlayerSet();
+		PlayerSet players = this.space.getPlayers();
 		players.sendMessage(message);
 		players.sendSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP);
 

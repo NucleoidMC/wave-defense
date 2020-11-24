@@ -13,26 +13,30 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.WdMapGenerator;
+import xyz.nucleoid.fantasy.BubbleWorldConfig;
+import xyz.nucleoid.fantasy.BubbleWorldSpawner;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
+import xyz.nucleoid.plasmid.game.GameOpenProcedure;
+import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.GameWaitingLobby;
-import xyz.nucleoid.plasmid.game.GameWorld;
 import xyz.nucleoid.plasmid.game.StartResult;
-import xyz.nucleoid.plasmid.game.event.*;
+import xyz.nucleoid.plasmid.game.event.AttackEntityListener;
+import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
+import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
+import xyz.nucleoid.plasmid.game.event.RequestStartListener;
+import xyz.nucleoid.plasmid.game.event.UseBlockListener;
+import xyz.nucleoid.plasmid.game.event.UseItemListener;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
-import xyz.nucleoid.plasmid.world.bubble.BubbleWorldConfig;
-import xyz.nucleoid.plasmid.world.bubble.BubbleWorldSpawner;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class WdWaiting {
-	private final GameWorld world;
+	private final GameSpace world;
 	private final WdMap map;
 	private final WdConfig config;
 
 	private final WdSpawnLogic spawnLogic;
 
-	private WdWaiting(GameWorld world, WdMap map, WdConfig config) {
+	private WdWaiting(GameSpace world, WdMap map, WdConfig config) {
 		this.world = world;
 		this.map = map;
 		this.config = config;
@@ -40,39 +44,36 @@ public final class WdWaiting {
 		this.spawnLogic = new WdSpawnLogic(world, config);
 	}
 
-	public static CompletableFuture<GameWorld> open(GameOpenContext<WdConfig> context) {
+	public static GameOpenProcedure open(GameOpenContext<WdConfig> context) {
 		WdMapGenerator generator = new WdMapGenerator();
 		WdConfig config = context.getConfig();
 
-		return generator.create(config)
-				.thenCompose(map -> {
-					BubbleWorldConfig worldConfig = new BubbleWorldConfig()
-							.setGenerator(map.chunkGenerator(context.getServer()))
-							.setDefaultGameMode(GameMode.SPECTATOR)
-							.setSpawner(BubbleWorldSpawner.atSurface(0, 0))
-							.setTimeOfDay(18000)
-							.setDifficulty(Difficulty.NORMAL);
+		WdMap map = generator.build(config);
+		BubbleWorldConfig worldConfig = new BubbleWorldConfig()
+				.setGenerator(map.chunkGenerator(context.getServer()))
+				.setDefaultGameMode(GameMode.SPECTATOR)
+				.setSpawner(BubbleWorldSpawner.atSurface(0, 0))
+				.setTimeOfDay(18000)
+				.setDifficulty(Difficulty.NORMAL);
 
-					return context.openWorld(worldConfig).thenApply(gameWorld -> {
-						WdWaiting waiting = new WdWaiting(gameWorld, map, config);
+		return context.createOpenProcedure(worldConfig, (game) -> {
+			WdWaiting waiting = new WdWaiting(game.getSpace(), map, config);
+			GameWaitingLobby.applyTo(game, context.getConfig().playerConfig);
 
-						return GameWaitingLobby.open(gameWorld, config.playerConfig, game -> {
-							game.setRule(GameRule.CRAFTING, RuleResult.DENY);
-							game.setRule(GameRule.PORTALS, RuleResult.DENY);
-							game.setRule(GameRule.PVP, RuleResult.DENY);
-							game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
-							game.setRule(GameRule.HUNGER, RuleResult.DENY);
+			game.setRule(GameRule.CRAFTING, RuleResult.DENY);
+			game.setRule(GameRule.PORTALS, RuleResult.DENY);
+			game.setRule(GameRule.PVP, RuleResult.DENY);
+			game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
+			game.setRule(GameRule.HUNGER, RuleResult.DENY);
 
-							game.on(RequestStartListener.EVENT, waiting::requestStart);
+			game.on(RequestStartListener.EVENT, waiting::requestStart);
 
-							game.on(PlayerAddListener.EVENT, waiting::addPlayer);
-							game.on(PlayerDeathListener.EVENT, waiting::onPlayerDeath);
-							game.on(AttackEntityListener.EVENT, waiting::onAttackEntity);
-							game.on(UseBlockListener.EVENT, waiting::onUseBlock);
-							game.on(UseItemListener.EVENT, waiting::onUseItem);
-						});
-					});
-				});
+			game.on(PlayerAddListener.EVENT, waiting::addPlayer);
+			game.on(PlayerDeathListener.EVENT, waiting::onPlayerDeath);
+			game.on(AttackEntityListener.EVENT, waiting::onAttackEntity);
+			game.on(UseBlockListener.EVENT, waiting::onUseBlock);
+			game.on(UseItemListener.EVENT, waiting::onUseItem);
+		});
 	}
 
 	private ActionResult onAttackEntity(ServerPlayerEntity attacker, Hand hand, Entity attacked, EntityHitResult hitResult) {

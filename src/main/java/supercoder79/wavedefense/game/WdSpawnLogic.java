@@ -11,16 +11,17 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
-import xyz.nucleoid.plasmid.game.GameWorld;
+
+import xyz.nucleoid.plasmid.game.GameSpace;
 
 import java.util.Random;
 
 public final class WdSpawnLogic {
-    private final GameWorld world;
+    private final GameSpace space;
     private final WdConfig config;
 
-    public WdSpawnLogic(GameWorld world, WdConfig config) {
-        this.world = world;
+    public WdSpawnLogic(GameSpace space, WdConfig config) {
+        this.space = space;
         this.config = config;
     }
 
@@ -38,9 +39,9 @@ public final class WdSpawnLogic {
     }
 
     public void spawnPlayer(ServerPlayerEntity player) {
-        ServerWorld world = this.world.getWorld();
+        ServerWorld world = this.space.getWorld();
 
-        BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.world.getWorld(), this.config);
+        BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.space.getWorld(), this.config);
         ChunkPos chunkPos = new ChunkPos(pos);
         world.getChunkManager().addTicket(ChunkTicketType.field_19347, chunkPos, 1, player.getEntityId());
 

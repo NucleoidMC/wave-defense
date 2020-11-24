@@ -6,7 +6,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.WeightedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
@@ -35,7 +34,7 @@ public final class WdWaveSpawner {
         this.game = game;
         this.wave = wave;
 
-        this.startTime = game.world.getWorld().getTime();
+        this.startTime = game.space.getWorld().getTime();
     }
 
     public boolean tick(long time) {
@@ -43,7 +42,7 @@ public final class WdWaveSpawner {
         int targetZombies = Math.min((int) (timeSinceStart * wave.totalZombies / SPAWN_TICKS), wave.totalZombies);
 
         if (targetZombies > spawnedZombies) {
-            ServerWorld world = game.world.getWorld();
+            ServerWorld world = game.space.getWorld();
             Vec3d centerPos = game.guide.getCenterPos();
             Random random = new Random();
 
