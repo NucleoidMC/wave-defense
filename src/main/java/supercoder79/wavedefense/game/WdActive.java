@@ -125,6 +125,39 @@ public final class WdActive {
 		this.damageFarPlayers(guide.getCenterPos());
 
 		this.bar.tick(waveManager.getActiveWave());
+
+		// This is a horrifically cursed workaround for UseBlockListener not working. I'm sorry.
+		if (time % 20 == 0) {
+			for (ServerPlayerEntity player : this.participants) {
+				BlockPos.Mutable mutable = player.getBlockPos().mutableCopy();
+
+				for(int x = -1; x <= 1; x++) {
+					for(int z = -1; z <= 1; z++) {
+						for(int y = 0; y <= 2; y++) {
+
+							BlockPos local = mutable.add(x, y, z);
+							if (this.space.getWorld().getBlockState(local).isOf(Blocks.CHEST)) {
+								if (!this.openedChests.contains(local)) {
+									this.participants.forEach((participant) -> {
+										participant.sendMessage(new LiteralText(player.getEntityName() + " has found a loot chest!"), false);
+										participant.sendMessage(new LiteralText("You recieved 12 iron."), false);
+										participant.inventory.insertStack(new ItemStack(Items.IRON_INGOT, 12));
+									});
+
+									// Change glowstone to obsidian
+									world.setBlockState(local.down(), Blocks.OBSIDIAN.getDefaultState());
+
+									this.openedChests.add(local);
+								}
+
+
+							}
+						}
+					}
+				}
+			}
+		}
+
 	}
 
 	private TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {
@@ -166,12 +199,13 @@ public final class WdActive {
 			players.sendMessage(new LiteralText("You made it to wave " + waveManager.getWaveOrdinal() + ".").formatted(Formatting.DARK_RED));
 
 			// Close game in 10 secs
-			gameCloseTick = this.space.getWorld().getTime() + (10 * 20);
+			this.gameCloseTick = this.space.getWorld().getTime() + (10 * 20);
 		}
 
 		return ActionResult.FAIL;
 	}
 
+	// TODO: this doesn't work. The logic has been moved to tick() as a hacky workaround.
 	private ActionResult onUseBlock(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
 		if (this.space.getWorld().getBlockState(hitResult.getBlockPos()).isOf(Blocks.CHEST)) {
 			if (!this.openedChests.contains(hitResult.getBlockPos())) {
