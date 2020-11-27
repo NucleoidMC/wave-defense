@@ -26,6 +26,7 @@ import supercoder79.wavedefense.map.WdMap;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.event.*;
 import xyz.nucleoid.plasmid.game.player.JoinResult;
+import xyz.nucleoid.plasmid.game.player.MutablePlayerSet;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
@@ -70,7 +71,7 @@ public final class WdActive {
 	}
 
 	public static void open(GameSpace world, WdMap map, WdConfig config) {
-		WdActive active = new WdActive(world, map, config, world.getPlayers());
+		WdActive active = new WdActive(world, map, config, world.getPlayers().copy());
 
 		world.openGame(game -> {
 			game.setRule(GameRule.CRAFTING, RuleResult.ALLOW);
@@ -107,7 +108,7 @@ public final class WdActive {
 	}
 
 	private void removePlayer(ServerPlayerEntity player) {
-		// TODO: reimplement
+		((MutablePlayerSet)participants).remove(player);
 	}
 
 	private void tick() {
@@ -149,8 +150,6 @@ public final class WdActive {
 
 									this.openedChests.add(local);
 								}
-
-
 							}
 						}
 					}
@@ -235,6 +234,12 @@ public final class WdActive {
 						.build()
 		);
 
+		player.inventory.insertStack(1,
+				ItemStackBuilder.of(Items.COOKED_BEEF)
+						.setCount(8)
+						.build()
+		);
+
 		player.inventory.insertStack(8,
 				ItemStackBuilder.of(Items.COMPASS)
 						.setName(new LiteralText("Item Shop"))
@@ -248,10 +253,10 @@ public final class WdActive {
 	}
 
 	private void eliminatePlayer(ServerPlayerEntity player) {
-		// TODO: reimplement
-//		if (!participants.remove(player)) {
-//			return;
-//		}
+		// TODO: why is this being done?
+		if (!((MutablePlayerSet)participants).remove(player)) {
+			return;
+		}
 
 		Text message = player.getDisplayName().shallowCopy().append(" succumbed to the zombies....")
 				.formatted(Formatting.RED);

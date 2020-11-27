@@ -67,7 +67,7 @@ public final class WdItemShop {
             shop.addItem(ItemStackBuilder.of(Items.ARROW).setCount(8).build(), Cost.ofIron(2));
 
             shop.addItem(new ItemStack(Items.GOLDEN_APPLE), Cost.ofIron(8));
-            shop.addItem(new ItemStack(Items.COOKED_BEEF, 2), Cost.ofIron(2));
+            shop.addItem(new ItemStack(Items.COOKED_BEEF, 2), Cost.ofIron(1));
         });
     }
 
