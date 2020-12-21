@@ -139,10 +139,6 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 				BlockState stone = Blocks.STONE.getDefaultState();
 
 				int genHeight = Math.max(terrainHeight, seaLevel);
-				if (distanceToPath2 >= this.minBarrierRadius2 && distanceToPath2 <= this.maxBarrierRadius2) {
-					genHeight = 255;
-					air = waterState = Blocks.BARRIER.getDefaultState();
-				}
 
 				for (int y = 0; y <= genHeight; y++) {
 					// Simple surface building

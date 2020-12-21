@@ -39,7 +39,7 @@ public final class WdActive {
 	public final GameSpace space;
 	public final WdMap map;
 	public final WdConfig config;
-	private final PlayerSet participants;
+	private final MutablePlayerSet participants;
 	private final WdSpawnLogic spawnLogic;
 	public final WdWaveManager waveManager;
 	private final Object2IntMap<UUID> playerKillAmounts = new Object2IntOpenHashMap<>();
@@ -55,7 +55,7 @@ public final class WdActive {
 
 	public final int groupSize;
 
-	private WdActive(GameSpace space, WdMap map, WdConfig config, PlayerSet participants) {
+	private WdActive(GameSpace space, WdMap map, WdConfig config, MutablePlayerSet participants) {
 		this.space = space;
 		this.map = map;
 		this.config = config;
@@ -71,7 +71,7 @@ public final class WdActive {
 	}
 
 	public static void open(GameSpace world, WdMap map, WdConfig config) {
-		WdActive active = new WdActive(world, map, config, world.getPlayers().copy());
+		WdActive active = new WdActive(world, map, config, (MutablePlayerSet) world.getPlayers().copy());
 
 		world.openGame(game -> {
 			game.setRule(GameRule.CRAFTING, RuleResult.ALLOW);
@@ -108,7 +108,7 @@ public final class WdActive {
 	}
 
 	private void removePlayer(ServerPlayerEntity player) {
-		((MutablePlayerSet)participants).remove(player);
+		participants.remove(player);
 	}
 
 	private void tick() {
@@ -253,8 +253,7 @@ public final class WdActive {
 	}
 
 	private void eliminatePlayer(ServerPlayerEntity player) {
-		// TODO: why is this being done?
-		if (!((MutablePlayerSet)participants).remove(player)) {
+		if (!participants.remove(player)) {
 			return;
 		}
 
