@@ -38,12 +38,12 @@ public final class WdWaveSpawner {
     }
 
     public boolean tick(long time) {
-        long timeSinceStart = time - startTime;
-        int targetZombies = Math.min((int) (timeSinceStart * wave.totalZombies / SPAWN_TICKS), wave.totalZombies);
+        long timeSinceStart = time - this.startTime;
+        int targetZombies = Math.min((int) (timeSinceStart * this.wave.totalZombies / SPAWN_TICKS), this.wave.totalZombies);
 
-        if (targetZombies > spawnedZombies) {
-            ServerWorld world = game.space.getWorld();
-            Vec3d centerPos = game.guide.getCenterPos();
+        if (targetZombies > this.spawnedZombies) {
+            ServerWorld world = this.game.space.getWorld();
+            Vec3d centerPos = this.game.guide.getCenterPos();
             Random random = new Random();
 
             WeightedList<Position> validCenters = new WeightedList<>();
@@ -55,7 +55,7 @@ public final class WdWaveSpawner {
                 double aZ = pos.getZ() - centerPos.getZ();
                 double dist = (aX * aX) + (aZ * aZ);
 
-                double threshold = game.config.spawnRadius * SQRT2_2;
+                double threshold = this.game.config.spawnRadius * SQRT2_2;
 
                 if (dist * dist >= threshold * threshold) {
                     validCenters.add(participant.getPos(), (int) (getDistWeight(dist - threshold) * 100));
@@ -67,7 +67,7 @@ public final class WdWaveSpawner {
 
                 // Spawn zombies closer to faraway players
                 // TODO: some randomization here
-                double distance = chosenPos == centerPos ? game.config.spawnRadius : 8;
+                double distance = chosenPos == centerPos ? this.game.config.spawnRadius : 8;
 
                 double theta = random.nextDouble() * 2 * Math.PI;
                 int x = (int) (chosenPos.getX() + (Math.cos(theta) * distance));
@@ -75,25 +75,25 @@ public final class WdWaveSpawner {
 
                 BlockPos pos = WdSpawnLogic.findSurfaceAt(x, z, 12, world);
                 if (spawnZombie(world, pos)) {
-                    wave.onZombieAdded();
+                    this.wave.onZombieAdded();
                 }
             }
 
-            spawnedZombies = targetZombies;
+            this.spawnedZombies = targetZombies;
         }
 
-        return spawnedZombies >= wave.totalZombies;
+        return this.spawnedZombies >= this.wave.totalZombies;
     }
 
     private boolean spawnZombie(ServerWorld world, BlockPos pos) {
-        MonsterClass monsterClass = getZombieClass(world.getRandom(), wave.ordinal);
-        MonsterModifier mod = getZombieModifier(world.getRandom()); //TODO: scale based on ordinal
+        MonsterClass monsterClass = getZombieClass(world.getRandom(), this.wave.ordinal);
+        MonsterModifier mod = getZombieModifier(world.getRandom(), this.wave.ordinal);
 
         MobEntity zombie;
         if (world.containsFluid(new Box(pos).expand(1.0))) {
-            zombie = new WaveDrownedEntity(world, game, mod, MonsterClasses.DROWNED);
+            zombie = new WaveDrownedEntity(world, this.game, mod, MonsterClasses.DROWNED);
         } else {
-            zombie = new WaveZombieEntity(world, game, mod, monsterClass);
+            zombie = new WaveZombieEntity(world, this.game, mod, monsterClass);
         }
 
         zombie.refreshPositionAndAngles(pos, 0, 0);
@@ -120,8 +120,8 @@ public final class WdWaveSpawner {
         return MonsterClasses.DEFAULT;
     }
 
-    private MonsterModifier getZombieModifier(Random random) {
-        int r = random.nextInt(50);
+    private MonsterModifier getZombieModifier(Random random, int ordinal) {
+        int r = random.nextInt((int) getModBound(ordinal));
 
         if (r <= 1) { // 4% chance of withering
             return MonsterModifier.WITHER;
@@ -132,6 +132,12 @@ public final class WdWaveSpawner {
         }
 
         return MonsterModifier.NORMAL;
+    }
+
+    // The bound for the random.nextInt used to get the modifier, starts at 50 and gets lower
+    // -5\ln x+50
+    private static double getModBound(int ordinal) {
+        return (-5 * Math.log(ordinal)) + 50;
     }
 
     // Weights go from 0.083ish to 0.5

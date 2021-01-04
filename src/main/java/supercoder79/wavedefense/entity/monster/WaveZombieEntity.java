@@ -67,7 +67,7 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
 
     @Override
     public int ironCount() {
-        return monsterClass.ironCount();
+        return this.monsterClass.ironCount() + this.mod.ironBonus;
     }
 
     @Override
