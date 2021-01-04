@@ -7,14 +7,18 @@ import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.widget.BossBarWidget;
+import xyz.nucleoid.plasmid.widget.GlobalWidgets;
 
-public final class WdBar implements AutoCloseable {
+public final class WdBar {
     private final BossBarWidget bar;
-    private final LiteralText idleTitle = new LiteralText("Wave Defense");
+    private static final LiteralText IDLE_TITLE = new LiteralText("Wave Defense");
 
-    public WdBar(GameSpace space) {
-        PlayerSet players = space.getPlayers();
-        this.bar = new BossBarWidget(space, idleTitle, BossBar.Color.GREEN, BossBar.Style.PROGRESS);
+    private WdBar(BossBarWidget bar) {
+        this.bar = bar;
+    }
+
+    public static WdBar create(GlobalWidgets widgets) {
+        return new WdBar(widgets.addBossBar(IDLE_TITLE, BossBar.Color.GREEN, BossBar.Style.PROGRESS));
     }
 
     public void tick(@Nullable WdWave wave) {
@@ -22,17 +26,12 @@ public final class WdBar implements AutoCloseable {
             this.bar.setTitle(this.titleForWave(wave));
             this.bar.setProgress(wave.remainingZombies / (float) wave.totalZombies);
         } else {
-            this.bar.setTitle(idleTitle);
+            this.bar.setTitle(IDLE_TITLE);
             this.bar.setProgress(0.0F);
         }
     }
 
     private Text titleForWave(WdWave wave) {
         return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingZombies + " zombies remain.");
-    }
-
-    @Override
-    public void close() {
-        this.bar.close();
     }
 }

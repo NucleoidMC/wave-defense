@@ -30,11 +30,15 @@ public final class WaveDrownedEntity extends DrownedEntity implements WaveEntity
 
         monsterClass.apply(this, mod);
 
+        this.initializeGoals();
         this.setAttributes();
     }
 
     @Override
     protected void initGoals() {
+    }
+
+    protected void initializeGoals() {
         this.goalSelector.add(1, new DrownedEntity.DrownedAttackGoal(this, this.monsterClass.speed(), false));
         this.goalSelector.add(1, new DrownedEntity.TargetAboveWaterGoal(this, 1.0, 48));
         this.goalSelector.add(2, new MoveTowardGameCenterGoal<>(this));

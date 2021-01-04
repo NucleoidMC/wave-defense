@@ -30,11 +30,15 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
 
         monsterClass.apply(this, mod);
 
+        this.initializeGoals();
         this.setAttributes();
     }
 
     @Override
     protected void initGoals() {
+    }
+
+    protected void initializeGoals() {
         this.goalSelector.add(1, new ZombieAttackGoal(this, this.monsterClass.speed(), false));
         this.goalSelector.add(2, new MoveTowardGameCenterGoal<>(this));
         this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));

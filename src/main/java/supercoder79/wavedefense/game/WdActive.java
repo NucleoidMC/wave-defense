@@ -32,6 +32,7 @@ import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 import xyz.nucleoid.plasmid.util.PlayerRef;
+import xyz.nucleoid.plasmid.widget.GlobalWidgets;
 
 import java.util.*;
 
@@ -55,7 +56,7 @@ public final class WdActive {
 
 	public final int groupSize;
 
-	private WdActive(GameSpace space, WdMap map, WdConfig config, MutablePlayerSet participants) {
+	private WdActive(GameSpace space, WdMap map, WdConfig config, MutablePlayerSet participants, GlobalWidgets widgets) {
 		this.space = space;
 		this.map = map;
 		this.config = config;
@@ -63,7 +64,7 @@ public final class WdActive {
 
 		this.spawnLogic = new WdSpawnLogic(this.space, config);
 		this.waveManager = new WdWaveManager(this);
-		this.bar = this.space.addResource(new WdBar(this.space));
+		this.bar = WdBar.create(widgets);
 
 		this.guide = new WdGuide(this);
 
@@ -71,9 +72,10 @@ public final class WdActive {
 	}
 
 	public static void open(GameSpace world, WdMap map, WdConfig config) {
-		WdActive active = new WdActive(world, map, config, (MutablePlayerSet) world.getPlayers().copy());
-
 		world.openGame(game -> {
+			GlobalWidgets widgets = new GlobalWidgets(game);
+			WdActive active = new WdActive(world, map, config, (MutablePlayerSet) world.getPlayers().copy(), widgets);
+
 			game.setRule(GameRule.CRAFTING, RuleResult.ALLOW);
 			game.setRule(GameRule.PORTALS, RuleResult.DENY);
 			game.setRule(GameRule.PVP, RuleResult.DENY);
