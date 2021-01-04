@@ -43,7 +43,7 @@ public final class WdSpawnLogic {
 
         BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.space.getWorld(), this.config);
         ChunkPos chunkPos = new ChunkPos(pos);
-        world.getChunkManager().addTicket(ChunkTicketType.field_19347, chunkPos, 1, player.getEntityId());
+        world.getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, chunkPos, 1, player.getEntityId());
 
         player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0F, 0.0F);
     }

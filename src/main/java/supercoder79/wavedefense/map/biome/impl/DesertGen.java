@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.BuiltinBiomes;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.feature.DeadTreeGen;
@@ -78,6 +79,6 @@ public final class DesertGen implements BiomeGen {
 
 	@Override
 	public RegistryKey<Biome> getFakingBiome() {
-		return BuiltinBiomes.DESERT;
+		return BiomeKeys.DESERT;
 	}
 }

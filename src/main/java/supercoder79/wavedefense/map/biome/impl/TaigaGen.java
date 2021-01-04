@@ -8,6 +8,7 @@ import xyz.nucleoid.plasmid.game.gen.MapGen;
 
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.BuiltinBiomes;
 
 public final class TaigaGen implements BiomeGen {
@@ -30,7 +31,7 @@ public final class TaigaGen implements BiomeGen {
 
 	@Override
 	public RegistryKey<Biome> getFakingBiome() {
-		return BuiltinBiomes.TAIGA;
+		return BiomeKeys.TAIGA;
 	}
 
 	@Override

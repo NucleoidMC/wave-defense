@@ -1,4 +1,4 @@
-package supercoder79.wavedefense.entity;
+package supercoder79.wavedefense.entity.monster;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -6,29 +6,36 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.FollowTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
+
+import supercoder79.wavedefense.entity.MonsterModifier;
+import supercoder79.wavedefense.entity.WaveEntity;
+import supercoder79.wavedefense.entity.MonsterClass;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
 import supercoder79.wavedefense.game.WdActive;
 
 public final class WaveDrownedEntity extends DrownedEntity implements WaveEntity {
     private final WdActive game;
-    private final ZombieModifier mod;
-    private final ZombieClass zombieClass;
+    private final MonsterModifier mod;
+    private final MonsterClass monsterClass;
 
-    public WaveDrownedEntity(World world, WdActive game, ZombieModifier mod, ZombieClass zombieClass) {
+    public WaveDrownedEntity(World world, WdActive game, MonsterModifier mod, MonsterClass monsterClass) {
         super(EntityType.DROWNED, world);
         this.game = game;
         this.mod = mod;
-        this.zombieClass = zombieClass;
+        this.monsterClass = monsterClass;
 
-        zombieClass.apply(this, mod);
+        monsterClass.apply(this, mod);
+
+        this.setAttributes();
     }
 
     @Override
     protected void initGoals() {
-        this.goalSelector.add(1, new DrownedEntity.DrownedAttackGoal(this, 1.0, false));
+        this.goalSelector.add(1, new DrownedEntity.DrownedAttackGoal(this, this.monsterClass.speed(), false));
         this.goalSelector.add(1, new DrownedEntity.TargetAboveWaterGoal(this, 1.0, 48));
         this.goalSelector.add(2, new MoveTowardGameCenterGoal<>(this));
         this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
@@ -49,9 +56,14 @@ public final class WaveDrownedEntity extends DrownedEntity implements WaveEntity
         return didAttack;
     }
 
+    public void setAttributes() {
+        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(this.monsterClass.maxHealth());
+        this.setHealth((float) this.monsterClass.maxHealth());
+    }
+
     @Override
     public int ironCount() {
-        return zombieClass.ironCount();
+        return monsterClass.ironCount();
     }
 
     @Override

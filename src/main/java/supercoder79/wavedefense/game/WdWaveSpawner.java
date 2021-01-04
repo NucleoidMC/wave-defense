@@ -9,11 +9,11 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
-import supercoder79.wavedefense.entity.ZombieClass;
-import supercoder79.wavedefense.entity.ZombieClasses;
-import supercoder79.wavedefense.entity.ZombieModifier;
-import supercoder79.wavedefense.entity.WaveDrownedEntity;
-import supercoder79.wavedefense.entity.WaveZombieEntity;
+import supercoder79.wavedefense.entity.MonsterClass;
+import supercoder79.wavedefense.entity.MonsterClasses;
+import supercoder79.wavedefense.entity.MonsterModifier;
+import supercoder79.wavedefense.entity.monster.WaveDrownedEntity;
+import supercoder79.wavedefense.entity.monster.WaveZombieEntity;
 
 import java.util.Random;
 
@@ -86,14 +86,14 @@ public final class WdWaveSpawner {
     }
 
     private boolean spawnZombie(ServerWorld world, BlockPos pos) {
-        ZombieClass zombieClass = getZombieClass(world.getRandom(), wave.ordinal);
-        ZombieModifier mod = getZombieModifier(world.getRandom()); //TODO: scale based on ordinal
+        MonsterClass monsterClass = getZombieClass(world.getRandom(), wave.ordinal);
+        MonsterModifier mod = getZombieModifier(world.getRandom()); //TODO: scale based on ordinal
 
         MobEntity zombie;
         if (world.containsFluid(new Box(pos).expand(1.0))) {
-            zombie = new WaveDrownedEntity(world, game, mod, ZombieClasses.DROWNED);
+            zombie = new WaveDrownedEntity(world, game, mod, MonsterClasses.DROWNED);
         } else {
-            zombie = new WaveZombieEntity(world, game, mod, zombieClass);
+            zombie = new WaveZombieEntity(world, game, mod, monsterClass);
         }
 
         zombie.refreshPositionAndAngles(pos, 0, 0);
@@ -102,26 +102,36 @@ public final class WdWaveSpawner {
         return world.spawnEntity(zombie);
     }
 
-    private ZombieClass getZombieClass(Random random, int waveOrdinal) {
-        if (waveOrdinal > 5 && random.nextInt((int) (500.0 / (waveOrdinal - 5))) == 0) {
-            return ZombieClasses.KNIGHT;
+    private MonsterClass getZombieClass(Random random, int waveOrdinal) {
+        if (waveOrdinal > 10) {
+            if (random.nextInt((int) (300.0 / (waveOrdinal - 10))) == 0) {
+                return MonsterClasses.TANK;
+            }
+
+            if (random.nextInt((int) (250.0 / (waveOrdinal - 10))) == 0) {
+                return MonsterClasses.SCOUT;
+            }
         }
 
-        return ZombieClasses.DEFAULT;
+        if (waveOrdinal > 5 && random.nextInt((int) (200.0 / (waveOrdinal - 5))) == 0) {
+            return MonsterClasses.KNIGHT;
+        }
+
+        return MonsterClasses.DEFAULT;
     }
 
-    private ZombieModifier getZombieModifier(Random random) {
+    private MonsterModifier getZombieModifier(Random random) {
         int r = random.nextInt(50);
 
         if (r <= 1) { // 4% chance of withering
-            return ZombieModifier.WITHER;
+            return MonsterModifier.WITHER;
         } else if (r <= 5) { // 8% chance of poison
-            return ZombieModifier.POISON;
+            return MonsterModifier.POISON;
         } else if (r <= 10) { // 10% chance of weakness
-            return ZombieModifier.WEAKNESS;
+            return MonsterModifier.WEAKNESS;
         }
 
-        return ZombieModifier.NORMAL;
+        return MonsterModifier.NORMAL;
     }
 
     // Weights go from 0.083ish to 0.5

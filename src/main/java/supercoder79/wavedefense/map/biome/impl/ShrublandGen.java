@@ -6,6 +6,7 @@ import supercoder79.wavedefense.map.biome.BiomeGen;
 
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.BuiltinBiomes;
 
 public final class ShrublandGen implements BiomeGen {
@@ -43,6 +44,6 @@ public final class ShrublandGen implements BiomeGen {
 
 	@Override
 	public RegistryKey<Biome> getFakingBiome() {
-		return BuiltinBiomes.SAVANNA;
+		return BiomeKeys.SAVANNA;
 	}
 }

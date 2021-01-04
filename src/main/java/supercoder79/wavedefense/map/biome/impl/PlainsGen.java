@@ -6,6 +6,7 @@ import supercoder79.wavedefense.map.biome.BiomeGen;
 
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.BuiltinBiomes;
 
 public final class PlainsGen implements BiomeGen {
@@ -33,6 +34,6 @@ public final class PlainsGen implements BiomeGen {
 
 	@Override
 	public RegistryKey<Biome> getFakingBiome() {
-		return BuiltinBiomes.PLAINS;
+		return BiomeKeys.PLAINS;
 	}
 }
