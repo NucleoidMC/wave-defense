@@ -35,7 +35,7 @@ public final class GuideVillagerEntity extends VillagerEntity {
         if (this.paused) {
             this.navigation.stop();
         } else if (this.targetPos != null && this.navigation.isIdle()) {
-            this.navigation.startMovingTo(this.targetPos.getX() + 0.5, this.targetPos.getY(), this.targetPos.getZ() + 0.5, 0.4);
+            this.navigation.startMovingTo(this.targetPos.getX() + 0.5, this.targetPos.getY(), this.targetPos.getZ() + 0.5, 0.5);
         }
     }
 
