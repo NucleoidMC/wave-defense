@@ -9,8 +9,12 @@ import net.minecraft.entity.effect.StatusEffects;
 public enum MonsterModifier {
 	NORMAL("", null, 0),
 	POISON("Poisoning ", () -> new StatusEffectInstance(StatusEffects.POISON, 160), 2),
-	WEAKNESS("Weakening ", () -> new StatusEffectInstance(StatusEffects.WEAKNESS, 300), 2),
-	WITHER("Withering ", () -> new StatusEffectInstance(StatusEffects.WITHER, 100), 2);
+	WEAKNESS("Weakening ", () -> new StatusEffectInstance(StatusEffects.WEAKNESS, 300), 3),
+	WITHER("Withering ", () -> new StatusEffectInstance(StatusEffects.WITHER, 150), 3),
+	HUNGER("Hungering ", () -> new StatusEffectInstance(StatusEffects.HUNGER, 300), 2),
+	SLOWNESS("Slowing ", () -> new StatusEffectInstance(StatusEffects.SLOWNESS, 200), 2),
+	BLINDNESS("Blinding ", () -> new StatusEffectInstance(StatusEffects.BLINDNESS, 200), 3),
+	NAUSEA("Nauseating ", () -> new StatusEffectInstance(StatusEffects.NAUSEA, 150), 3);
 
 	public final String prefix;
 	public final Supplier<StatusEffectInstance> effect;

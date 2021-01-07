@@ -130,12 +130,20 @@ public final class WdWaveSpawner {
     private MonsterModifier getZombieModifier(Random random, int ordinal) {
         int r = random.nextInt((int) getModBound(ordinal));
 
-        if (r <= 1) { // 4% chance of withering
+        if (r <= 1) {
             return MonsterModifier.WITHER;
-        } else if (r <= 5) { // 8% chance of poison
+        } else if (r <= 3) {
             return MonsterModifier.POISON;
-        } else if (r <= 10) { // 10% chance of weakness
+        } else if (r <= 6) {
             return MonsterModifier.WEAKNESS;
+        } else if (r <= 8) {
+            return MonsterModifier.HUNGER;
+        } else if (r <= 11) {
+            return MonsterModifier.SLOWNESS;
+        } else if (r <= 14) {
+            return MonsterModifier.BLINDNESS;
+        } else if (r <= 16) {
+            return MonsterModifier.NAUSEA;
         }
 
         return MonsterModifier.NORMAL;
