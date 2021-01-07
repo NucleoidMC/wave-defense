@@ -117,6 +117,13 @@ public final class WdWaveSpawner {
             return MonsterClasses.KNIGHT;
         }
 
+        if (random.nextInt((int) (150.0 / waveOrdinal)) == 0) {
+            return MonsterClasses.FIGHTER;
+        }
+        if (random.nextInt((int) (150.0 / waveOrdinal - 5)) == 0) {
+            return MonsterClasses.RUNNER;
+        }
+
         return MonsterClasses.DEFAULT;
     }
 

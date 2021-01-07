@@ -81,6 +81,6 @@ public final class WdWaveManager {
 
     private int zombieCount(int index) {
         double baseCount = game.groupSize * 1.5 + 5.0;
-        return Math.min(MathHelper.floor(baseCount + index * 2.5), 64 + this.game.groupSize * 2);
+        return Math.min(MathHelper.floor(baseCount + index * 3.5), 64 + this.game.groupSize * 2);
     }
 }

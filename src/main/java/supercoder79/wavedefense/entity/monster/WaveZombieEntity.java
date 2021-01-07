@@ -28,7 +28,7 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
         this.mod = mod;
         this.monsterClass = monsterClass;
 
-        monsterClass.apply(this, mod);
+        monsterClass.apply(this, mod, world.getRandom());
 
         this.initializeGoals();
         this.setAttributes();
@@ -53,7 +53,7 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
 
         if (didAttack) {
             if (target instanceof LivingEntity && mod.effect != null) {
-                ((LivingEntity)target).addStatusEffect(mod.effect);
+                ((LivingEntity)target).addStatusEffect(mod.effect.get());
             }
         }
 

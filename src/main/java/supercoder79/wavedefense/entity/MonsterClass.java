@@ -1,9 +1,11 @@
 package supercoder79.wavedefense.entity;
 
+import java.util.Random;
+
 import net.minecraft.entity.mob.ZombieEntity;
 
 public interface MonsterClass {
-	void apply(ZombieEntity entity, MonsterModifier mod);
+	void apply(ZombieEntity entity, MonsterModifier mod, Random random);
 
 	int ironCount();
 
