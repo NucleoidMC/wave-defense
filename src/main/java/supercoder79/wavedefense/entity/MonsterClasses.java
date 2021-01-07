@@ -159,12 +159,12 @@ public class MonsterClasses {
 
 		@Override
 		public double maxHealth() {
-			return 15.0;
+			return 25.0;
 		}
 
 		@Override
 		public double speed() {
-			return 1.15;
+			return 1.0;
 		}
 
 		@Override
