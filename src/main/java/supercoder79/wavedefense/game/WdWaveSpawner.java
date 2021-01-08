@@ -104,23 +104,24 @@ public final class WdWaveSpawner {
 
     private MonsterClass getZombieClass(Random random, int waveOrdinal) {
         if (waveOrdinal > 10) {
-            if (random.nextInt((int) (300.0 / (waveOrdinal - 10))) == 0) {
+            if (random.nextInt((int) (150.0 / (waveOrdinal - 10))) == 0) {
                 return MonsterClasses.TANK;
             }
 
-            if (random.nextInt((int) (250.0 / (waveOrdinal - 10))) == 0) {
+            if (random.nextInt((int) (100.0 / (waveOrdinal - 10))) == 0) {
                 return MonsterClasses.SCOUT;
             }
         }
 
-        if (waveOrdinal > 5 && random.nextInt((int) (200.0 / (waveOrdinal - 5))) == 0) {
+        if (waveOrdinal > 5 && random.nextInt((int) (100.0 / (waveOrdinal - 5))) == 0) {
             return MonsterClasses.KNIGHT;
         }
 
-        if (random.nextInt((int) (150.0 / waveOrdinal)) == 0) {
+        if (random.nextInt((int) (75.0 / waveOrdinal)) == 0) {
             return MonsterClasses.FIGHTER;
         }
-        if (random.nextInt((int) (150.0 / waveOrdinal - 5)) == 0) {
+
+        if (random.nextInt((int) (75.0 / waveOrdinal)) == 0) {
             return MonsterClasses.RUNNER;
         }
 

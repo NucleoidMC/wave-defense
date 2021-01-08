@@ -105,7 +105,7 @@ public class MonsterClasses {
 
 		@Override
 		public double speed() {
-			return 1.25;
+			return 1.3;
 		}
 
 		@Override
@@ -128,7 +128,7 @@ public class MonsterClasses {
 
 		@Override
 		public double speed() {
-			return 1.15;
+			return 1.4;
 		}
 
 		@Override
