@@ -30,6 +30,9 @@ public final class WdBar {
     }
 
     private Text titleForWave(WdWave wave) {
-        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingMonsters + " monsters remain.");
+        String monsterSuffix = wave.remainingMonsters == 1 ? "" : "s";
+        String remainSuffix = wave.remainingMonsters == 1 ? "s" : "";
+
+        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingMonsters + " monster" + monsterSuffix +" remain" + remainSuffix + ".");
     }
 }

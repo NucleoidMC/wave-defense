@@ -47,10 +47,8 @@ public final class WdItemShop {
                     })
             );
 
-            boolean hasBow = player.inventory.contains(new ItemStack(Items.BOW));
-
             int powerLevel = game.getEnchantmentLevel(game.powerLevels, player);
-            Cost powerCost = !hasBow || powerLevel >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(2, powerLevel) * 16));
+            Cost powerCost = powerLevel >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(2, powerLevel) * 16));
 
             shop.add(ShopEntry.ofIcon(Items.CROSSBOW)
                     .withName(new LiteralText("Bow Power " + (powerLevel + 1)))
@@ -63,8 +61,7 @@ public final class WdItemShop {
             );
 
             shop.addItem(ItemStackBuilder.of(Items.IRON_AXE).setUnbreakable().build(), Cost.ofIron(32));
-            shop.addItem(ItemStackBuilder.of(Items.BOW).setUnbreakable().build(), Cost.ofIron(32));
-            shop.addItem(ItemStackBuilder.of(Items.ARROW).setCount(8).build(), Cost.ofIron(2));
+            shop.addItem(ItemStackBuilder.of(Items.ARROW).setCount(4).build(), Cost.ofIron(2));
 
             shop.addItem(new ItemStack(Items.GOLDEN_APPLE), Cost.ofIron(8));
             shop.addItem(new ItemStack(Items.COOKED_BEEF, 2), Cost.ofIron(1));

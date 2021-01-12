@@ -237,7 +237,19 @@ public final class WdActive {
 		);
 
 		player.inventory.insertStack(1,
+				ItemStackBuilder.of(Items.BOW)
+						.setUnbreakable()
+						.build()
+		);
+
+		player.inventory.insertStack(2,
 				ItemStackBuilder.of(Items.COOKED_BEEF)
+						.setCount(8)
+						.build()
+		);
+
+		player.inventory.insertStack(3,
+				ItemStackBuilder.of(Items.ARROW)
 						.setCount(8)
 						.build()
 		);
