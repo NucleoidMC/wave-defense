@@ -31,7 +31,7 @@ public final class WdWaveManager {
             }
         }
 
-        if (waveSpawner == null && wave.remainingZombies <= 0) {
+        if (waveSpawner == null && wave.remainingMonsters <= 0) {
             PlayerSet players = game.space.getPlayers();
             players.sendMessage(new LiteralText("The wave has ended!"));
 
@@ -55,11 +55,11 @@ public final class WdWaveManager {
         waveSpawner = new WdWaveSpawner(game, wave);
 
         PlayerSet players = game.space.getPlayers();
-        players.sendMessage(new LiteralText("Wave #" + wave.ordinal + " with " + wave.totalZombies + " zombies is coming!"));
+        players.sendMessage(new LiteralText("Wave #" + wave.ordinal + " with " + wave.totalMonsters + " monsters is coming!"));
     }
 
     private WdWave createWave(int index) {
-        return new WdWave(index + 1, zombieCount(index));
+        return new WdWave(index + 1, monsterCount(index));
     }
 
     @Nullable
@@ -79,7 +79,7 @@ public final class WdWaveManager {
         return game.map.waveStarts.getDouble(Math.min(nextWaveIndex, game.map.waveStarts.size() - 1));
     }
 
-    private int zombieCount(int index) {
+    private int monsterCount(int index) {
         double baseCount = game.groupSize * 1.5 + 5.0;
         return Math.min(MathHelper.floor(baseCount + index * 3.5), 64 + this.game.groupSize * 2);
     }

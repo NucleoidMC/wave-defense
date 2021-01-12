@@ -2,20 +2,20 @@ package supercoder79.wavedefense.game;
 
 public final class WdWave {
     public final int ordinal;
-    public final int totalZombies;
+    public final int totalMonsters;
 
-    public int remainingZombies;
+    public int remainingMonsters;
 
-    public WdWave(int ordinal, int totalZombies) {
+    public WdWave(int ordinal, int totalMonsters) {
         this.ordinal = ordinal;
-        this.totalZombies = totalZombies;
+        this.totalMonsters = totalMonsters;
     }
 
-    public void onZombieAdded() {
-        this.remainingZombies++;
+    public void onMonsterAdded() {
+        this.remainingMonsters++;
     }
 
-    public void onZombieKilled() {
-        this.remainingZombies--;
+    public void onMonsterKilled() {
+        this.remainingMonsters--;
     }
 }

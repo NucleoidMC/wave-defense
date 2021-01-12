@@ -3,17 +3,15 @@ package supercoder79.wavedefense.entity.monster;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.mob.SkeletonEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
-import supercoder79.wavedefense.entity.MonsterClass;
+import supercoder79.wavedefense.entity.monster.classes.MonsterClass;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
 import supercoder79.wavedefense.game.WdActive;
 
@@ -39,11 +37,12 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
     }
 
     protected void initializeGoals() {
+        // TODO: custom attack goal
         this.goalSelector.add(1, new ZombieAttackGoal(this, this.monsterClass.speed(), false));
         this.goalSelector.add(2, new MoveTowardGameCenterGoal<>(this));
         this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
         this.goalSelector.add(4, new LookAroundGoal(this));
-        this.targetSelector.add(1, new RevengeGoal(this).setGroupRevenge(ZombifiedPiglinEntity.class));
+        this.targetSelector.add(1, new RevengeGoal(this, WaveSkeletonEntity.class).setGroupRevenge(ZombifiedPiglinEntity.class));
         this.targetSelector.add(2, new FollowTargetGoal<>(this, PlayerEntity.class, true));
     }
 

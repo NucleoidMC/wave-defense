@@ -175,7 +175,7 @@ public final class WdActive {
 		if (entity instanceof WaveEntity) {
 			WdWave activeWave = waveManager.getActiveWave();
 			if (activeWave != null) {
-				activeWave.onZombieKilled();
+				activeWave.onMonsterKilled();
 
 				if (source.getAttacker() instanceof ServerPlayerEntity) {
 					ServerPlayerEntity player = (ServerPlayerEntity) source.getAttacker();
@@ -259,7 +259,7 @@ public final class WdActive {
 			return;
 		}
 
-		Text message = player.getDisplayName().shallowCopy().append(" succumbed to the zombies....")
+		Text message = player.getDisplayName().shallowCopy().append(" succumbed to the monsters....")
 				.formatted(Formatting.RED);
 
 		PlayerSet players = this.space.getPlayers();

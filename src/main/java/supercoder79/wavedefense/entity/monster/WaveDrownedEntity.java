@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
-import supercoder79.wavedefense.entity.MonsterClass;
+import supercoder79.wavedefense.entity.monster.classes.MonsterClass;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
 import supercoder79.wavedefense.game.WdActive;
 

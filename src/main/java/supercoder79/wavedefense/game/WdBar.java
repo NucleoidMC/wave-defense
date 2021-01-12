@@ -4,8 +4,6 @@ import net.minecraft.entity.boss.BossBar;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.plasmid.game.GameSpace;
-import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.widget.BossBarWidget;
 import xyz.nucleoid.plasmid.widget.GlobalWidgets;
 
@@ -24,7 +22,7 @@ public final class WdBar {
     public void tick(@Nullable WdWave wave) {
         if (wave != null) {
             this.bar.setTitle(this.titleForWave(wave));
-            this.bar.setProgress(wave.remainingZombies / (float) wave.totalZombies);
+            this.bar.setProgress(wave.remainingMonsters / (float) wave.totalMonsters);
         } else {
             this.bar.setTitle(IDLE_TITLE);
             this.bar.setProgress(0.0F);
@@ -32,6 +30,6 @@ public final class WdBar {
     }
 
     private Text titleForWave(WdWave wave) {
-        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingZombies + " zombies remain.");
+        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingMonsters + " monsters remain.");
     }
 }

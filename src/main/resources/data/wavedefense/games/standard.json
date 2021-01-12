@@ -13,5 +13,5 @@
   },
   "min_wave_spacing": 30.0,
   "max_wave_spacing": 60.0,
-  "spawn_radius": 48
+  "spawn_radius": 40
 }
