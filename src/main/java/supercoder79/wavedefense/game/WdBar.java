@@ -33,6 +33,6 @@ public final class WdBar {
         String monsterSuffix = wave.remainingMonsterCount == 1 ? "" : "s";
         String remainSuffix = wave.remainingMonsterCount == 1 ? "s" : "";
 
-        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingMonsterCount + " monster" + monsterSuffix + " remain" + remainSuffix + "   " + wave.remainingMonsterScore + "/" + wave.accumulatedMonsterScore);
+        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingMonsterCount + " monster" + monsterSuffix + " remain" + remainSuffix);
     }
 }
