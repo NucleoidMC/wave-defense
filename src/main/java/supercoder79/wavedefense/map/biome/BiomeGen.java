@@ -54,5 +54,7 @@ public interface BiomeGen {
 		return PoplarTreeGen.INSTANCE;
 	}
 
+	default boolean isSnowy() { return false; }
+
 	RegistryKey<Biome> getFakingBiome();
 }

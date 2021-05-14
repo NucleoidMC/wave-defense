@@ -1,20 +1,26 @@
 package supercoder79.wavedefense.game;
 
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.WitchEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.collection.WeightedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
+import supercoder79.wavedefense.entity.WaveEntity;
+import supercoder79.wavedefense.entity.monster.*;
 import supercoder79.wavedefense.entity.monster.classes.*;
 import supercoder79.wavedefense.entity.MonsterModifier;
-import supercoder79.wavedefense.entity.monster.WaveDrownedEntity;
-import supercoder79.wavedefense.entity.monster.WaveSkeletonEntity;
-import supercoder79.wavedefense.entity.monster.WaveZombieEntity;
+import supercoder79.wavedefense.entity.monster.waveentity.*;
+import supercoder79.wavedefense.util.RandomCollection;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public final class WdWaveSpawner {
@@ -22,163 +28,184 @@ public final class WdWaveSpawner {
     // sqrt2/2 works better with larger numbers... perhaps we need a smarter way of calculating these?
     private static final double SQRT3_2 = Math.sqrt(3) / 2.0;
     private static final double SQRT2_2 = Math.sqrt(2) / 2.0;
-    private static final long SPAWN_TICKS = 20 * 5;
 
     private final WdActive game;
     private final WdWave wave;
 
     private final long startTime;
-    private int spawnedMonsters;
+
+    private final ArrayList<WaveEntity> mobsToSpawn = new ArrayList<>();
 
     WdWaveSpawner(WdActive game, WdWave wave) {
         this.game = game;
         this.wave = wave;
 
         this.startTime = game.space.getWorld().getTime();
+
+        int currentScore = wave.totalMonsterScore;
+
+        ServerWorld world = this.game.space.getWorld();
+        Vec3d centerPos = this.game.guide.getCenterPos();
+        Random random = new Random();
+
+        WeightedList<Position> validCenters = new WeightedList<>();
+        validCenters.add(centerPos, this.game.getParticipants().size() * 100);
+
+        for (ServerPlayerEntity participant : this.game.getParticipants()) {
+            BlockPos pos = participant.getBlockPos();
+            double aX = pos.getX() - centerPos.getX();
+            double aZ = pos.getZ() - centerPos.getZ();
+            double dist = (aX * aX) + (aZ * aZ);
+
+            double threshold = this.game.config.spawnRadius * SQRT2_2;
+
+            if (dist * dist >= threshold * threshold) {
+                validCenters.add(participant.getPos(), (int) (getDistWeight(dist - threshold) * 100));
+            }
+        }
+
+        while (currentScore >= 0) {
+            BlockPos pos = randomMonsterSpawnPos(centerPos, random, validCenters);
+            WaveEntity entity = createMob(this.wave.ordinal, world,
+                    world.containsFluid(new Box(pos).expand(1.0)),
+                    world.getBlockState(pos).getBlock().equals(Blocks.SNOW),
+                    world.getBlockState(pos.down()).getBlock().equals(Blocks.SAND) || world.getBlockState(pos.down()).getBlock().equals(Blocks.SMOOTH_RED_SANDSTONE));
+
+            MonsterModifier mod = MonsterModifier.next(this.wave.ordinal, entity);
+            entity.setMod(mod);
+            entity.getMonsterClass().apply((MobEntity) entity, mod, world.getRandom(), game.waveManager.getWaveOrdinal());
+
+            if (entity instanceof WavePhantomEntity) {
+                pos = WdSpawnLogic.findSurfaceAt((int) centerPos.getX() + random.nextInt(11) - 5, (int) centerPos.getZ() + random.nextInt(11) - 5, 12, game.space.getWorld())
+                        .add(0, 16, 0);
+            }
+
+            if (entity.getMonsterClass().equals(StrayClasses.WIZARD)) {
+                currentScore -= 20;
+                wave.monsterCount++;
+                wave.onMonsterAdded(20);
+            }
+
+            if (entity instanceof WaveCaveSpiderEntity)
+                pos = pos.up();
+
+            ((MobEntity) entity).refreshPositionAndAngles(pos, 0, 0);
+            ((MobEntity) entity).setPersistent();
+
+            mobsToSpawn.add(entity);
+            currentScore -= entity.monsterScore();
+            wave.monsterCount++;
+            wave.onMonsterAdded(entity.monsterScore());
+        }
     }
 
     public boolean tick(long time) {
-        long timeSinceStart = time - this.startTime;
-        int targetMonsters = Math.min((int) (timeSinceStart * this.wave.totalMonsters / SPAWN_TICKS), this.wave.totalMonsters);
+        long timeSinceStart = time - this.startTime - 1;
+        int mobTick = (int) (timeSinceStart / 5) + 1;
 
-        if (targetMonsters > this.spawnedMonsters) {
-            ServerWorld world = this.game.space.getWorld();
-            Vec3d centerPos = this.game.guide.getCenterPos();
-            Random random = new Random();
+        if (mobTick <= mobsToSpawn.size() && timeSinceStart % 5 == 0) {
+            if (spawnMonster(game.space.getWorld(), mobTick - 1)) {
+                WaveEntity entity = mobsToSpawn.get(mobTick - 1);
+                this.wave.onMonsterSpawned(entity.monsterScore());
 
-            WeightedList<Position> validCenters = new WeightedList<>();
-            validCenters.add(centerPos, this.game.getParticipants().size() * 100);
-
-            for (ServerPlayerEntity participant : this.game.getParticipants()) {
-                BlockPos pos = participant.getBlockPos();
-                double aX = pos.getX() - centerPos.getX();
-                double aZ = pos.getZ() - centerPos.getZ();
-                double dist = (aX * aX) + (aZ * aZ);
-
-                double threshold = this.game.config.spawnRadius * SQRT2_2;
-
-                if (dist * dist >= threshold * threshold) {
-                    validCenters.add(participant.getPos(), (int) (getDistWeight(dist - threshold) * 100));
-                }
+                if (entity.getMonsterClass().equals(StrayClasses.WIZARD))
+                    this.wave.onMonsterSpawned(20);
             }
-
-            for (int i = spawnedMonsters; i < targetMonsters; i++) {
-                Position chosenPos = validCenters.pickRandom(random);
-
-                // Spawn monsters closer to faraway players
-                // TODO: some randomization here
-                double distance = chosenPos == centerPos ? this.game.config.spawnRadius : 4;
-
-                double theta = random.nextDouble() * 2 * Math.PI;
-                int x = (int) (chosenPos.getX() + (Math.cos(theta) * distance));
-                int z = (int) (chosenPos.getZ() + (Math.sin(theta) * distance));
-
-                BlockPos pos = WdSpawnLogic.findSurfaceAt(x, z, 12, world);
-                if (spawnMonster(world, pos)) {
-                    this.wave.onMonsterAdded();
-                }
-            }
-
-            this.spawnedMonsters = targetMonsters;
         }
 
-        return this.spawnedMonsters >= this.wave.totalMonsters;
+        return mobTick >= mobsToSpawn.size();
     }
 
-    private boolean spawnMonster(ServerWorld world, BlockPos pos) {
-        MonsterModifier mod = getMonsterModifier(world.getRandom(), this.wave.ordinal);
+    private BlockPos randomMonsterSpawnPos(Vec3d centerPos, Random random, WeightedList<Position> validCenters) {
+        Position chosenPos = validCenters.pickRandom(random);
 
+        // Spawn monsters closer to faraway players
+        // TODO: some randomization here
+        double distance = chosenPos == centerPos ? this.game.config.spawnRadius : 4;
+
+        double theta = random.nextDouble() * 2 * Math.PI;
+        int x = (int) (chosenPos.getX() + (Math.cos(theta) * distance));
+        int z = (int) (chosenPos.getZ() + (Math.sin(theta) * distance));
+
+        return WdSpawnLogic.findSurfaceAt(x, z, 12, game.space.getWorld());
+    }
+
+    private boolean spawnMonster(ServerWorld world, int order) {
         MobEntity monster;
-        if (world.containsFluid(new Box(pos).expand(1.0))) {
-            monster = new WaveDrownedEntity(world, this.game, mod, DrownedClasses.DROWNED);
-        } else {
-            monster = createMob(world.getRandom(), this.wave.ordinal, world, mod);
+
+        monster = (MobEntity) mobsToSpawn.get(order);
+
+        if (monster instanceof WaveSummonerEntity) {
+            world.spawnEntity(monster);
+            SummonersSpiderEntity spider = new SummonersSpiderEntity(EntityType.SPIDER, this.game.space.getWorld());
+            spider.refreshPositionAndAngles(monster.getBlockPos(), 0, 0);
+            spider.setPersistent();
+            this.game.space.getWorld().spawnEntity(spider);
+            return monster.startRiding(spider);
         }
 
-        monster.refreshPositionAndAngles(pos, 0, 0);
-        monster.setPersistent();
+        if (monster instanceof WaveStrayEntity && ((WaveStrayEntity) monster).getMonsterClass().equals(StrayClasses.WIZARD)) {
+            world.spawnEntity(monster);
+            WizardsPhantomEntity phantom = new WizardsPhantomEntity(this.game.space.getWorld(), this.game);
+            phantom.refreshPositionAndAngles(monster.getBlockPos(), 0, 0);
+            phantom.setPersistent();
+            phantom.setPhantomSize(3);
+            this.game.space.getWorld().spawnEntity(phantom);
+            return monster.startRiding(phantom);
+        }
+
+        monster.setCustomName(new LiteralText(mobsToSpawn.get(order).getMod().prefix + " " + mobsToSpawn.get(order).getMonsterClass().name()));
 
         return world.spawnEntity(monster);
     }
 
-    private MobEntity createMob(Random random, int waveOrdinal, ServerWorld world, MonsterModifier mod) {
-        if (random.nextInt((int) Math.max(10.0, 75.0 / waveOrdinal)) == 0) {
-            SkeletonClass skeletonClass = getSkeletonClass(random, waveOrdinal);
+    private WaveEntity createMob(int waveOrdinal, ServerWorld world, boolean aquatic, boolean snow, boolean sand) {
+        RandomCollection<WaveEntity> mobChoices = new RandomCollection<>();
 
-            return new WaveSkeletonEntity(world, this.game, mod, skeletonClass);
-        } else {
-            MonsterClass zombieClass = getZombieClass(random, waveOrdinal);
+        WaveEntity zombieType = new WaveZombieEntity(world, this.game, MonsterClass.nextZombie(waveOrdinal));
+        WaveEntity skeletonType = new WaveSkeletonEntity(world, this.game, SkeletonClass.nextSkeleton(waveOrdinal));
 
-            return new WaveZombieEntity(world, this.game, mod, zombieClass);
-        }
-    }
+        if (sand)
+            zombieType = new WaveHuskEntity(world, this.game, MonsterClass.nextHusk(waveOrdinal));
 
-    private MonsterClass getZombieClass(Random random, int waveOrdinal) {
-        if (waveOrdinal > 10) {
-            if (random.nextInt((int) (150.0 / (waveOrdinal - 10))) == 0) {
-                return ZombieClasses.TANK;
-            }
+        if (aquatic)
+            zombieType = new WaveDrownedEntity(world, this.game, MonsterClass.nextDrowned(waveOrdinal));
 
-            if (random.nextInt((int) (100.0 / (waveOrdinal - 10))) == 0) {
-                return ZombieClasses.SCOUT;
-            }
-        }
+        if (snow)
+            skeletonType = new WaveStrayEntity(world, this.game, SkeletonClass.nextStray(waveOrdinal));
 
-        if (waveOrdinal > 5 && random.nextInt((int) (100.0 / (waveOrdinal - 5))) == 0) {
-            return ZombieClasses.KNIGHT;
-        }
+        mobChoices
+                .add(wave.isSummonerWave ? 5 : 0,
+                        new WaveSummonerEntity(
+                                world,
+                                game,
+                                SkeletonClasses.SUMMONER))
 
-        if (random.nextInt((int) (75.0 / waveOrdinal)) == 0) {
-            return ZombieClasses.FIGHTER;
-        }
+                .add(Math.min(1.3, (waveOrdinal - 12) / 6d) * game.config.monsterSpawnChoices.witch,
+                        new WaveWitchEntity(
+                                world,
+                                game,
+                                WitchClasses.DEFAULT))
 
-        if (random.nextInt((int) (75.0 / waveOrdinal)) == 0) {
-            return ZombieClasses.RUNNER;
-        }
+                .add(15 * game.config.monsterSpawnChoices.zombie,
+                        zombieType)
 
-        return ZombieClasses.DEFAULT;
-    }
+                .add(Math.min(Math.max(0, (waveOrdinal - 2) / 6d), 4) * game.config.monsterSpawnChoices.skeleton,
+                        skeletonType)
 
-    private SkeletonClass getSkeletonClass(Random random, int waveOrdinal) {
-        if (waveOrdinal > 5) {
-            if (random.nextInt((int) (100.0 / (waveOrdinal - 5))) == 0) {
-                return SkeletonClasses.SNIPER;
-            }
+                .add(Math.min(Math.max(0, (waveOrdinal - 8) / 9d), 2) * game.config.monsterSpawnChoices.phantom,
+                        new WavePhantomEntity(
+                                world,
+                                this.game,
+                                PhantomClass.next(waveOrdinal)))
 
-            if (random.nextInt((int) (75.0 / (waveOrdinal - 5))) == 0) {
-                return SkeletonClasses.RAPIDSHOOTER;
-            }
-        }
+                .add(Math.min(Math.max(0, (waveOrdinal - 10) / 6d), 1) * game.config.monsterSpawnChoices.caveSpider + (wave.isSpiderWave ? 20 : 0),
+                        new WaveCaveSpiderEntity(
+                                world,
+                                this.game,
+                                CaveSpiderClasses.DEFAULT));
 
-        return SkeletonClasses.SKELETON;
-    }
-
-    private MonsterModifier getMonsterModifier(Random random, int ordinal) {
-        int r = random.nextInt((int) getModBound(ordinal));
-
-        if (r <= 1) {
-            return MonsterModifier.WITHER;
-        } else if (r <= 3) {
-            return MonsterModifier.POISON;
-        } else if (r <= 6) {
-            return MonsterModifier.WEAKNESS;
-        } else if (r <= 8) {
-            return MonsterModifier.HUNGER;
-        } else if (r <= 11) {
-            return MonsterModifier.SLOWNESS;
-        } else if (r <= 14) {
-            return MonsterModifier.BLINDNESS;
-        } else if (r <= 16) {
-            return MonsterModifier.NAUSEA;
-        }
-
-        return MonsterModifier.NORMAL;
-    }
-
-    // The bound for the random.nextInt used to get the modifier, starts at 50 and gets lower
-    // -5\ln x+50
-    private static double getModBound(int ordinal) {
-        return (-5 * Math.log(ordinal)) + 50;
+        return mobChoices.next();
     }
 
     // Weights go from 0.083ish to 0.5

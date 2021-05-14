@@ -12,27 +12,31 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.ServerWorldAccess;
 
 public final class ShrubGen implements MapGen {
-	public static final ShrubGen INSTANCE = new ShrubGen();
-	private static final BlockState LOG = Blocks.OAK_LOG.getDefaultState();
-	private static final BlockState LEAVES = Blocks.OAK_LEAVES.getDefaultState().with(Properties.DISTANCE_1_7, 1);
+    public static final ShrubGen INSTANCE = new ShrubGen();
+    private static final BlockState LOG = Blocks.OAK_LOG.getDefaultState();
+    private static final BlockState LEAVES = Blocks.OAK_LEAVES.getDefaultState().with(Properties.DISTANCE_1_7, 1);
 
-	@Override
-	public void generate(ServerWorldAccess world, BlockPos pos, Random random) {
-		if (world.getBlockState(pos.down()) != Blocks.GRASS_BLOCK.getDefaultState()) return;
+    @Override
+    public void generate(ServerWorldAccess world, BlockPos pos, Random random) {
+        if (world.getBlockState(pos.down()) != Blocks.GRASS_BLOCK.getDefaultState()
+                || world.getBlockState(pos.add(1, -1, 1)) != Blocks.GRASS_BLOCK.getDefaultState()
+                || world.getBlockState(pos.add(1, -1, -1)) != Blocks.GRASS_BLOCK.getDefaultState()
+                || world.getBlockState(pos.add(-1, -1, 1)) != Blocks.GRASS_BLOCK.getDefaultState()
+                || world.getBlockState(pos.add(-1, -1, -1)) != Blocks.GRASS_BLOCK.getDefaultState()) return;
 
-		world.setBlockState(pos, LOG, 3);
+        world.setBlockState(pos, LOG, 3);
 
-		if (random.nextBoolean()) {
-			pos = pos.up();
-			world.setBlockState(pos, LOG, 3);
-		}
+        if (random.nextBoolean()) {
+            pos = pos.up();
+            world.setBlockState(pos, LOG, 3);
+        }
 
-		for (Direction dir : Direction.values()) {
-			BlockPos local = pos.offset(dir);
+        for (Direction dir : Direction.values()) {
+            BlockPos local = pos.offset(dir);
 
-			if (world.getBlockState(local).isAir()) {
-				world.setBlockState(local, LEAVES, 3);
-			}
-		}
-	}
+            if (world.getBlockState(local).isAir()) {
+                world.setBlockState(local, LEAVES, 3);
+            }
+        }
+    }
 }

@@ -80,7 +80,7 @@ public final class WdGuide {
             }
 
             BlockPos targetPos = points.get(currentTargetIndex);
-            targetPos = world.getTopPosition(Heightmap.Type.WORLD_SURFACE, targetPos);
+            targetPos = world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, targetPos);
 
             entity.setTargetPos(targetPos);
 

@@ -20,7 +20,7 @@ public final class SprucePoplarTreeGen implements MapGen {
         if (world.getBlockState(pos.down()) != Blocks.GRASS_BLOCK.getDefaultState()) return;
 
         double maxRadius = 2.6 + ((random.nextDouble() - 0.5) * 0.2);
-        int leafDistance = random.nextInt(3) + 2;
+        int leafDistance = random.nextInt(3) + 3;
 
         BlockPos.Mutable mutable = pos.mutableCopy();
         for (int y = 0; y < 12; y++) {
@@ -38,7 +38,7 @@ public final class SprucePoplarTreeGen implements MapGen {
         mutable.move(Direction.UP, leafDistance);
 
         for (int y = 0; y < 12; y++) {
-            GenHelper.circle(mutable.mutableCopy(), maxRadius * radius(y / 11.f), leafPos -> {
+            GenHelper.circle(mutable.mutableCopy(), maxRadius * radius(y / 11.f) + random.nextInt(3) - 1, leafPos -> {
                 if (world.getBlockState(leafPos).isAir()) {
                     world.setBlockState(leafPos, LEAVES, 3);
                 }

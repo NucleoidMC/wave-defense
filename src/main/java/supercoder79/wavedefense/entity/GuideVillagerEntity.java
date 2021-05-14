@@ -39,7 +39,7 @@ public final class GuideVillagerEntity extends VillagerEntity {
         }
     }
 
-    @Override
+    /*@Override
     public void pushAwayFrom(Entity entity) {
     }
 
@@ -54,7 +54,7 @@ public final class GuideVillagerEntity extends VillagerEntity {
     @Override
     public boolean isPushable() {
         return false;
-    }
+    }*/
 
     @Override
     public boolean isPersistent() {

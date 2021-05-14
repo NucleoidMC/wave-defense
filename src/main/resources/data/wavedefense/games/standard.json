@@ -11,7 +11,94 @@
     "segment_length": 32,
     "radius": 4.0
   },
-  "min_wave_spacing": 30.0,
-  "max_wave_spacing": 60.0,
-  "spawn_radius": 40
+  "min_wave_spacing": 15,
+  "max_wave_spacing": 25,
+  "spawn_radius": 30,
+
+  "monster_spawns": {
+    "post_wave_5_scale": 1.07,
+    "base_group_size_scale": 4,
+    "base_index_scale": 3,
+    "index_scale": 1.06,
+    "group_size_scale": 1.1,
+    "upper_group_size_scale": 1.5,
+    "upper_index_scale": 1.5
+  },
+
+  "monster_spawn_choices": {
+    "zombie": 1.0,
+    "skeleton": 1.0,
+    "phantom": 1.0,
+    "witch": 1.0,
+    "cave_spider": 1.0
+  },
+
+  "shop": {
+    "sword_type": {
+      "diamond": 3,
+      "netherite": 8
+    },
+    "sharpness": {
+      "base": 16,
+      "scale": 1.8
+    },
+    "power": {
+      "base": 16,
+      "scale": 2.0
+    },
+    "piercing": {
+      "base": 16,
+      "scale": 2.0
+    },
+    "armor_type": {
+      "iron": 1,
+      "diamond": 3,
+      "netherite": 6
+    },
+    "protection": {
+      "base": 12,
+      "scale": 2.0
+    },
+    "bread": {
+      "count": 4,
+      "cost": 1
+    },
+    "steak": {
+      "count": 2,
+      "cost": 1
+    },
+    "golden_carrot": {
+      "count": 2,
+      "cost": 2
+    },
+    "golden_apple": {
+      "count": 1,
+      "cost": 8
+    },
+    "arrow": {
+      "count": 2,
+      "cost": 2
+    },
+    "healing_potion": {
+      "count": 3,
+      "cost": 1
+    },
+    "harming_potion": {
+      "count": 3,
+      "cost": 1
+    },
+    "swiftness_potion": {
+      "count": 1,
+      "cost": 1
+    },
+    "regeneration_potion": {
+      "count": 1,
+      "cost": 1
+    },
+    "quick_charge": {
+      "1": 2,
+      "2": 5,
+      "3": 8
+    }
+  }
 }
