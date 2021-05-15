@@ -252,7 +252,7 @@ public final class SkeletonClasses {
 
         @Override
         public int goldCount() {
-            return 1 + new Random().nextInt(2);
+            return new Random().nextInt(2) + new Random().nextInt(2);
         }
 
         @Override

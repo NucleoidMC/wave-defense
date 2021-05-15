@@ -54,6 +54,8 @@ public final class WdActive {
 
     public final int groupSize;
 
+    public int averageGroupSize;
+
     private WdActive(GameSpace space, WdMap map, WdConfig config, MutablePlayerSet participants, GlobalWidgets widgets) {
         this.space = space;
         this.map = map;
@@ -67,6 +69,7 @@ public final class WdActive {
         this.guide = new WdGuide(this);
 
         this.groupSize = participants.size();
+        this.averageGroupSize = groupSize;
     }
 
     public static void open(GameSpace world, WdMap map, WdConfig config) {

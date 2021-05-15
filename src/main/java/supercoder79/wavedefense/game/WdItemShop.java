@@ -183,6 +183,10 @@ public final class WdItemShop {
             shop.addItem(ItemStackBuilder.of(Items.ARROW).setCount(config.arrow.count).build(), Cost.ofIron(config.arrow.cost));
             shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
                     .withCost(Cost.no()));
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
 
             shop.add(ShopEntry.ofIcon(helmet)
                     .withName(new LiteralText("Upgrade Helmet"))
@@ -221,7 +225,10 @@ public final class WdItemShop {
             shop.addItem(new ItemStack(Items.COOKED_BEEF, config.steak.count), Cost.ofIron(config.steak.cost));
             shop.addItem(new ItemStack(Items.GOLDEN_CARROT, config.goldenCarrot.count), Cost.ofIron(config.goldenCarrot.cost));
             shop.addItem(new ItemStack(Items.GOLDEN_APPLE, config.goldenApple.count), Cost.ofIron(config.goldenApple.cost));
-
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
 
             shop.add(ShopEntry.ofIcon(chestplate)
                     .withName(new LiteralText("Upgrade Chestplate"))
@@ -273,6 +280,10 @@ public final class WdItemShop {
                     new ItemStack(Items.POTION, config.regenerationPotion.count),
                     Potions.STRONG_REGENERATION),
                     Cost.ofGold(config.regenerationPotion.cost));
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
 
             shop.add(ShopEntry.ofIcon(leggings)
                     .withName(new LiteralText("Upgrade Leggings"))
@@ -304,6 +315,10 @@ public final class WdItemShop {
                     })
             );
 
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
             shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
                     .withCost(Cost.no()));
             shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
@@ -349,10 +364,12 @@ public final class WdItemShop {
                     .withCost(Cost.no()));
 
             int quickChargeCost = config.quickCharge.lvl1;
-            if (properties.quickChargeLevel == 1)
+            if (properties.quickChargeLevel == 1) {
                 quickChargeCost = config.quickCharge.lvl2;
-            if (properties.quickChargeLevel == 2)
+            }
+            if (properties.quickChargeLevel == 2) {
                 quickChargeCost = config.quickCharge.lvl3;
+            }
 
             shop.add(ShopEntry.ofIcon(Items.CROSSBOW)
                     .withName(new LiteralText("Crossbow Quick Charge " + (quickCharge + 1)))
@@ -364,6 +381,10 @@ public final class WdItemShop {
                     })
             );
 
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
+            shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
+                    .withCost(Cost.no()));
             shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
                     .withCost(Cost.no()));
             shop.add(ShopEntry.ofIcon(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
