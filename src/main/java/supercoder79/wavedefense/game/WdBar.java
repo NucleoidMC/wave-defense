@@ -22,7 +22,7 @@ public final class WdBar {
     public void tick(@Nullable WdWave wave) {
         if (wave != null) {
             this.bar.setTitle(this.titleForWave(wave));
-            this.bar.setProgress(wave.remainingMonsters / (float) wave.totalMonsters);
+            this.bar.setProgress(wave.remainingMonsterScore / (float) wave.accumulatedMonsterScore);
         } else {
             this.bar.setTitle(IDLE_TITLE);
             this.bar.setProgress(0.0F);
@@ -30,9 +30,9 @@ public final class WdBar {
     }
 
     private Text titleForWave(WdWave wave) {
-        String monsterSuffix = wave.remainingMonsters == 1 ? "" : "s";
-        String remainSuffix = wave.remainingMonsters == 1 ? "s" : "";
+        String monsterSuffix = wave.remainingMonsterCount == 1 ? "" : "s";
+        String remainSuffix = wave.remainingMonsterCount == 1 ? "s" : "";
 
-        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingMonsters + " monster" + monsterSuffix +" remain" + remainSuffix + ".");
+        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingMonsterCount + " monster" + monsterSuffix + " remain" + remainSuffix);
     }
 }

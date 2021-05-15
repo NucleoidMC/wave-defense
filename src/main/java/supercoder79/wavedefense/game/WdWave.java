@@ -1,21 +1,38 @@
 package supercoder79.wavedefense.game;
 
+import java.util.Random;
+
 public final class WdWave {
     public final int ordinal;
-    public final int totalMonsters;
+    public final int totalMonsterScore;
+    public int remainingMonsterScore;
+    public int accumulatedMonsterScore;
+    public int monsterCount;
+    public int remainingMonsterCount;
 
-    public int remainingMonsters;
+    public boolean isSummonerWave;
+    public boolean isSpiderWave;
+    public boolean isWizardWave;
 
-    public WdWave(int ordinal, int totalMonsters) {
+    public WdWave(int ordinal, int totalMonsterScore) {
         this.ordinal = ordinal;
-        this.totalMonsters = totalMonsters;
+        this.totalMonsterScore = totalMonsterScore;
+
+        this.isSummonerWave = ordinal >= 15 && ordinal % 5 == 0 && !isWizardWave;
+        this.isSpiderWave = ordinal >= 10 && new Random().nextInt(5) == 0 && !isSummonerWave;
     }
 
-    public void onMonsterAdded() {
-        this.remainingMonsters++;
+    public void onMonsterAdded(int score) {
+        this.accumulatedMonsterScore += score;
     }
 
-    public void onMonsterKilled() {
-        this.remainingMonsters--;
+    public void onMonsterSpawned(int score) {
+        this.remainingMonsterScore += score;
+        this.remainingMonsterCount++;
+    }
+
+    public void onMonsterKilled(int score) {
+        this.remainingMonsterScore -= score;
+        this.remainingMonsterCount--;
     }
 }

@@ -4,12 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import kdotjpg.opensimplex.OpenSimplexNoise;
-import supercoder79.wavedefense.map.biome.impl.DesertGen;
-import supercoder79.wavedefense.map.biome.impl.ForestGen;
-import supercoder79.wavedefense.map.biome.impl.PlainsGen;
-import supercoder79.wavedefense.map.biome.impl.ShrublandGen;
-import supercoder79.wavedefense.map.biome.impl.SwampGen;
-import supercoder79.wavedefense.map.biome.impl.TaigaGen;
+import supercoder79.wavedefense.map.biome.impl.*;
 
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryLookupCodec;
@@ -60,9 +55,9 @@ public final class FakeBiomeSource extends BiomeSource {
 
 		double rainfall = (rainfallNoise.eval(x / 320.0, z / 320.0) + 1) / 2;
 
-		if (temperature > 0.8) {
+		if (temperature > 0.85) {
 			return DesertGen.INSTANCE;
-		} else if (temperature > 0.5) {
+		} else if (temperature > 0.575) {
 			if (rainfall < 0.35) {
 				return DesertGen.INSTANCE;
 			} else if (rainfall < 0.5) {
@@ -72,12 +67,14 @@ public final class FakeBiomeSource extends BiomeSource {
 			} else {
 				return PlainsGen.INSTANCE;
 			}
-		} else {
+		} else if (temperature > 0.4) {
 			if (rainfall > 0.575) {
 				return TaigaGen.INSTANCE;
 			} else {
 				return ForestGen.INSTANCE;
 			}
+		} else {
+			return TundraGen.INSTANCE;
 		}
 	}
 }
