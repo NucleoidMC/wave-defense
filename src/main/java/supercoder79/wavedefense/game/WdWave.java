@@ -12,13 +12,12 @@ public final class WdWave {
 
     public boolean isSummonerWave;
     public boolean isSpiderWave;
-    public boolean isWizardWave;
 
     public WdWave(int ordinal, int totalMonsterScore) {
         this.ordinal = ordinal;
         this.totalMonsterScore = totalMonsterScore;
 
-        this.isSummonerWave = ordinal >= 15 && ordinal % 5 == 0 && !isWizardWave;
+        this.isSummonerWave = ordinal >= 15 && ordinal % 5 == 0;
         this.isSpiderWave = ordinal >= 10 && new Random().nextInt(5) == 0 && !isSummonerWave;
     }
 

@@ -1,9 +1,9 @@
 package supercoder79.wavedefense.game;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.WitchEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
@@ -13,6 +13,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
+import net.minecraft.world.Heightmap;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.*;
 import supercoder79.wavedefense.entity.monster.classes.*;
@@ -124,10 +125,25 @@ public final class WdWaveSpawner {
         double distance = chosenPos == centerPos ? this.game.config.spawnRadius : 4;
 
         double theta = random.nextDouble() * 2 * Math.PI;
-        int x = (int) (chosenPos.getX() + (Math.cos(theta) * distance));
-        int z = (int) (chosenPos.getZ() + (Math.sin(theta) * distance));
 
-        return WdSpawnLogic.findSurfaceAt(x, z, 12, game.space.getWorld());
+        int x, z;
+        BlockPos surfacePos = new BlockPos.Mutable(0, 0, 0);
+        BlockState surfaceBlock;
+
+        boolean found = false;
+
+        while (!found) {
+            x = (int) (chosenPos.getX() + (Math.cos(theta) * distance));
+            z = (int) (chosenPos.getZ() + (Math.sin(theta) * distance));
+            surfacePos = WdSpawnLogic.findSurfaceAt(x, z, 12, game.space.getWorld()).down();
+            surfaceBlock = game.space.getWorld().getBlockState(surfacePos);
+
+            if (!surfaceBlock.getBlock().equals(Blocks.PACKED_ICE)) {
+                found = true;
+            }
+        }
+
+        return surfacePos.up();
     }
 
     private boolean spawnMonster(ServerWorld world, int order) {

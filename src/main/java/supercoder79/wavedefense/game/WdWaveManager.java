@@ -44,7 +44,7 @@ public final class WdWaveManager {
                             style.withColor(TextColor.parse("green"))
                     ));
             int survivalBonus = 3 + wave.ordinal;
-            int survivalGold = wave.ordinal % 5 == 0 ? MathHelper.ceil(wave.ordinal / 10d) : 0;
+            int survivalGold = wave.ordinal % 5 == 0 ? MathHelper.ceil(wave.ordinal / 20d) : 0;
 
             if (survivalGold == 0)
                 players.sendMessage(new LiteralText("You earned " + survivalBonus + " iron for surviving this wave!")
@@ -86,6 +86,8 @@ public final class WdWaveManager {
                 .styled(style ->
                         style.withColor(TextColor.parse("light_purple"))
                 ));
+
+        game.averageGroupSize = (game.averageGroupSize + game.getParticipants().size()) / 2;
     }
 
     private WdWave createWave(int index) {
@@ -111,7 +113,7 @@ public final class WdWaveManager {
 
     private int monsterScore(int index) {
         WdConfig.MonsterSpawns monsterSpawns = game.config.monsterSpawns;
-        double base = game.groupSize * monsterSpawns.baseGroupSizeScale + index * monsterSpawns.baseIndexScale + 2;
-        return Math.min(MathHelper.floor(base + Math.pow(Math.max(0, index - 5), monsterSpawns.postWaveFiveScale) + Math.pow(index, monsterSpawns.indexScale) * Math.pow(game.groupSize, monsterSpawns.groupSizeScale)), MathHelper.floor(80 + Math.pow(game.groupSize, monsterSpawns.upperGroupSizeScale) * 18 + Math.pow(index, monsterSpawns.upperIndexScale)));
+        double base = game.averageGroupSize * monsterSpawns.baseGroupSizeScale + index * monsterSpawns.baseIndexScale + 2;
+        return Math.min(MathHelper.floor(base + Math.pow(Math.max(0, index - 5), monsterSpawns.postWaveFiveScale) + Math.pow(index, monsterSpawns.indexScale) * Math.pow(game.averageGroupSize, monsterSpawns.groupSizeScale)), MathHelper.floor(80 + Math.pow(game.averageGroupSize, monsterSpawns.upperGroupSizeScale) * 18 + Math.pow(index, monsterSpawns.upperIndexScale)));
     }
 }

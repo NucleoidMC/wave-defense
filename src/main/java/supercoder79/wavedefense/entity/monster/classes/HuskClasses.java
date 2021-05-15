@@ -17,7 +17,7 @@ public final class HuskClasses {
     public static final MonsterClass DEFAULT = new MonsterClass() {
         @Override
         public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
-            entity.setCustomName(new LiteralText(mod.prefix + "Husk"));
+
         }
 
         @Override

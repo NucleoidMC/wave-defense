@@ -76,15 +76,15 @@
       "cost": 8
     },
     "arrow": {
-      "count": 2,
+      "count": 3,
       "cost": 2
     },
     "healing_potion": {
-      "count": 3,
+      "count": 6,
       "cost": 1
     },
     "harming_potion": {
-      "count": 3,
+      "count": 6,
       "cost": 1
     },
     "swiftness_potion": {
@@ -92,7 +92,7 @@
       "cost": 1
     },
     "regeneration_potion": {
-      "count": 1,
+      "count": 2,
       "cost": 1
     },
     "quick_charge": {
