@@ -59,7 +59,7 @@ public class WaveSummonerEntity extends SkeletonEntity implements WaveEntity {
         this.goalSelector.add(4, new LookAroundGoal(this));
         this.goalSelector.add(4, new AttackGoal(this));
         this.targetSelector.add(1, new RevengeGoal(this, WaveSummonerEntity.class));
-        this.targetSelector.add(2, new FollowTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
     }
 
     @Override

@@ -4,12 +4,11 @@ import java.util.Random;
 
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.feature.SprucePoplarTreeGen;
-import xyz.nucleoid.plasmid.game.gen.MapGen;
 
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.BuiltinBiomes;
+import xyz.nucleoid.substrate.gen.MapGen;
 
 public final class TaigaGen implements BiomeGen {
 	public static final TaigaGen INSTANCE = new TaigaGen();

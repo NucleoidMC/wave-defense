@@ -1,6 +1,5 @@
 package supercoder79.wavedefense.entity;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.passive.VillagerEntity;

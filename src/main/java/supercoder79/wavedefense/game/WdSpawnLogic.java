@@ -12,38 +12,27 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
 
-import xyz.nucleoid.plasmid.game.GameSpace;
-
 import java.util.Random;
 
-public final class WdSpawnLogic {
-    private final GameSpace space;
-    private final WdConfig config;
-
-    public WdSpawnLogic(GameSpace space, WdConfig config) {
-        this.space = space;
-        this.config = config;
-    }
+public record WdSpawnLogic(ServerWorld world, WdConfig config) {
 
     public void resetPlayer(ServerPlayerEntity player, GameMode gameMode) {
-        player.inventory.clear();
+        player.getInventory().clear();
         player.getEnderChestInventory().clear();
         player.clearStatusEffects();
         player.setHealth(20.0F);
         player.getHungerManager().setFoodLevel(20);
         player.getHungerManager().add(5, 0.5F);
         player.fallDistance = 0.0F;
-        player.setGameMode(gameMode);
+        player.changeGameMode(gameMode);
         player.setExperienceLevel(0);
         player.setExperiencePoints(0);
     }
 
     public void spawnPlayer(ServerPlayerEntity player) {
-        ServerWorld world = this.space.getWorld();
-
-        BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.space.getWorld(), this.config);
+        BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.world, this.config);
         ChunkPos chunkPos = new ChunkPos(pos);
-        world.getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, chunkPos, 1, player.getEntityId());
+        world.getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, chunkPos, 1, player.getId());
 
         player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0F, 0.0F);
     }
@@ -62,7 +51,7 @@ public final class WdSpawnLogic {
             mutablePos.setY(topY - 1);
 
             BlockState ground = world.getBlockState(mutablePos);
-            if (ground.getBlock().isIn(BlockTags.LEAVES)) {
+            if (ground.isIn(BlockTags.LEAVES)) {
                 continue;
             }
 
@@ -83,7 +72,7 @@ public final class WdSpawnLogic {
             mutablePos.setY(topY - 1);
 
             BlockState ground = world.getBlockState(mutablePos);
-            if (ground.getBlock().isIn(BlockTags.LEAVES)) {
+            if (ground.isIn(BlockTags.LEAVES)) {
                 continue;
             }
 

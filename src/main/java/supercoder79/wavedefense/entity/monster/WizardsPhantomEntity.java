@@ -13,7 +13,6 @@ import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.classes.MonsterClass;
 import supercoder79.wavedefense.entity.monster.classes.PhantomClasses;
-import supercoder79.wavedefense.entity.monster.classes.StrayClasses;
 import supercoder79.wavedefense.game.WdActive;
 
 public class WizardsPhantomEntity extends PhantomEntity implements WaveEntity {
@@ -62,11 +61,6 @@ public class WizardsPhantomEntity extends PhantomEntity implements WaveEntity {
         if (this.hasPassengers())
             return true;
         return super.isInvulnerableTo(damageSource);
-    }
-
-    @Override
-    protected boolean canDropLootAndXp() {
-        return false;
     }
 
     @Override

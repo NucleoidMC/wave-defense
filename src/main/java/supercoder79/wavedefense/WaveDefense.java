@@ -13,8 +13,8 @@ public class WaveDefense implements ModInitializer {
 	public void onInitialize() {
 		GameType.register(
 				new Identifier("wavedefense", "wavedefense"),
-				WdWaiting::open,
-				WdConfig.CODEC
-		);
+				WdConfig.CODEC,
+				WdWaiting::open
+				);
 	}
 }

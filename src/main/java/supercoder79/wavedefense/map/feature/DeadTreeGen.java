@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
-import xyz.nucleoid.plasmid.game.gen.MapGen;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -17,6 +16,7 @@ import net.minecraft.world.ModifiableTestableWorld;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.gen.feature.TreeFeature;
 import net.minecraft.world.gen.foliage.FoliagePlacer;
+import xyz.nucleoid.substrate.gen.MapGen;
 
 public final class DeadTreeGen implements MapGen {
 	public static final DeadTreeGen INSTANCE = new DeadTreeGen();

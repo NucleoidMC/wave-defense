@@ -58,8 +58,8 @@ public final class WdWaveManager {
                         ));
 
             for (PlayerEntity player : players) {
-                player.inventory.insertStack(new ItemStack(Items.IRON_INGOT, survivalBonus));
-                player.inventory.insertStack(new ItemStack(Items.GOLD_INGOT, survivalGold));
+                player.getInventory().insertStack(new ItemStack(Items.IRON_INGOT, survivalBonus));
+                player.getInventory().insertStack(new ItemStack(Items.GOLD_INGOT, survivalGold));
             }
 
             activeWave = null;
@@ -67,7 +67,7 @@ public final class WdWaveManager {
     }
 
     private void tickInactive(double progressBlocks) {
-        if (nextWaveIndex >= game.map.waveStarts.size()) {
+        if (nextWaveIndex >= game.map.waveStarts().size()) {
             return;
         }
 
@@ -108,7 +108,7 @@ public final class WdWaveManager {
     }
 
     public double getNextWaveDistance() {
-        return game.map.waveStarts.getDouble(Math.min(nextWaveIndex, game.map.waveStarts.size() - 1));
+        return game.map.waveStarts().getDouble(Math.min(nextWaveIndex, game.map.waveStarts().size() - 1));
     }
 
     private int monsterScore(int index) {

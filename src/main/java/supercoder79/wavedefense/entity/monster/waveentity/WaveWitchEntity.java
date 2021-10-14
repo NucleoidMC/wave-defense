@@ -16,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
@@ -33,8 +34,8 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
         this.setMonsterClass(monsterClass);
 
         this.goalSelector.add(0, new MoveTowardGameCenterGoal<>(this));
-        this.targetSelector.add(2, new FollowTargetGoal<>(this, PlayerEntity.class, true));
-        this.targetSelector.add(0, new FollowTargetGoal<>(this, MobEntity.class, 1, false, false, e -> !(e instanceof WitchEntity)));
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(0, new ActiveTargetGoal<>(this, MobEntity.class, 1, false, false, e -> !(e instanceof WitchEntity)));
 
         this.setAttributes();
     }
@@ -129,7 +130,7 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
         }
 
         ((ServerWorld) world).spawnParticles(
-                new DustParticleEffect(red, green, blue, scale + stateTimer / 150f),
+                new DustParticleEffect(new Vec3f(red, green, blue), scale + stateTimer / 150f),
                 this.getX(), this.getY() + particleSpawnY + 0.3, this.getZ(),
                 2, 0.2, 0.0, 0.2, 0.1
         );

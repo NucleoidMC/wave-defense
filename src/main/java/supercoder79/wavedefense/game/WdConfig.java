@@ -2,7 +2,7 @@ package supercoder79.wavedefense.game;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import xyz.nucleoid.plasmid.game.config.PlayerConfig;
+import xyz.nucleoid.plasmid.game.common.config.PlayerConfig;
 
 public final class WdConfig {
     public static final Codec<WdConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(

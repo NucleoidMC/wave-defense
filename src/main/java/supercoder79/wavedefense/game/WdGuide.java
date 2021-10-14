@@ -1,6 +1,8 @@
 package supercoder79.wavedefense.game;
 
-import net.minecraft.network.packet.s2c.play.WorldBorderS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldBorderCenterChangedS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldBorderSizeChangedS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -34,7 +36,7 @@ public final class WdGuide {
 
     public WdGuide(WdActive game) {
         this.game = game;
-        this.world = game.space.getWorld();
+        this.world = game.world;
 
         PlayerSet players = game.space.getPlayers();
 
@@ -44,7 +46,7 @@ public final class WdGuide {
     }
 
     public void tick(long time, boolean waveActive) {
-        if (entity == null || entity.removed) {
+        if (entity == null || entity.isRemoved()) {
             entity = spawnEntity(centerPos.x, centerPos.z);
         }
 
@@ -57,7 +59,7 @@ public final class WdGuide {
         }
 
         if (time % 10 == 0) {
-            WdPath.Progress progress = game.map.path.getProgressAt(entity.getX(), entity.getZ());
+            WdPath.Progress progress = game.map.path().getProgressAt(entity.getX(), entity.getZ());
             this.centerPos = progress.center;
             this.progressPercent = progress.percent;
 
@@ -74,7 +76,7 @@ public final class WdGuide {
         }
 
         if (time % 10 == 0 || !entity.isNavigating()) {
-            List<BlockPos> points = game.map.path.getPoints();
+            List<BlockPos> points = game.map.path().getPoints();
             if (currentTargetIndex >= points.size()) {
                 return;
             }
@@ -110,7 +112,7 @@ public final class WdGuide {
 
     public void onAddPlayer(ServerPlayerEntity player) {
         WorldBorder worldBorder = getWorldBorder();
-        player.networkHandler.sendPacket(new WorldBorderS2CPacket(worldBorder, WorldBorderS2CPacket.Type.INITIALIZE));
+        player.networkHandler.sendPacket(new WorldBorderInitializeS2CPacket(worldBorder));
     }
 
     private void updateWorldBorder() {
@@ -124,8 +126,8 @@ public final class WdGuide {
             boolean hidden = deltaX * deltaX + deltaZ * deltaZ < 1.5 * 1.5;
             worldBorder.setSize(hidden ? 20000.0 : size);
 
-            player.networkHandler.sendPacket(new WorldBorderS2CPacket(worldBorder, WorldBorderS2CPacket.Type.SET_CENTER));
-            player.networkHandler.sendPacket(new WorldBorderS2CPacket(worldBorder, WorldBorderS2CPacket.Type.SET_SIZE));
+            player.networkHandler.sendPacket(new WorldBorderCenterChangedS2CPacket(worldBorder));
+            player.networkHandler.sendPacket(new WorldBorderSizeChangedS2CPacket(worldBorder));
         }
     }
 
@@ -168,6 +170,6 @@ public final class WdGuide {
     }
 
     public double getProgressBlocks() {
-        return progressPercent * game.map.path.getLength();
+        return progressPercent * game.map.path().getLength();
     }
 }
