@@ -53,7 +53,7 @@ public class WaveSkeletonEntity extends SkeletonEntity implements WaveEntity {
 		this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
 		this.goalSelector.add(6, new LookAroundGoal(this));
 		this.targetSelector.add(1, new RevengeGoal(this, WaveZombieEntity.class, WaveSkeletonEntity.class));
-		this.targetSelector.add(2, new FollowTargetGoal<>(this, PlayerEntity.class, true));
+		this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
 	}
 
 	public void setAttributes() {
@@ -76,7 +76,7 @@ public class WaveSkeletonEntity extends SkeletonEntity implements WaveEntity {
 		double xDist = target.getX() - this.getX();
 		double yDist = target.getBodyY(0.3333333333333333D) - arrowProjectile.getY();
 		double zDist = target.getZ() - this.getZ();
-		double yScale = MathHelper.sqrt(xDist * xDist + zDist * zDist);
+		double yScale = MathHelper.sqrt((float) (xDist * xDist + zDist * zDist));
 
 		arrowProjectile.setVelocity(xDist, yDist + yScale * 0.20000000298023224D, zDist, this.getMonsterClass().arrowSpeed(), this.getMonsterClass().arrowDivergence());
 		this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));

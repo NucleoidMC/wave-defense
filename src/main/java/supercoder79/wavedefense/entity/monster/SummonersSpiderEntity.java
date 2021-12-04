@@ -26,11 +26,6 @@ public class SummonersSpiderEntity extends SpiderEntity {
     }
 
     @Override
-    protected boolean canDropLootAndXp() {
-        return false;
-    }
-
-    @Override
     protected boolean shouldDropLoot() {
         return false;
     }

@@ -1,6 +1,6 @@
 package supercoder79.wavedefense.entity.goal;
 
-import net.minecraft.entity.ai.TargetFinder;
+import net.minecraft.entity.ai.FuzzyTargeting;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.util.math.Vec3d;
@@ -31,7 +31,7 @@ public final class MoveTowardGameCenterGoal<T extends PathAwareEntity & WaveEnti
     public void start() {
         WdActive game = entity.getGame();
         Vec3d center = game.guide.getCenterPos();
-        Vec3d target = TargetFinder.findTargetTowards(entity, 15, 15, center);
+        Vec3d target = FuzzyTargeting.findTo(entity, 15, 15, center);
 
         if (target != null) {
             entity.getNavigation().startMovingTo(target.x, target.y, target.z, 1.0);

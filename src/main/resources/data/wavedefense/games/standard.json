@@ -1,6 +1,9 @@
 {
   "type": "wavedefense:wavedefense",
-  "name": "Wave Defense",
+  "name": {
+    "translate": "gameType.wavedefense.wavedefense"
+  },
+  "icon": "zombie_head",
   "players": {
     "min": 1,
     "max": 100,

@@ -7,19 +7,18 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.collection.WeightedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
-import net.minecraft.world.Heightmap;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.*;
 import supercoder79.wavedefense.entity.monster.classes.*;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.monster.waveentity.*;
 import supercoder79.wavedefense.util.RandomCollection;
+import supercoder79.wavedefense.util.WeightedList;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -41,11 +40,11 @@ public final class WdWaveSpawner {
         this.game = game;
         this.wave = wave;
 
-        this.startTime = game.space.getWorld().getTime();
+        this.startTime = game.world.getTime();
 
         int currentScore = wave.totalMonsterScore;
 
-        ServerWorld world = this.game.space.getWorld();
+        ServerWorld world = this.game.world;
         Vec3d centerPos = this.game.guide.getCenterPos();
         Random random = new Random();
 
@@ -77,7 +76,7 @@ public final class WdWaveSpawner {
             entity.getMonsterClass().apply((MobEntity) entity, mod, world.getRandom(), game.waveManager.getWaveOrdinal());
 
             if (entity instanceof WavePhantomEntity) {
-                pos = WdSpawnLogic.findSurfaceAt((int) centerPos.getX() + random.nextInt(11) - 5, (int) centerPos.getZ() + random.nextInt(11) - 5, 12, game.space.getWorld())
+                pos = WdSpawnLogic.findSurfaceAt((int) centerPos.getX() + random.nextInt(11) - 5, (int) centerPos.getZ() + random.nextInt(11) - 5, 12, game.world)
                         .add(0, 16, 0);
             }
 
@@ -105,7 +104,7 @@ public final class WdWaveSpawner {
         int mobTick = (int) (timeSinceStart / 5) + 1;
 
         if (mobTick <= mobsToSpawn.size() && timeSinceStart % 5 == 0) {
-            if (spawnMonster(game.space.getWorld(), mobTick - 1)) {
+            if (spawnMonster(game.world, mobTick - 1)) {
                 WaveEntity entity = mobsToSpawn.get(mobTick - 1);
                 this.wave.onMonsterSpawned(entity.monsterScore());
 
@@ -135,8 +134,8 @@ public final class WdWaveSpawner {
         while (!found) {
             x = (int) (chosenPos.getX() + (Math.cos(theta) * distance));
             z = (int) (chosenPos.getZ() + (Math.sin(theta) * distance));
-            surfacePos = WdSpawnLogic.findSurfaceAt(x, z, 12, game.space.getWorld()).down();
-            surfaceBlock = game.space.getWorld().getBlockState(surfacePos);
+            surfacePos = WdSpawnLogic.findSurfaceAt(x, z, 12, game.world).down();
+            surfaceBlock = game.world.getBlockState(surfacePos);
 
             if (!surfaceBlock.getBlock().equals(Blocks.PACKED_ICE)) {
                 found = true;
@@ -153,20 +152,20 @@ public final class WdWaveSpawner {
 
         if (monster instanceof WaveSummonerEntity) {
             world.spawnEntity(monster);
-            SummonersSpiderEntity spider = new SummonersSpiderEntity(EntityType.SPIDER, this.game.space.getWorld());
+            SummonersSpiderEntity spider = new SummonersSpiderEntity(EntityType.SPIDER, this.game.world);
             spider.refreshPositionAndAngles(monster.getBlockPos(), 0, 0);
             spider.setPersistent();
-            this.game.space.getWorld().spawnEntity(spider);
+            this.game.world.spawnEntity(spider);
             return monster.startRiding(spider);
         }
 
         if (monster instanceof WaveStrayEntity && ((WaveStrayEntity) monster).getMonsterClass().equals(StrayClasses.WIZARD)) {
             world.spawnEntity(monster);
-            WizardsPhantomEntity phantom = new WizardsPhantomEntity(this.game.space.getWorld(), this.game);
+            WizardsPhantomEntity phantom = new WizardsPhantomEntity(this.game.world, this.game);
             phantom.refreshPositionAndAngles(monster.getBlockPos(), 0, 0);
             phantom.setPersistent();
             phantom.setPhantomSize(3);
-            this.game.space.getWorld().spawnEntity(phantom);
+            this.game.world.spawnEntity(phantom);
             return monster.startRiding(phantom);
         }
 

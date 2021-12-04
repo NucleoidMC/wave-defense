@@ -11,6 +11,7 @@ import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
@@ -25,7 +26,7 @@ public class WizardsSnowballEntity extends SnowballEntity {
         super.tick();
 
         ((ServerWorld)world).spawnParticles(
-                new DustParticleEffect(0.4f, 0.5f, 1.0f, 1f),
+                new DustParticleEffect(new Vec3f(0.4f, 0.5f, 1.0f), 1f),
                 this.getX(), this.getY(), this.getZ(),
                 1, 0.0, 0.0, 0.0, 0.1
         );

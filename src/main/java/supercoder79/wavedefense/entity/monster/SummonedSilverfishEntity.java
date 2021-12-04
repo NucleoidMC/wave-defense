@@ -3,8 +3,6 @@ package supercoder79.wavedefense.entity.monster;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.SilverfishEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.world.World;
 
 public class SummonedSilverfishEntity extends SilverfishEntity {

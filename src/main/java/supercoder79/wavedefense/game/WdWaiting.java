@@ -4,75 +4,77 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.Heightmap;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.WdMapGenerator;
-import xyz.nucleoid.fantasy.BubbleWorldConfig;
-import xyz.nucleoid.fantasy.BubbleWorldSpawner;
+import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
 import xyz.nucleoid.plasmid.game.GameOpenProcedure;
+import xyz.nucleoid.plasmid.game.GameResult;
 import xyz.nucleoid.plasmid.game.GameSpace;
-import xyz.nucleoid.plasmid.game.GameWaitingLobby;
-import xyz.nucleoid.plasmid.game.StartResult;
-import xyz.nucleoid.plasmid.game.event.AttackEntityListener;
-import xyz.nucleoid.plasmid.game.event.PlayerAddListener;
-import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
-import xyz.nucleoid.plasmid.game.event.RequestStartListener;
-import xyz.nucleoid.plasmid.game.event.UseBlockListener;
-import xyz.nucleoid.plasmid.game.event.UseItemListener;
-import xyz.nucleoid.plasmid.game.rule.GameRule;
-import xyz.nucleoid.plasmid.game.rule.RuleResult;
+import xyz.nucleoid.plasmid.game.common.GameWaitingLobby;
+import xyz.nucleoid.plasmid.game.event.GameActivityEvents;
+import xyz.nucleoid.plasmid.game.event.GamePlayerEvents;
+import xyz.nucleoid.plasmid.game.rule.GameRuleType;
+import xyz.nucleoid.stimuli.event.block.BlockUseEvent;
+import xyz.nucleoid.stimuli.event.item.ItemUseEvent;
+import xyz.nucleoid.stimuli.event.player.PlayerAttackEntityEvent;
+import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 
 public final class WdWaiting {
-	private final GameSpace world;
+	private final GameSpace gameSpace;
 	private final WdMap map;
 	private final WdConfig config;
 
 	private final WdSpawnLogic spawnLogic;
+	private final ServerWorld world;
 
-	private WdWaiting(GameSpace world, WdMap map, WdConfig config) {
-		this.world = world;
+	private WdWaiting(GameSpace gameSpace, WdMap map, WdConfig config, ServerWorld world) {
+		this.gameSpace = gameSpace;
 		this.map = map;
 		this.config = config;
+		this.world = world;
 
 		this.spawnLogic = new WdSpawnLogic(world, config);
 	}
 
 	public static GameOpenProcedure open(GameOpenContext<WdConfig> context) {
 		WdMapGenerator generator = new WdMapGenerator();
-		WdConfig config = context.getConfig();
+		WdConfig config = context.config();
 
 		WdMap map = generator.build(config);
-		BubbleWorldConfig worldConfig = new BubbleWorldConfig()
-				.setGenerator(map.chunkGenerator(context.getServer()))
-				.setDefaultGameMode(GameMode.SPECTATOR)
-				.setSpawner(BubbleWorldSpawner.atSurface(0, 0))
+		RuntimeWorldConfig worldConfig = new RuntimeWorldConfig()
+				.setGenerator(map.chunkGenerator(context.server()))
 				.setTimeOfDay(18000)
 				.setDifficulty(Difficulty.NORMAL);
 
-		return context.createOpenProcedure(worldConfig, (game) -> {
-			WdWaiting waiting = new WdWaiting(game.getSpace(), map, config);
-			GameWaitingLobby.applyTo(game, context.getConfig().playerConfig);
+		return context.openWithWorld(worldConfig, (game, world) -> {
+			WdWaiting waiting = new WdWaiting(game.getGameSpace(), map, config, world);
+			GameWaitingLobby.addTo(game, context.config().playerConfig);
 
-			game.setRule(GameRule.CRAFTING, RuleResult.DENY);
-			game.setRule(GameRule.PORTALS, RuleResult.DENY);
-			game.setRule(GameRule.PVP, RuleResult.DENY);
-			game.setRule(GameRule.FALL_DAMAGE, RuleResult.DENY);
-			game.setRule(GameRule.HUNGER, RuleResult.DENY);
+			game.setRule(GameRuleType.CRAFTING, ActionResult.FAIL);
+			game.setRule(GameRuleType.PORTALS, ActionResult.FAIL);
+			game.setRule(GameRuleType.PVP, ActionResult.FAIL);
+			game.setRule(GameRuleType.FALL_DAMAGE, ActionResult.FAIL);
+			game.setRule(GameRuleType.HUNGER, ActionResult.FAIL);
 
-			game.on(RequestStartListener.EVENT, waiting::requestStart);
+			game.listen(GameActivityEvents.REQUEST_START, waiting::requestStart);
 
-			game.on(PlayerAddListener.EVENT, waiting::addPlayer);
-			game.on(PlayerDeathListener.EVENT, waiting::onPlayerDeath);
-			game.on(AttackEntityListener.EVENT, waiting::onAttackEntity);
-			game.on(UseBlockListener.EVENT, waiting::onUseBlock);
-			game.on(UseItemListener.EVENT, waiting::onUseItem);
+			game.listen(GamePlayerEvents.OFFER, offer -> offer.accept(world, new Vec3d(0, world.getTopY(Heightmap.Type.MOTION_BLOCKING, 0, 0), 0)));
+			game.listen(GamePlayerEvents.ADD, waiting::addPlayer);
+			game.listen(PlayerDeathEvent.EVENT, waiting::onPlayerDeath);
+			game.listen(PlayerAttackEntityEvent.EVENT, waiting::onAttackEntity);
+			game.listen(BlockUseEvent.EVENT, waiting::onUseBlock);
+			game.listen(ItemUseEvent.EVENT, waiting::onUseItem);
 		});
 	}
 
@@ -88,9 +90,9 @@ public final class WdWaiting {
 		return TypedActionResult.success(player.getStackInHand(hand));
 	}
 
-	private StartResult requestStart() {
-		WdActive.open(this.world, this.map, this.config);
-		return StartResult.OK;
+	private GameResult requestStart() {
+		WdActive.open(this.gameSpace, this.map, this.config, this.world);
+		return GameResult.ok();
 	}
 
 	private void addPlayer(ServerPlayerEntity player) {
