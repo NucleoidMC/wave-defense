@@ -31,7 +31,7 @@ public final class TundraGen implements BiomeGen {
 
 	@Override
 	public RegistryKey<Biome> getFakingBiome() {
-		return BiomeKeys.SNOWY_TUNDRA;
+		return BiomeKeys.SNOWY_PLAINS;
 	}
 
 	@Override

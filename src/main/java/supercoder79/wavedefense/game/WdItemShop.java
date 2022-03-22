@@ -196,8 +196,7 @@ public final class WdItemShop {
                 })
         );
 
-        shop.setSlot(0 * 9 + 5, ShopEntry.ofIcon(ItemStackBuilder.of(Items.ARROW).setCount(config.arrow.count).build()).withCost(Cost.ofIron(config.arrow.cost)));
-
+        shop.setSlot(0 * 9 + 4, ShopEntry.buyItem(new ItemStack(Items.ARROW, config.arrow.count), Cost.ofIron(config.arrow.cost)));
 
         shop.setSlot(1 * 9 + 0, ShopEntry.ofIcon(helmet)
                 .withName(new LiteralText("Upgrade Helmet"))

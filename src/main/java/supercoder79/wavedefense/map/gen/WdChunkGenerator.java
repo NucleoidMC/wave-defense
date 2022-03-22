@@ -6,22 +6,21 @@ import net.minecraft.block.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
 import net.minecraft.structure.StructureManager;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.biome.source.BiomeArray;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ProtoChunk;
-import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.StructureAccessor;
+import net.minecraft.world.gen.chunk.Blender;
+import net.minecraft.world.gen.densityfunction.DensityFunctionTypes;
 import supercoder79.wavedefense.game.WdConfig;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.biome.BiomeGen;
@@ -30,11 +29,13 @@ import supercoder79.wavedefense.map.feature.*;
 import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
 import xyz.nucleoid.substrate.gen.GrassGen;
 
+import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public final class WdChunkGenerator extends GameChunkGenerator {
+    private static final MultiNoiseUtil.MultiNoiseSampler ZERO_SAMPLER = new MultiNoiseUtil.MultiNoiseSampler(DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), Collections.emptyList());
     private final WdHeightSampler heightSampler;
     private final OpenSimplexNoise pathNoise;
     private final OpenSimplexNoise detailNoise;
@@ -73,13 +74,15 @@ public final class WdChunkGenerator extends GameChunkGenerator {
     }
 
     @Override
-    public void populateBiomes(Registry<Biome> registry, Chunk chunk) {
-        ChunkPos chunkPos = chunk.getPos();
-        ((ProtoChunk) chunk).setBiomes(new BiomeArray(registry, chunk, chunkPos, this.biomeSource));
+    public CompletableFuture<Chunk> populateBiomes(Registry<Biome> registry, Executor executor, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
+        return CompletableFuture.supplyAsync(Util.debugSupplier("init_biomes", () -> {
+            chunk.populateBiomes(this.biomeSource, ZERO_SAMPLER);
+            return chunk;
+        }), Util.getMainWorkerExecutor());
     }
 
     @Override
-    public CompletableFuture<Chunk> populateNoise(Executor executor, StructureAccessor structures, Chunk chunk) {
+    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, StructureAccessor structures, Chunk chunk) {
         return CompletableFuture.supplyAsync(() -> {
             int chunkX = chunk.getPos().x * 16;
             int chunkZ = chunk.getPos().z * 16;
@@ -109,7 +112,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
                     BlockState topWaterState = Blocks.WATER.getDefaultState();
                     BlockState underWaterState = Blocks.WATER.getDefaultState();
 
-                    if (biome.getFakingBiome().equals(BiomeKeys.SNOWY_TUNDRA)) {
+                    if (biome.getFakingBiome().equals(BiomeKeys.SNOWY_PLAINS)) {
                         waterState = Blocks.ICE.getDefaultState();
                         topWaterState = Blocks.ICE.getDefaultState();
                         underWaterState = Blocks.ICE.getDefaultState();
@@ -197,12 +200,12 @@ public final class WdChunkGenerator extends GameChunkGenerator {
     }
 
     @Override
-    public void generateFeatures(ChunkRegion region, StructureAccessor structures) {
+    public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structures) {
         BlockPos.Mutable mutable = new BlockPos.Mutable();
         Random random = new Random();
-
-        int chunkX = region.getCenterPos().x * 16;
-        int chunkZ = region.getCenterPos().z * 16;
+        
+        int chunkX = chunk.getPos().x * 16;
+        int chunkZ = chunk.getPos().z * 16;
 
         BiomeGen biome = biomeSource.getRealBiome(chunkX + 8, chunkZ + 8);
 
@@ -210,36 +213,36 @@ public final class WdChunkGenerator extends GameChunkGenerator {
         for (int i = 0; i < treeAmt; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = region.getTopY(Heightmap.Type.MOTION_BLOCKING, x, z);
+            int y = world.getTopY(Heightmap.Type.MOTION_BLOCKING, x, z);
 
-            biome.tree(x, z, random).generate(region, mutable.set(x, y, z).toImmutable(), random);
+            biome.tree(x, z, random).generate(world, mutable.set(x, y, z).toImmutable(), random);
         }
 
         int shrubAmt = biome.shrubAmt(random);
         for (int i = 0; i < shrubAmt; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
-            ShrubGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+            ShrubGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
         }
 
         int grassAmt = biome.grassAmt(random);
         for (int i = 0; i < grassAmt; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
-            GrassGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+            GrassGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
         }
 
         for (int i = 0; i < 4; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = region.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
+            int y = world.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
 
             if (y <= 48) {
-                ImprovedDiskGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+                ImprovedDiskGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
             }
         }
 
@@ -247,30 +250,26 @@ public final class WdChunkGenerator extends GameChunkGenerator {
         for (int i = 0; i < cactusAmt; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
-            CactusGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+            CactusGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
         }
 
         if (random.nextInt(6) == 0) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = region.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
 
-            chestGen.generate(region, mutable.set(x, y, z).toImmutable(), random);
+            chestGen.generate(world, mutable.set(x, y, z).toImmutable(), random);
         }
 
         if (biome.isSnowy() && random.nextInt(5) == 0) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = region.getTopY(Heightmap.Type.MOTION_BLOCKING, x, z);
+            int y = world.getTopY(Heightmap.Type.MOTION_BLOCKING, x, z);
 
-            CustomIceSpikeGen.INSTANCE.generate(region, mutable.set(x, y, z).toImmutable(), random);
+            CustomIceSpikeGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
         }
-    }
-
-    @Override
-    public void carve(long seed, BiomeAccess biomes, Chunk chunk, GenerationStep.Carver carver) {
     }
 
     @Override
