@@ -1,5 +1,7 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
+import org.joml.Vector3f;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -16,7 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
@@ -130,7 +132,7 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
         }
 
         ((ServerWorld) world).spawnParticles(
-                new DustParticleEffect(new Vec3f(red, green, blue), scale + stateTimer / 150f),
+                new DustParticleEffect(new Vector3f(red, green, blue), scale + stateTimer / 150f),
                 this.getX(), this.getY() + particleSpawnY + 0.3, this.getZ(),
                 2, 0.2, 0.0, 0.2, 0.1
         );
@@ -153,13 +155,13 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
     }
 
     @Override
-    public int ironCount() {
-        return this.getMonsterClass().ironCount() + this.getMod().ironBonus;
+    public int ironCount(Random random) {
+        return this.getMonsterClass().ironCount(random) + this.getMod().ironBonus;
     }
 
     @Override
-    public int goldCount() {
-        return this.getMonsterClass().goldCount();
+    public int goldCount(Random random) {
+        return this.getMonsterClass().goldCount(random);
     }
 
     @Override

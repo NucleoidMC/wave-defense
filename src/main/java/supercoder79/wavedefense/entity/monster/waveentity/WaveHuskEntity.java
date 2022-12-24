@@ -10,6 +10,7 @@ import net.minecraft.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HuskEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
@@ -63,13 +64,13 @@ public final class WaveHuskEntity extends HuskEntity implements WaveEntity {
     }
 
     @Override
-    public int ironCount() {
-        return this.getMonsterClass().ironCount() + this.getMod().ironBonus;
+    public int ironCount(Random random) {
+        return this.getMonsterClass().ironCount(random) + this.getMod().ironBonus;
     }
 
     @Override
-    public int goldCount() {
-        return this.getMonsterClass().goldCount();
+    public int goldCount(Random random) {
+        return this.getMonsterClass().goldCount(random);
     }
 
     @Override

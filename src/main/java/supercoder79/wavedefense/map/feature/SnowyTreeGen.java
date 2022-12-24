@@ -5,11 +5,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ServerWorldAccess;
 import xyz.nucleoid.substrate.gen.GenHelper;
 import xyz.nucleoid.substrate.gen.MapGen;
-
-import java.util.Random;
 
 public final class SnowyTreeGen implements MapGen {
     public static final SnowyTreeGen INSTANCE = new SnowyTreeGen();

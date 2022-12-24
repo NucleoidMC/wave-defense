@@ -10,7 +10,6 @@ import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -144,14 +143,14 @@ public final class WdActive {
                             if (this.world.getBlockState(local).isOf(Blocks.CHEST)) {
                                 if (!this.openedChests.contains(local)) {
                                     this.participants.forEach((participant) -> {
-                                        participant.sendMessage(new LiteralText(player.getEntityName() + " has found a loot chest!"), false);
+                                        participant.sendMessage(Text.literal(player.getEntityName() + " has found a loot chest!"), false);
 
                                         if (new Random().nextInt(4) == 0) {
-                                            participant.sendMessage(new LiteralText("You recieved 6 iron and 1 gold!"), false);
+                                            participant.sendMessage(Text.literal("You recieved 6 iron and 1 gold!"), false);
                                             participant.getInventory().insertStack(new ItemStack(Items.IRON_INGOT, 6));
                                             participant.getInventory().insertStack(new ItemStack(Items.GOLD_INGOT, 1));
                                         } else {
-                                            participant.sendMessage(new LiteralText("You recieved 12 iron!"), false);
+                                            participant.sendMessage(Text.literal("You recieved 12 iron!"), false);
                                             participant.getInventory().insertStack(new ItemStack(Items.IRON_INGOT, 12));
                                         }
                                     });
@@ -171,10 +170,10 @@ public final class WdActive {
         for (Entity entity : world.iterateEntities()) {
             if (entity instanceof WaveEntity) {
                 String prefix = ((WaveEntity) entity).getMod().prefix;
-                MutableText name = new LiteralText((prefix + " " + ((WaveEntity) entity).getMonsterClass().name()));
+                MutableText name = Text.literal((prefix + " " + ((WaveEntity) entity).getMonsterClass().name()));
 
                 if (prefix.equals(""))
-                    name = new LiteralText((((WaveEntity) entity).getMonsterClass().name()));
+                    name = Text.literal((((WaveEntity) entity).getMonsterClass().name()));
 
                 if (((WaveEntity) entity).showHealth()) {
                     MutableText healthBar = ASCIIProgressBar.get(((MobEntity) entity).getHealth() / ((MobEntity) entity).getMaxHealth(), 7);
@@ -205,8 +204,8 @@ public final class WdActive {
                 if (source.getAttacker() instanceof ServerPlayerEntity) {
                     ServerPlayerEntity player = (ServerPlayerEntity) source.getAttacker();
 
-                    player.getInventory().insertStack(new ItemStack(Items.IRON_INGOT, ((WaveEntity) entity).ironCount()));
-                    player.getInventory().insertStack(new ItemStack(Items.GOLD_INGOT, ((WaveEntity) entity).goldCount()));
+                    player.getInventory().insertStack(new ItemStack(Items.IRON_INGOT, ((WaveEntity) entity).ironCount(entity.getRandom())));
+                    player.getInventory().insertStack(new ItemStack(Items.GOLD_INGOT, ((WaveEntity) entity).goldCount(entity.getRandom())));
                     player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
                 }
             }
@@ -223,8 +222,8 @@ public final class WdActive {
         if (participants.isEmpty()) {
             // Display win results
             PlayerSet players = space.getPlayers();
-            players.sendMessage(new LiteralText("All players died....").formatted(Formatting.DARK_RED));
-            players.sendMessage(new LiteralText("You made it to wave " + waveManager.getWaveOrdinal() + ".").formatted(Formatting.DARK_RED));
+            players.sendMessage(Text.literal("All players died....").formatted(Formatting.DARK_RED));
+            players.sendMessage(Text.literal("You made it to wave " + waveManager.getWaveOrdinal() + ".").formatted(Formatting.DARK_RED));
 
             // Close game in 10 secs
             this.gameCloseTick = this.world.getTime() + (10 * 20);
@@ -238,8 +237,8 @@ public final class WdActive {
         if (this.world.getBlockState(hitResult.getBlockPos()).isOf(Blocks.CHEST)) {
             if (!this.openedChests.contains(hitResult.getBlockPos())) {
                 for (ServerPlayerEntity participant : this.participants) {
-                    participant.sendMessage(new LiteralText(player.getDisplayName() + " has found a loot chest!"), false);
-                    participant.sendMessage(new LiteralText("You recieved 12 iron."), false);
+                    participant.sendMessage(Text.literal(player.getDisplayName() + " has found a loot chest!"), false);
+                    participant.sendMessage(Text.literal("You recieved 12 iron."), false);
                     participant.getInventory().insertStack(new ItemStack(Items.IRON_INGOT, 12));
                     participant.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
                 }
@@ -290,7 +289,7 @@ public final class WdActive {
 
         player.getInventory().insertStack(8,
                 ItemStackBuilder.of(Items.COMPASS)
-                        .setName(new LiteralText("Item Shop"))
+                        .setName(Text.literal("Item Shop"))
                         .build()
         );
 
@@ -307,7 +306,7 @@ public final class WdActive {
             return;
         }
 
-        Text message = player.getDisplayName().shallowCopy().append(" succumbed to the monsters....")
+        Text message = player.getDisplayName().copy().append(" succumbed to the monsters....")
                 .formatted(Formatting.RED);
 
         PlayerSet players = this.space.getPlayers();
@@ -340,7 +339,7 @@ public final class WdActive {
         }
 
         for (ServerPlayerEntity player : farPlayers) {
-            LiteralText message = new LiteralText("You are too far away from your villager!");
+            MutableText message = Text.literal("You are too far away from your villager!");
             player.sendMessage(message.formatted(Formatting.RED), true);
 
             player.damage(DamageSource.OUT_OF_WORLD, 0.5F);

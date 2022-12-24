@@ -6,12 +6,11 @@ import net.minecraft.item.DyeItem;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.EquipmentHelper;
 import supercoder79.wavedefense.entity.MonsterModifier;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public final class HuskClasses {
     public static final MonsterClass DEFAULT = new MonsterClass() {
@@ -21,12 +20,12 @@ public final class HuskClasses {
         }
 
         @Override
-        public int ironCount() {
-            return 1 + new Random().nextInt(2);
+        public int ironCount(Random random) {
+            return 1 + random.nextInt(2);
         }
 
         @Override
-        public int goldCount() {
+        public int goldCount(Random random) {
             return 0;
         }
 
@@ -82,13 +81,13 @@ public final class HuskClasses {
         }
 
         @Override
-        public int ironCount() {
+        public int ironCount(Random random) {
             return 5;
         }
 
         @Override
-        public int goldCount() {
-            return new Random().nextInt(6) == 0 ? 1 : 0;
+        public int goldCount(Random random) {
+            return random.nextInt(6) == 0 ? 1 : 0;
         }
 
         @Override

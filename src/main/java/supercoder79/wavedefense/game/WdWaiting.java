@@ -11,6 +11,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
@@ -51,7 +52,7 @@ public final class WdWaiting {
 		WdMapGenerator generator = new WdMapGenerator();
 		WdConfig config = context.config();
 
-		WdMap map = generator.build(config);
+		WdMap map = generator.build(config, Random.createLocal());
 		RuntimeWorldConfig worldConfig = new RuntimeWorldConfig()
 				.setGenerator(map.chunkGenerator(context.server()))
 				.setTimeOfDay(18000)

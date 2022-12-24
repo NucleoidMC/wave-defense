@@ -2,14 +2,13 @@ package supercoder79.wavedefense.map.biome.impl;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.feature.DeadTreeGen;
 import xyz.nucleoid.substrate.gen.MapGen;
-
-import java.util.Random;
 
 public final class DesertGen implements BiomeGen {
 	public static final DesertGen INSTANCE = new DesertGen();

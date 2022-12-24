@@ -3,7 +3,7 @@ package supercoder79.wavedefense.game;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +39,7 @@ public final class WdWaveManager {
 
         if (waveSpawner == null && wave.remainingMonsterScore <= 0) {
             PlayerSet players = game.space.getPlayers();
-            players.sendMessage(new LiteralText("The wave has ended!")
+            players.sendMessage(Text.literal("The wave has ended!")
                     .styled(style ->
                             style.withColor(TextColor.parse("green"))
                     ));
@@ -47,12 +47,12 @@ public final class WdWaveManager {
             int survivalGold = wave.ordinal % 5 == 0 ? MathHelper.ceil(wave.ordinal / 20d) : 0;
 
             if (survivalGold == 0)
-                players.sendMessage(new LiteralText("You earned " + survivalBonus + " iron for surviving this wave!")
+                players.sendMessage(Text.literal("You earned " + survivalBonus + " iron for surviving this wave!")
                         .styled(style ->
                                 style.withColor(TextColor.parse("yellow"))
                         ));
             else
-                players.sendMessage(new LiteralText("You earned " + survivalBonus + " iron and " + survivalGold + " gold for surviving this wave!")
+                players.sendMessage(Text.literal("You earned " + survivalBonus + " iron and " + survivalGold + " gold for surviving this wave!")
                         .styled(style ->
                                 style.withColor(TextColor.parse("yellow"))
                         ));
@@ -82,7 +82,7 @@ public final class WdWaveManager {
         waveSpawner = new WdWaveSpawner(game, wave);
 
         PlayerSet players = game.space.getPlayers();
-        players.sendMessage(new LiteralText("Wave #" + wave.ordinal + " with " + wave.monsterCount + " monsters is coming!")
+        players.sendMessage(Text.literal("Wave #" + wave.ordinal + " with " + wave.monsterCount + " monsters is coming!")
                 .styled(style ->
                         style.withColor(TextColor.parse("light_purple"))
                 ));
@@ -91,7 +91,7 @@ public final class WdWaveManager {
     }
 
     private WdWave createWave(int index) {
-        return new WdWave(index + 1, monsterScore(index));
+        return new WdWave(this.game.world.getRandom(), index + 1, monsterScore(index));
     }
 
     @Nullable

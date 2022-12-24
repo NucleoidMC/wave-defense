@@ -5,18 +5,19 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import kdotjpg.opensimplex.OpenSimplexNoise;
-import net.minecraft.util.registry.RegistryCodecs;
-import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.registry.RegistryCodecs;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import supercoder79.wavedefense.map.biome.impl.*;
 
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSource;
 
 public final class FakeBiomeSource extends BiomeSource {
 	public static final Codec<FakeBiomeSource> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			RegistryCodecs.dynamicRegistry(Registry.BIOME_KEY, Lifecycle.stable(), Biome.CODEC).fieldOf("biomes").forGetter(source -> source.biomeRegistry),
+			RegistryCodecs.createRegistryCodec(RegistryKeys.BIOME, Lifecycle.stable(), Biome.CODEC).fieldOf("biomes").forGetter(source -> source.biomeRegistry),
 			Codec.LONG.fieldOf("seed").stable().forGetter(source -> source.seed))
 			.apply(instance, instance.stable(FakeBiomeSource::new)));
 
@@ -40,11 +41,6 @@ public final class FakeBiomeSource extends BiomeSource {
 	@Override
 	protected Codec<? extends BiomeSource> getCodec() {
 		return CODEC;
-	}
-
-	@Override
-	public BiomeSource withSeed(long seed) {
-		return new FakeBiomeSource(this.biomeRegistry, seed);
 	}
 
 	@Override

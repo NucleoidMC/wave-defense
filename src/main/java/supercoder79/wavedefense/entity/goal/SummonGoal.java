@@ -3,14 +3,14 @@ package supercoder79.wavedefense.entity.goal;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.SilverfishEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.SummonedSilverfishEntity;
 import supercoder79.wavedefense.entity.monster.waveentity.WaveSummonerEntity;
 
 import java.util.EnumSet;
-import java.util.Random;
 
 public final class SummonGoal<T extends WaveSummonerEntity & WaveEntity> extends Goal {
     private final T entity;
@@ -33,10 +33,10 @@ public final class SummonGoal<T extends WaveSummonerEntity & WaveEntity> extends
         entity.handSwingTimer = 10;
         SilverfishEntity silverfish = new SummonedSilverfishEntity(EntityType.SILVERFISH, entity.getEntityWorld());
         BlockPos pos = entity.getBlockPos();
-        Random random = new Random();
+        Random random = entity.getRandom();
         silverfish.refreshPositionAndAngles(pos.add(random.nextInt(5) - 2, 2, random.nextInt(5) - 2), 0, 0);
         silverfish.setPersistent();
-        silverfish.setCustomName(new LiteralText("Silverfish"));
+        silverfish.setCustomName(Text.literal("Silverfish"));
         entity.setAttacking(true);
         entity.getEntityWorld().spawnEntity(silverfish);
     }

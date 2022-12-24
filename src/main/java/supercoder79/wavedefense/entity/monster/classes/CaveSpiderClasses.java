@@ -1,10 +1,8 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.MonsterModifier;
-
-import java.util.Random;
 
 public class CaveSpiderClasses {
     public static final MonsterClass DEFAULT = new MonsterClass() {
@@ -14,12 +12,12 @@ public class CaveSpiderClasses {
         }
 
         @Override
-        public int ironCount() {
-            return 1 + new Random().nextInt(2);
+        public int ironCount(Random random) {
+            return 1 + random.nextInt(2);
         }
 
         @Override
-        public int goldCount() {
+        public int goldCount(Random random) {
             return 0;
         }
 

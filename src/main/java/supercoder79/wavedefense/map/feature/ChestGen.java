@@ -1,11 +1,10 @@
 package supercoder79.wavedefense.map.feature;
 
-import java.util.Random;
-
 import supercoder79.wavedefense.map.gen.WdPath;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.ServerWorldAccess;
 import xyz.nucleoid.substrate.gen.MapGen;
 

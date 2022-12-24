@@ -6,8 +6,9 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.PhantomEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
@@ -53,7 +54,7 @@ public class WizardsPhantomEntity extends PhantomEntity implements WaveEntity {
         if (this.game.guide.getCenterPos().distanceTo(this.getPos()) > 30)
             this.setPositionTarget(new BlockPos(this.game.guide.getCenterPos()), 999);
 
-        this.setCustomName(new LiteralText(""));
+        this.setCustomName(Text.empty());
     }
 
     @Override
@@ -69,17 +70,12 @@ public class WizardsPhantomEntity extends PhantomEntity implements WaveEntity {
     }
 
     @Override
-    public boolean canBeControlledByRider() {
-        return true;
-    }
-
-    @Override
-    public int ironCount() {
+    public int ironCount(Random random) {
         return 20;
     }
 
     @Override
-    public int goldCount() {
+    public int goldCount(Random random) {
         return 1;
     }
 
