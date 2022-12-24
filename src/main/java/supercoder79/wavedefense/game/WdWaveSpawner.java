@@ -6,11 +6,12 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.*;
@@ -21,7 +22,6 @@ import supercoder79.wavedefense.util.RandomCollection;
 import supercoder79.wavedefense.util.WeightedList;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public final class WdWaveSpawner {
     // Magic values for finding faraway players
@@ -46,7 +46,7 @@ public final class WdWaveSpawner {
 
         ServerWorld world = this.game.world;
         Vec3d centerPos = this.game.guide.getCenterPos();
-        Random random = new Random();
+        Random random = world.getRandom();
 
         WeightedList<Position> validCenters = new WeightedList<>();
         validCenters.add(centerPos, this.game.getParticipants().size() * 100);
@@ -169,7 +169,7 @@ public final class WdWaveSpawner {
             return monster.startRiding(phantom);
         }
 
-        monster.setCustomName(new LiteralText(mobsToSpawn.get(order).getMod().prefix + " " + mobsToSpawn.get(order).getMonsterClass().name()));
+        monster.setCustomName(Text.literal(mobsToSpawn.get(order).getMod().prefix + " " + mobsToSpawn.get(order).getMonsterClass().name()));
 
         return world.spawnEntity(monster);
     }

@@ -5,10 +5,10 @@ import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public final class WdPath {
     private final List<BlockPos> points;
@@ -21,9 +21,7 @@ public final class WdPath {
         this.length = length;
     }
 
-    public static WdPath generate(int totalLength, int segmentLength) {
-        Random random = new Random();
-
+    public static WdPath generate(Random random, int totalLength, int segmentLength) {
         BlockPos point = BlockPos.ORIGIN;
 
         List<BlockPos> points = new ArrayList<>();
@@ -36,7 +34,7 @@ public final class WdPath {
         int maxDeltaX = segmentLength / 2;
 
         while (currentLength < totalLength) {
-            int deltaX = MathHelper.nextInt(random, -maxDeltaX, maxDeltaX);
+            int deltaX = 0;//TODO random.next MathHelper.nextInt(random, -maxDeltaX, maxDeltaX);
             int deltaZ = MathHelper.floor(Math.sqrt(segmentLength * segmentLength - deltaX * deltaX));
             double length = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 

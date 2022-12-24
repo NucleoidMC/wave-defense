@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 public class WaveSkeletonEntity extends SkeletonEntity implements WaveEntity {
@@ -85,13 +86,13 @@ public class WaveSkeletonEntity extends SkeletonEntity implements WaveEntity {
 	}
 
 	@Override
-	public int ironCount() {
-		return this.getMonsterClass().ironCount() + this.getMod().ironBonus;
+	public int ironCount(Random random) {
+		return this.getMonsterClass().ironCount(random) + this.getMod().ironBonus;
 	}
 
 	@Override
-	public int goldCount() {
-		return this.getMonsterClass().goldCount();
+	public int goldCount(Random random) {
+		return this.getMonsterClass().goldCount(random);
 	}
 
 	@Override

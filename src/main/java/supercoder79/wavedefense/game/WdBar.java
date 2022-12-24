@@ -1,7 +1,6 @@
 package supercoder79.wavedefense.game;
 
 import net.minecraft.entity.boss.BossBar;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.plasmid.game.common.GlobalWidgets;
@@ -9,7 +8,7 @@ import xyz.nucleoid.plasmid.game.common.widget.BossBarWidget;
 
 public final class WdBar {
     private final BossBarWidget bar;
-    private static final LiteralText IDLE_TITLE = new LiteralText("Wave Defense");
+    private static final Text IDLE_TITLE = Text.literal("Wave Defense");
 
     private WdBar(BossBarWidget bar) {
         this.bar = bar;
@@ -33,6 +32,6 @@ public final class WdBar {
         String monsterSuffix = wave.remainingMonsterCount == 1 ? "" : "s";
         String remainSuffix = wave.remainingMonsterCount == 1 ? "s" : "";
 
-        return new LiteralText("Wave #" + wave.ordinal + ": " + wave.remainingMonsterCount + " monster" + monsterSuffix + " remain" + remainSuffix);
+        return Text.literal("Wave #" + wave.ordinal + ": " + wave.remainingMonsterCount + " monster" + monsterSuffix + " remain" + remainSuffix);
     }
 }

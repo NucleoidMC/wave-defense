@@ -1,6 +1,6 @@
 package supercoder79.wavedefense.game;
 
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 
 public final class WdWave {
     public final int ordinal;
@@ -13,12 +13,12 @@ public final class WdWave {
     public boolean isSummonerWave;
     public boolean isSpiderWave;
 
-    public WdWave(int ordinal, int totalMonsterScore) {
+    public WdWave(Random random, int ordinal, int totalMonsterScore) {
         this.ordinal = ordinal;
         this.totalMonsterScore = totalMonsterScore;
 
         this.isSummonerWave = ordinal >= 15 && ordinal % 5 == 0;
-        this.isSpiderWave = ordinal >= 10 && new Random().nextInt(5) == 0 && !isSummonerWave;
+        this.isSpiderWave = ordinal >= 10 && random.nextInt(5) == 0 && !isSummonerWave;
     }
 
     public void onMonsterAdded(int score) {

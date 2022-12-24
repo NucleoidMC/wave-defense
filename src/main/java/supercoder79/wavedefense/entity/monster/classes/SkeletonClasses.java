@@ -1,17 +1,16 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
+import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.EquipmentHelper;
 import supercoder79.wavedefense.entity.MonsterModifier;
 
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.text.LiteralText;
 
 public final class SkeletonClasses {
     public static final SkeletonClass DEFAULT = new SkeletonClass() {
@@ -21,12 +20,12 @@ public final class SkeletonClasses {
         }
 
         @Override
-        public int ironCount() {
+        public int ironCount(Random random) {
             return 2;
         }
 
         @Override
-        public int goldCount() {
+        public int goldCount(Random random) {
             return 0;
         }
 
@@ -88,13 +87,13 @@ public final class SkeletonClasses {
         }
 
         @Override
-        public int ironCount() {
+        public int ironCount(Random random) {
             return iron;
         }
 
         @Override
-        public int goldCount() {
-            return new Random().nextInt(15) == 0 ? 1 : 0;
+        public int goldCount(Random random) {
+            return random.nextInt(15) == 0 ? 1 : 0;
         }
 
         @Override
@@ -163,13 +162,13 @@ public final class SkeletonClasses {
         }
 
         @Override
-        public int ironCount() {
+        public int ironCount(Random random) {
             return iron;
         }
 
         @Override
-        public int goldCount() {
-            return new Random().nextInt(8) == 0 ? 1 : 0;
+        public int goldCount(Random random) {
+            return random.nextInt(8) == 0 ? 1 : 0;
         }
 
         @Override
@@ -246,13 +245,13 @@ public final class SkeletonClasses {
         }
 
         @Override
-        public int ironCount() {
+        public int ironCount(Random random) {
             return iron;
         }
 
         @Override
-        public int goldCount() {
-            return new Random().nextInt(2) + new Random().nextInt(2);
+        public int goldCount(Random random) {
+            return random.nextInt(2) + random.nextInt(2);
         }
 
         @Override

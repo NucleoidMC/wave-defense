@@ -9,6 +9,7 @@ import net.minecraft.entity.mob.PhantomEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
@@ -58,13 +59,13 @@ public class WavePhantomEntity extends PhantomEntity implements WaveEntity {
     }
 
     @Override
-    public int ironCount() {
-        return this.getMonsterClass().ironCount() + this.getMod().ironBonus;
+    public int ironCount(Random random) {
+        return this.getMonsterClass().ironCount(random) + this.getMod().ironBonus;
     }
 
     @Override
-    public int goldCount() {
-        return this.getMonsterClass().goldCount();
+    public int goldCount(Random random) {
+        return this.getMonsterClass().goldCount(random);
     }
 
     @Override

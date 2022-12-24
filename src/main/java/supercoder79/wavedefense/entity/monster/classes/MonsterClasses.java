@@ -1,11 +1,9 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.EquipmentHelper;
 import supercoder79.wavedefense.entity.MonsterModifier;
-
-import java.util.Random;
 
 public final class MonsterClasses {
 	public static final MonsterClass DEFAULT = new MonsterClass() {
@@ -34,12 +32,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount() {
+		public int ironCount(Random random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount() {
+		public int goldCount(Random random) {
 			return 0;
 		}
 
@@ -86,13 +84,13 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount() {
+		public int ironCount(Random random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount() {
-			return new Random().nextInt(12) == 0 ? 1 : 0;
+		public int goldCount(Random random) {
+			return random.nextInt(12) == 0 ? 1 : 0;
 		}
 
 		@Override
@@ -130,13 +128,13 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount() {
+		public int ironCount(Random random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount() {
-			return new Random().nextInt(4) == 0 ? 1 : 0;
+		public int goldCount(Random random) {
+			return random.nextInt(4) == 0 ? 1 : 0;
 		}
 
 		@Override
@@ -172,13 +170,13 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount() {
+		public int ironCount(Random random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount() {
-			return new Random().nextInt(8) == 0 ? 1 : 0;
+		public int goldCount(Random random) {
+			return random.nextInt(8) == 0 ? 1 : 0;
 		}
 
 		@Override
@@ -212,12 +210,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount() {
+		public int ironCount(Random random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount() {
+		public int goldCount(Random random) {
 			return 0;
 		}
 
@@ -266,12 +264,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount() {
+		public int ironCount(Random random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount() {
+		public int goldCount(Random random) {
 			return 0;
 		}
 

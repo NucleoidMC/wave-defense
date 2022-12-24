@@ -1,14 +1,12 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
-import java.util.Random;
-
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.MonsterModifier;
 
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.text.LiteralText;
 
 public final class DrownedClasses {
 	public static final MonsterClass DEFAULT = new MonsterClass() {
@@ -18,12 +16,12 @@ public final class DrownedClasses {
 		}
 
 		@Override
-		public int ironCount() {
+		public int ironCount(Random random) {
 			return 1;
 		}
 
 		@Override
-		public int goldCount() {
+		public int goldCount(Random random) {
 			return 0;
 		}
 
@@ -45,13 +43,13 @@ public final class DrownedClasses {
 		}
 
 		@Override
-		public int ironCount() {
+		public int ironCount(Random random) {
 			return 8;
 		}
 
 		@Override
-		public int goldCount() {
-			return new Random().nextInt(5) == 0 ? 1 : 0;
+		public int goldCount(Random random) {
+			return random.nextInt(5) == 0 ? 1 : 0;
 		}
 
 		@Override

@@ -6,9 +6,8 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.util.RandomCollection;
-
-import java.util.Random;
 
 public class EquipmentHelper {
     public static ItemStack enchant(Item item, int waveOrdinal, int difficulty, Random random) {

@@ -14,7 +14,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import xyz.nucleoid.plasmid.shop.Cost;
 import xyz.nucleoid.plasmid.shop.ShopEntry;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
@@ -34,7 +34,7 @@ public final class WdItemShop {
             }
         };
         
-        shop.setTitle(new LiteralText("Item Shop"));
+        shop.setTitle(Text.literal("Item Shop"));
 
         updateShop(player, game, shop);
 
@@ -150,8 +150,8 @@ public final class WdItemShop {
         }
 
         shop.setSlot(0 * 9 + 0, ShopEntry.ofIcon(sword)
-                .withName(new LiteralText("Upgrade Sword"))
-                .addLore(new LiteralText(swordText))
+                .withName(Text.literal("Upgrade Sword"))
+                .addLore(Text.literal(swordText))
                 .withCost(swordCost)
                 .onBuy(p -> {
                     properties.swordLevel++;
@@ -167,8 +167,8 @@ public final class WdItemShop {
         );
 
         shop.setSlot(0 * 9 + 1, ShopEntry.ofIcon(Items.ENCHANTED_BOOK)
-                .withName(new LiteralText("Sword Sharpness " + (sharpness + 1)))
-                .addLore(new LiteralText("Increases the sharpness level of your sword"))
+                .withName(Text.literal("Sword Sharpness " + (sharpness + 1)))
+                .addLore(Text.literal("Increases the sharpness level of your sword"))
                 .withCost(Cost.ofIron((sharpness + 1) * config.sharpness.base + 4 * (int) (Math.max(0, Math.pow(sharpness - 2, config.sharpness.scale)))))
                 .onBuy(p -> {
                     properties.sharpness++;
@@ -177,8 +177,8 @@ public final class WdItemShop {
         );
 
         shop.setSlot(0 * 9 + 3, ShopEntry.ofIcon(Items.BOW)
-                .withName(new LiteralText("Bow Power " + (power + 1)))
-                .addLore(new LiteralText("Increases the power level of your bow"))
+                .withName(Text.literal("Bow Power " + (power + 1)))
+                .addLore(Text.literal("Increases the power level of your bow"))
                 .withCost(power >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(config.power.scale, power) * config.power.base)))
                 .onBuy(p -> {
                     properties.power++;
@@ -187,8 +187,8 @@ public final class WdItemShop {
         );
 
         shop.setSlot(0 * 9 + 4, ShopEntry.ofIcon(Items.CROSSBOW)
-                .withName(new LiteralText("Crossbow Piercing " + (piercing + 1)))
-                .addLore(new LiteralText("Increases the piercing level of your crossbow"))
+                .withName(Text.literal("Crossbow Piercing " + (piercing + 1)))
+                .addLore(Text.literal("Increases the piercing level of your crossbow"))
                 .withCost(piercing >= 5 ? Cost.no() : Cost.ofIron((int) (Math.pow(config.piercing.scale, piercing) * config.piercing.base)))
                 .onBuy(p -> {
                     properties.piercing++;
@@ -199,8 +199,8 @@ public final class WdItemShop {
         shop.setSlot(0 * 9 + 4, ShopEntry.buyItem(new ItemStack(Items.ARROW, config.arrow.count), Cost.ofIron(config.arrow.cost)));
 
         shop.setSlot(1 * 9 + 0, ShopEntry.ofIcon(helmet)
-                .withName(new LiteralText("Upgrade Helmet"))
-                .addLore(new LiteralText(helmetText))
+                .withName(Text.literal("Upgrade Helmet"))
+                .addLore(Text.literal(helmetText))
                 .withCost(helmetCost)
                 .onBuy(p -> {
                     properties.helmetLevel++;
@@ -219,8 +219,8 @@ public final class WdItemShop {
         );
 
         shop.setSlot(1 * 9 + 1, ShopEntry.ofIcon(Items.ENCHANTED_BOOK)
-                .withName(new LiteralText("Helmet Protection " + (helmetProtection + 1)))
-                .addLore(new LiteralText("Increases the protection level of your helmet"))
+                .withName(Text.literal("Helmet Protection " + (helmetProtection + 1)))
+                .addLore(Text.literal("Increases the protection level of your helmet"))
                 .withCost(helmetProtection >= 4 ? Cost.no() : Cost.ofIron((int) (Math.pow(config.protection.scale, helmetProtection) * config.protection.base)))
                 .onBuy(p -> {
                     properties.helmetProtection++;
@@ -234,8 +234,8 @@ public final class WdItemShop {
         shop.setSlot(1 * 9 + 6, ShopEntry.buyItem(new ItemStack(Items.GOLDEN_APPLE, config.goldenApple.count), Cost.ofIron(config.goldenApple.cost)));
 
         shop.setSlot(2 * 9 + 0, ShopEntry.ofIcon(chestplate)
-                .withName(new LiteralText("Upgrade Chestplate"))
-                .addLore(new LiteralText(chestplateText))
+                .withName(Text.literal("Upgrade Chestplate"))
+                .addLore(Text.literal(chestplateText))
                 .withCost(chestplateCost)
                 .onBuy(p -> {
                     properties.chestplateLevel++;
@@ -254,8 +254,8 @@ public final class WdItemShop {
         );
 
         shop.setSlot(2 * 9 + 1, ShopEntry.ofIcon(Items.ENCHANTED_BOOK)
-                .withName(new LiteralText("Chestplate Protection " + (chestplateProtection + 1)))
-                .addLore(new LiteralText("Increases the protection level of your chestplate"))
+                .withName(Text.literal("Chestplate Protection " + (chestplateProtection + 1)))
+                .addLore(Text.literal("Increases the protection level of your chestplate"))
                 .withCost(chestplateProtection >= 4 ? Cost.no() : Cost.ofIron((int) (Math.pow(config.protection.scale, chestplateProtection) * config.protection.base)))
                 .onBuy(p -> {
                     properties.chestplateProtection++;
@@ -282,8 +282,8 @@ public final class WdItemShop {
                 Cost.ofGold(config.regenerationPotion.cost)));
 
         shop.setSlot(3 * 9 + 0, ShopEntry.ofIcon(leggings)
-                .withName(new LiteralText("Upgrade Leggings"))
-                .addLore(new LiteralText(leggingsText))
+                .withName(Text.literal("Upgrade Leggings"))
+                .addLore(Text.literal(leggingsText))
                 .withCost(leggingsCost)
                 .onBuy(p -> {
                     properties.leggingsLevel++;
@@ -302,8 +302,8 @@ public final class WdItemShop {
         );
 
         shop.setSlot(3 * 9 + 1, ShopEntry.ofIcon(Items.ENCHANTED_BOOK)
-                .withName(new LiteralText("Leggings Protection " + (leggingsProtection + 1)))
-                .addLore(new LiteralText("Increases the protection level of your leggings"))
+                .withName(Text.literal("Leggings Protection " + (leggingsProtection + 1)))
+                .addLore(Text.literal("Increases the protection level of your leggings"))
                 .withCost(leggingsProtection >= 4 ? Cost.no() : Cost.ofIron((int) (Math.pow(config.protection.scale, leggingsProtection) * config.protection.base)))
                 .onBuy(p -> {
                     properties.leggingsProtection++;
@@ -312,8 +312,8 @@ public final class WdItemShop {
         );
 
         shop.setSlot(4 * 9 + 0, ShopEntry.ofIcon(boots)
-                .withName(new LiteralText("Upgrade Boots"))
-                .addLore(new LiteralText(bootsText))
+                .withName(Text.literal("Upgrade Boots"))
+                .addLore(Text.literal(bootsText))
                 .withCost(bootsCost)
                 .onBuy(p -> {
                     properties.bootsLevel++;
@@ -332,8 +332,8 @@ public final class WdItemShop {
         );
 
         shop.setSlot(4 * 9 + 1, ShopEntry.ofIcon(Items.ENCHANTED_BOOK)
-                .withName(new LiteralText("Boots Protection " + (bootsProtection + 1)))
-                .addLore(new LiteralText("Increases the protection level of your boots"))
+                .withName(Text.literal("Boots Protection " + (bootsProtection + 1)))
+                .addLore(Text.literal("Increases the protection level of your boots"))
                 .withCost(bootsProtection >= 4 ? Cost.no() : Cost.ofIron((int) (Math.pow(config.protection.scale, bootsProtection) * config.protection.base)))
                 .onBuy(p -> {
                     properties.bootsProtection++;
@@ -350,8 +350,8 @@ public final class WdItemShop {
         }
 
         shop.setSlot(4 * 9 + 3, ShopEntry.ofIcon(Items.CROSSBOW)
-                .withName(new LiteralText("Crossbow Quick Charge " + (quickCharge + 1)))
-                .addLore(new LiteralText("Increases the quick charge level of your crossbow"))
+                .withName(Text.literal("Crossbow Quick Charge " + (quickCharge + 1)))
+                .addLore(Text.literal("Increases the quick charge level of your crossbow"))
                 .withCost(quickCharge >= 3 ? Cost.no() : Cost.ofGold(quickChargeCost))
                 .onBuy(p -> {
                     properties.quickChargeLevel++;

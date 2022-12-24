@@ -3,14 +3,16 @@ package supercoder79.wavedefense.map.gen;
 import kdotjpg.opensimplex.OpenSimplexNoise;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
-import net.minecraft.structure.StructureManager;
+import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.world.biome.Biome;
@@ -20,7 +22,9 @@ import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
+import net.minecraft.world.gen.chunk.placement.StructurePlacementCalculator;
 import net.minecraft.world.gen.densityfunction.DensityFunctionTypes;
+import net.minecraft.world.gen.noise.NoiseConfig;
 import supercoder79.wavedefense.game.WdConfig;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.biome.BiomeGen;
@@ -30,7 +34,6 @@ import xyz.nucleoid.plasmid.game.world.generator.GameChunkGenerator;
 import xyz.nucleoid.substrate.gen.GrassGen;
 
 import java.util.Collections;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -60,8 +63,8 @@ public final class WdChunkGenerator extends GameChunkGenerator {
         this.minBarrierRadius2 = minBarrierRadius * minBarrierRadius;
         this.maxBarrierRadius2 = maxBarrierRadius * maxBarrierRadius;
 
-        Random random = new Random();
-        this.biomeSource = new FakeBiomeSource(server.getRegistryManager().get(Registry.BIOME_KEY), random.nextLong());
+        Random random = server.getOverworld().getRandom();
+        this.biomeSource = new FakeBiomeSource(server.getRegistryManager().get(RegistryKeys.BIOME), random.nextLong());
         this.heightSampler = new WdHeightSampler(map.path(), biomeSource, random.nextLong());
         this.pathNoise = new OpenSimplexNoise(random.nextLong());
         this.detailNoise = new OpenSimplexNoise(random.nextLong());
@@ -74,7 +77,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
     }
 
     @Override
-    public CompletableFuture<Chunk> populateBiomes(Registry<Biome> registry, Executor executor, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
+    public CompletableFuture<Chunk> populateBiomes(Executor executor, NoiseConfig noiseConfig, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
         return CompletableFuture.supplyAsync(Util.debugSupplier("init_biomes", () -> {
             chunk.populateBiomes(this.biomeSource, ZERO_SAMPLER);
             return chunk;
@@ -82,13 +85,13 @@ public final class WdChunkGenerator extends GameChunkGenerator {
     }
 
     @Override
-    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, StructureAccessor structures, Chunk chunk) {
+    public CompletableFuture<Chunk> populateNoise(Executor executor, Blender blender, NoiseConfig noiseConfig, StructureAccessor structures, Chunk chunk) {
         return CompletableFuture.supplyAsync(() -> {
             int chunkX = chunk.getPos().x * 16;
             int chunkZ = chunk.getPos().z * 16;
 
             BlockPos.Mutable mutable = new BlockPos.Mutable();
-            Random random = new Random();
+            Random random = Random.createLocal();
 
             for (int x = chunkX; x < chunkX + 16; x++) {
                 for (int z = chunkZ; z < chunkZ + 16; z++) {
@@ -202,7 +205,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
     @Override
     public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structures) {
         BlockPos.Mutable mutable = new BlockPos.Mutable();
-        Random random = new Random();
+        Random random = world.getRandom();
         
         int chunkX = chunk.getPos().x * 16;
         int chunkZ = chunk.getPos().z * 16;
@@ -273,7 +276,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
     }
 
     @Override
-    public void setStructureStarts(DynamicRegistryManager registryManager, StructureAccessor accessor, Chunk chunk, StructureManager manager, long seed) {
+    public void setStructureStarts(DynamicRegistryManager registryManager, StructurePlacementCalculator placementCalculator, StructureAccessor accessor, Chunk chunk, StructureTemplateManager manager) {
     }
 
     @Override

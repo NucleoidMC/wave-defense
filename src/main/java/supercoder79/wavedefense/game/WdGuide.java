@@ -7,6 +7,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.border.WorldBorder;
 import supercoder79.wavedefense.entity.GuideVillagerEntity;
@@ -14,7 +15,6 @@ import supercoder79.wavedefense.map.gen.WdPath;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 
 import java.util.List;
-import java.util.Random;
 
 public final class WdGuide {
     private static final float PAUSE_CHANCE = 1.0F / (20.0F * 15.0F);
@@ -23,7 +23,7 @@ public final class WdGuide {
     private final WdActive game;
     private final ServerWorld world;
 
-    private final Random random = new Random();
+    private final Random random;
 
     private GuideVillagerEntity entity;
 
@@ -37,6 +37,7 @@ public final class WdGuide {
     public WdGuide(WdActive game) {
         this.game = game;
         this.world = game.world;
+        this.random = game.world.getRandom();
 
         PlayerSet players = game.space.getPlayers();
 
