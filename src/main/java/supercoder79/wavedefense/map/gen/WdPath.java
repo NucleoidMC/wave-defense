@@ -34,7 +34,7 @@ public final class WdPath {
         int maxDeltaX = segmentLength / 2;
 
         while (currentLength < totalLength) {
-            int deltaX = 0;//TODO random.next MathHelper.nextInt(random, -maxDeltaX, maxDeltaX);
+            int deltaX = random.nextBetween(-maxDeltaX, maxDeltaX);
             int deltaZ = MathHelper.floor(Math.sqrt(segmentLength * segmentLength - deltaX * deltaX));
             double length = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 
