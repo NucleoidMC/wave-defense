@@ -4,7 +4,6 @@ import org.joml.Vector3f;
 
 import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,7 +33,7 @@ public class WizardsSnowballEntity extends SnowballEntity {
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        world.createExplosion(this, DamageSource.MAGIC, new ExplosionBehavior(), hitResult.getPos().getX(), hitResult.getPos().getY() + 0.4f, hitResult.getPos().getZ(), 0.32f, false, World.ExplosionSourceType.NONE);
+        world.createExplosion(this, this.getDamageSources().magic(), new ExplosionBehavior(), hitResult.getPos().getX(), hitResult.getPos().getY() + 0.4f, hitResult.getPos().getZ(), 0.32f, false, World.ExplosionSourceType.NONE);
         AreaEffectCloudEntity slownessAOE = new AreaEffectCloudEntity(world, hitResult.getPos().getX(), hitResult.getPos().getY() + 0.3, hitResult.getPos().getZ());
         slownessAOE.setRadius(1.3f);
         slownessAOE.addEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0));

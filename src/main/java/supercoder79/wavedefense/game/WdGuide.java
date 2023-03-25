@@ -152,7 +152,7 @@ public final class WdGuide {
     }
 
     private GuideVillagerEntity spawnEntity(double x, double z) {
-        BlockPos surfacePos = this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, new BlockPos(x, 0, z));
+        BlockPos surfacePos = this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, BlockPos.ofFloored(x, 0, z));
 
         GuideVillagerEntity entity = new GuideVillagerEntity(this.world);
         entity.refreshPositionAndAngles(surfacePos.getX() + 0.5, surfacePos.getY(), surfacePos.getZ() + 0.5, 0.0F, 0.0F);

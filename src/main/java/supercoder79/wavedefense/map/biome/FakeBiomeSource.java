@@ -1,6 +1,8 @@
 package supercoder79.wavedefense.map.biome;
 
-import com.google.common.collect.ImmutableList;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -29,13 +31,17 @@ public final class FakeBiomeSource extends BiomeSource {
 	private final OpenSimplexNoise roughnessNoise;
 
 	public FakeBiomeSource(Registry<Biome> biomeRegistry, long seed) {
-		super(ImmutableList.of());
 		this.biomeRegistry = biomeRegistry;
 		this.seed = seed;
 
 		temperatureNoise = new OpenSimplexNoise(seed + 79);
 		rainfallNoise = new OpenSimplexNoise(seed - 79);
 		roughnessNoise = new OpenSimplexNoise(seed);
+	}
+
+	@Override
+	protected Stream<RegistryEntry<Biome>> biomeStream() {
+		return this.biomeRegistry.streamEntries().map(Function.identity());
 	}
 
 	@Override

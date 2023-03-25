@@ -15,7 +15,7 @@ public class SummonersSpiderEntity extends SpiderEntity {
     public void tick() {
         super.tick();
         if (!this.hasPassengers())
-            this.damage(DamageSource.STARVE, 100);
+            this.damage(this.getDamageSources().starve(), 100);
     }
 
     @Override
