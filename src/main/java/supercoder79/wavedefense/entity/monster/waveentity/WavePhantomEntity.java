@@ -36,7 +36,7 @@ public class WavePhantomEntity extends PhantomEntity implements WaveEntity {
     public void tick() {
         super.tick();
         if (this.game.guide.getCenterPos().distanceTo(this.getPos()) > 30)
-            this.setPositionTarget(new BlockPos(this.game.guide.getCenterPos()), 999);
+            this.setPositionTarget(BlockPos.ofFloored(this.game.guide.getCenterPos()), 999);
     }
 
     @Override

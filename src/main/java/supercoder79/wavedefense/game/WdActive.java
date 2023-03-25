@@ -342,7 +342,7 @@ public final class WdActive {
             MutableText message = Text.literal("You are too far away from your villager!");
             player.sendMessage(message.formatted(Formatting.RED), true);
 
-            player.damage(DamageSource.OUT_OF_WORLD, 0.5F);
+            player.damage(player.getDamageSources().outOfWorld(), 0.5F);
         }
     }
 

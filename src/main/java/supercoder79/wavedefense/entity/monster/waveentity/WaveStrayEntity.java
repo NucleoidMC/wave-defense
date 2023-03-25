@@ -93,7 +93,7 @@ public class WaveStrayEntity extends StrayEntity implements WaveEntity {
 
 	@Override
 	public void attack(LivingEntity target, float pullProgress) {
-		ItemStack itemStack = this.getArrowType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
+		ItemStack itemStack = this.getProjectileType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
 		PersistentProjectileEntity arrowProjectile = this.createArrowProjectile(itemStack, pullProgress);
 		arrowProjectile.setDamage(arrowProjectile.getDamage() * this.getMonsterClass().damageScale());
 
