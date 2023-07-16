@@ -99,7 +99,7 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
         }
 
         if (particleSpawnY >= 0 && stateTimer % 2 == 0) {
-            for (Entity entity : world.getOtherEntities(this,
+            for (Entity entity : this.getWorld().getOtherEntities(this,
                     new Box(this.getPos().subtract(3, 3, 3),
                             this.getPos().add(3, 3, 3)), e -> !(e.equals(this)))) {
 
@@ -131,7 +131,7 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
             }
         }
 
-        ((ServerWorld) world).spawnParticles(
+        ((ServerWorld) this.getWorld()).spawnParticles(
                 new DustParticleEffect(new Vector3f(red, green, blue), scale + stateTimer / 150f),
                 this.getX(), this.getY() + particleSpawnY + 0.3, this.getZ(),
                 2, 0.2, 0.0, 0.2, 0.1

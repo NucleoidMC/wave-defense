@@ -47,7 +47,7 @@ public class WaveStrayEntity extends StrayEntity implements WaveEntity {
 	private int shootSnowballTimer = 60;
 
 	private void wizardTick() {
-		PlayerEntity closestPlayer = world.getClosestPlayer(this, 64);
+		PlayerEntity closestPlayer = this.getWorld().getClosestPlayer(this, 64);
 		shootSnowballTimer--;
 
 		if (shootSnowballTimer == 4)
@@ -57,9 +57,9 @@ public class WaveStrayEntity extends StrayEntity implements WaveEntity {
 			this.setAttacking(false);
 
 		if (closestPlayer != null && shootSnowballTimer <= 0 && shootSnowballTimer % 10 == 0) {
-			WizardsSnowballEntity snowball = new WizardsSnowballEntity(world, this);
+			WizardsSnowballEntity snowball = new WizardsSnowballEntity(this.getWorld(), this);
 			snowball.setVelocity(closestPlayer.getPos().subtract(this.getPos()).multiply(0.09));
-			world.spawnEntity(snowball);
+			this.getWorld().spawnEntity(snowball);
 
 			if (shootSnowballTimer <= -20)
 			shootSnowballTimer = 60;
@@ -110,7 +110,7 @@ public class WaveStrayEntity extends StrayEntity implements WaveEntity {
 		arrowProjectile.setVelocity(xDist, yDist + yScale * 0.20000000298023224D, zDist, this.getMonsterClass().arrowSpeed(), this.getMonsterClass().arrowDivergence());
 		this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
 
-		this.world.spawnEntity(arrowProjectile);
+		this.getWorld().spawnEntity(arrowProjectile);
 	}
 
 	@Override
