@@ -82,7 +82,7 @@ public class WaveSkeletonEntity extends SkeletonEntity implements WaveEntity {
 		arrowProjectile.setVelocity(xDist, yDist + yScale * 0.20000000298023224D, zDist, this.getMonsterClass().arrowSpeed(), this.getMonsterClass().arrowDivergence());
 		this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
 
-		this.world.spawnEntity(arrowProjectile);
+		this.getWorld().spawnEntity(arrowProjectile);
 	}
 
 	@Override

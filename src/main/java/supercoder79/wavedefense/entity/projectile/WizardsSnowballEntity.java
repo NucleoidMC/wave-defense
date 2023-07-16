@@ -24,7 +24,7 @@ public class WizardsSnowballEntity extends SnowballEntity {
     public void tick() {
         super.tick();
 
-        ((ServerWorld)world).spawnParticles(
+        ((ServerWorld)this.getWorld()).spawnParticles(
                 new DustParticleEffect(new Vector3f(0.4f, 0.5f, 1.0f), 1f),
                 this.getX(), this.getY(), this.getZ(),
                 1, 0.0, 0.0, 0.0, 0.1
@@ -33,12 +33,12 @@ public class WizardsSnowballEntity extends SnowballEntity {
 
     @Override
     protected void onCollision(HitResult hitResult) {
-        world.createExplosion(this, this.getDamageSources().magic(), new ExplosionBehavior(), hitResult.getPos().getX(), hitResult.getPos().getY() + 0.4f, hitResult.getPos().getZ(), 0.32f, false, World.ExplosionSourceType.NONE);
-        AreaEffectCloudEntity slownessAOE = new AreaEffectCloudEntity(world, hitResult.getPos().getX(), hitResult.getPos().getY() + 0.3, hitResult.getPos().getZ());
+        this.getWorld().createExplosion(this, this.getDamageSources().magic(), new ExplosionBehavior(), hitResult.getPos().getX(), hitResult.getPos().getY() + 0.4f, hitResult.getPos().getZ(), 0.32f, false, World.ExplosionSourceType.NONE);
+        AreaEffectCloudEntity slownessAOE = new AreaEffectCloudEntity(this.getWorld(), hitResult.getPos().getX(), hitResult.getPos().getY() + 0.3, hitResult.getPos().getZ());
         slownessAOE.setRadius(1.3f);
         slownessAOE.addEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0));
         slownessAOE.setDuration(80);
-        world.spawnEntity(slownessAOE);
+        this.getWorld().spawnEntity(slownessAOE);
         super.onCollision(hitResult);
     }
 
