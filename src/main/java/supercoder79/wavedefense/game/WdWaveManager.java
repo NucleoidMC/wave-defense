@@ -57,7 +57,7 @@ public final class WdWaveManager {
                                 style.withColor(TextColor.parse("yellow"))
                         ));
 
-            for (PlayerEntity player : players) {
+            for (PlayerEntity player : game.getParticipants()) {
                 player.getInventory().insertStack(new ItemStack(Items.IRON_INGOT, survivalBonus));
                 player.getInventory().insertStack(new ItemStack(Items.GOLD_INGOT, survivalGold));
             }
