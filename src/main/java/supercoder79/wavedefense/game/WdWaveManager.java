@@ -41,7 +41,7 @@ public final class WdWaveManager {
             PlayerSet players = game.space.getPlayers();
             players.sendMessage(Text.literal("The wave has ended!")
                     .styled(style ->
-                            style.withColor(TextColor.parse("green"))
+                            style.withColor(TextColor.parse("green").result().get())
                     ));
             int survivalBonus = 3 + wave.ordinal;
             int survivalGold = wave.ordinal % 5 == 0 ? MathHelper.ceil(wave.ordinal / 20d) : 0;
@@ -49,12 +49,12 @@ public final class WdWaveManager {
             if (survivalGold == 0)
                 players.sendMessage(Text.literal("You earned " + survivalBonus + " iron for surviving this wave!")
                         .styled(style ->
-                                style.withColor(TextColor.parse("yellow"))
+                                style.withColor(TextColor.parse("yellow").result().get())
                         ));
             else
                 players.sendMessage(Text.literal("You earned " + survivalBonus + " iron and " + survivalGold + " gold for surviving this wave!")
                         .styled(style ->
-                                style.withColor(TextColor.parse("yellow"))
+                                style.withColor(TextColor.parse("yellow").result().get())
                         ));
 
             for (PlayerEntity player : game.getParticipants()) {
@@ -84,7 +84,7 @@ public final class WdWaveManager {
         PlayerSet players = game.space.getPlayers();
         players.sendMessage(Text.literal("Wave #" + wave.ordinal + " with " + wave.monsterCount + " monsters is coming!")
                 .styled(style ->
-                        style.withColor(TextColor.parse("light_purple"))
+                        style.withColor(TextColor.parse("light_purple").result().get())
                 ));
 
         game.averageGroupSize = (game.averageGroupSize + game.getParticipants().size()) / 2;

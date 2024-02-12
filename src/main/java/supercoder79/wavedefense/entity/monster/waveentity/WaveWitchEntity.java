@@ -146,7 +146,7 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
     }
 
     @Override
-    public void attack(LivingEntity target, float pullProgress) {
+    public void shootAt(LivingEntity target, float pullProgress) {
     }
 
     @Override

@@ -143,7 +143,7 @@ public final class WdActive {
                             if (this.world.getBlockState(local).isOf(Blocks.CHEST)) {
                                 if (!this.openedChests.contains(local)) {
                                     this.participants.forEach((participant) -> {
-                                        participant.sendMessage(Text.literal(player.getEntityName() + " has found a loot chest!"), false);
+                                        participant.sendMessage(Text.literal(player.getNameForScoreboard() + " has found a loot chest!"), false);
 
                                         if (new Random().nextInt(4) == 0) {
                                             participant.sendMessage(Text.literal("You recieved 6 iron and 1 gold!"), false);

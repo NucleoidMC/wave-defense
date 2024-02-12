@@ -20,7 +20,7 @@ public class ASCIIProgressBar {
                 color = "gray";
 
             String finalColor = color;
-            bar.append(Text.literal("█").styled(style -> style.withColor(TextColor.parse(finalColor))));
+            bar.append(Text.literal("█").styled(style -> style.withColor(TextColor.parse(finalColor).result().get())));
         }
 
         return bar;
