@@ -1,5 +1,6 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
+import net.minecraft.util.math.ColorHelper;
 import org.joml.Vector3f;
 
 import net.minecraft.entity.Entity;
@@ -37,7 +38,7 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
 
         this.goalSelector.add(0, new MoveTowardGameCenterGoal<>(this));
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
-        this.targetSelector.add(0, new ActiveTargetGoal<>(this, MobEntity.class, 1, false, false, e -> !(e instanceof WitchEntity)));
+        this.targetSelector.add(0, new ActiveTargetGoal<>(this, MobEntity.class, 1, false, false, (e, a) -> !(e instanceof WitchEntity)));
 
         this.setAttributes();
     }
@@ -132,17 +133,17 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
         }
 
         ((ServerWorld) this.getWorld()).spawnParticles(
-                new DustParticleEffect(new Vector3f(red, green, blue), scale + stateTimer / 150f),
+                new DustParticleEffect(ColorHelper.fromFloats(1, red, green, blue), scale + stateTimer / 150f),
                 this.getX(), this.getY() + particleSpawnY + 0.3, this.getZ(),
                 2, 0.2, 0.0, 0.2, 0.1
         );
     }
 
     public void setAttributes() {
-        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
         this.setHealth((float) this.getMonsterClass().maxHealth());
 
-        this.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(0.3);
+        this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED).setBaseValue(0.3);
     }
 
     @Override

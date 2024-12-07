@@ -6,13 +6,16 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.util.RandomCollection;
 
+import java.util.Optional;
+
 public class EquipmentHelper {
-    public static ItemStack enchant(Item item, int waveOrdinal, int difficulty, Random random) {
+    public static ItemStack enchant(Item item, int waveOrdinal, int difficulty, Random random, DynamicRegistryManager manager) {
         if (random.nextDouble() > Math.max(0, 1 - (difficulty / 80d + waveOrdinal / 40d)))
-            return EnchantmentHelper.enchant(random, new ItemStack(item), (int) (Math.ceil((waveOrdinal - 10) / 5d) * (Math.max(difficulty, 2) / 4d)), true);
+            return EnchantmentHelper.enchant(random, new ItemStack(item), (int) (Math.ceil((waveOrdinal - 10) / 5d) * (Math.max(difficulty, 2) / 4d)), manager,Optional.empty());
         return new ItemStack(item);
     }
 
@@ -37,7 +40,7 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.HEAD, enchant(selectedHelmet, waveOrdinal, difficulty, random));
+        entity.equipStack(EquipmentSlot.HEAD, enchant(selectedHelmet, waveOrdinal, difficulty, random, entity.getRegistryManager()));
         return iron;
     }
 
@@ -62,7 +65,7 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.CHEST, enchant(selectedChestplate, waveOrdinal, difficulty, random));
+        entity.equipStack(EquipmentSlot.CHEST, enchant(selectedChestplate, waveOrdinal, difficulty, random, entity.getRegistryManager()));
         return iron;
     }
 
@@ -87,7 +90,7 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.LEGS, enchant(selectedLeggings, waveOrdinal, difficulty, random));
+        entity.equipStack(EquipmentSlot.LEGS, enchant(selectedLeggings, waveOrdinal, difficulty, random, entity.getRegistryManager()));
         return iron;
     }
 
@@ -112,7 +115,7 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.FEET, enchant(selectedBoots, waveOrdinal, difficulty, random));
+        entity.equipStack(EquipmentSlot.FEET, enchant(selectedBoots, waveOrdinal, difficulty, random, entity.getRegistryManager()));
         return iron;
     }
 
@@ -137,7 +140,7 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.MAINHAND, enchant(selectedSword, waveOrdinal, difficulty, random));
+        entity.equipStack(EquipmentSlot.MAINHAND, enchant(selectedSword, waveOrdinal, difficulty, random, entity.getRegistryManager()));
         return iron;
     }
 }

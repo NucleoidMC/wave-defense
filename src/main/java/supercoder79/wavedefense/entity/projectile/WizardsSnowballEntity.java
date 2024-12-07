@@ -1,5 +1,8 @@
 package supercoder79.wavedefense.entity.projectile;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.math.ColorHelper;
 import org.joml.Vector3f;
 
 import net.minecraft.entity.AreaEffectCloudEntity;
@@ -17,7 +20,7 @@ import net.minecraft.world.explosion.ExplosionBehavior;
 
 public class WizardsSnowballEntity extends SnowballEntity {
     public WizardsSnowballEntity(World world, LivingEntity owner) {
-        super(world, owner);
+        super(world, owner, new ItemStack(Items.SNOWBALL));
     }
 
     @Override
@@ -25,7 +28,7 @@ public class WizardsSnowballEntity extends SnowballEntity {
         super.tick();
 
         ((ServerWorld)this.getWorld()).spawnParticles(
-                new DustParticleEffect(new Vector3f(0.4f, 0.5f, 1.0f), 1f),
+                new DustParticleEffect(ColorHelper.fromFloats(1,0.4f, 0.5f, 1.0f), 1f),
                 this.getX(), this.getY(), this.getZ(),
                 1, 0.0, 0.0, 0.0, 0.1
         );

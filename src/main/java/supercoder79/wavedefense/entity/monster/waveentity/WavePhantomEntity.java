@@ -8,6 +8,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PhantomEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -40,8 +41,8 @@ public class WavePhantomEntity extends PhantomEntity implements WaveEntity {
     }
 
     @Override
-    public boolean tryAttack(Entity target) {
-        boolean didAttack = super.tryAttack(target);
+    public boolean tryAttack(ServerWorld world, Entity target) {
+        boolean didAttack = super.tryAttack(world, target);
 
         if (didAttack) {
             if (target instanceof LivingEntity && getMod().effect != null) {
@@ -53,9 +54,9 @@ public class WavePhantomEntity extends PhantomEntity implements WaveEntity {
     }
 
     public void setAttributes() {
-        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
         this.setHealth((float) this.getMonsterClass().maxHealth());
-        this.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE).setBaseValue(64d);
+        this.getAttributeInstance(EntityAttributes.FOLLOW_RANGE).setBaseValue(64d);
     }
 
     @Override

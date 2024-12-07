@@ -1,9 +1,9 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.DyeItem;
-import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.random.Random;
@@ -43,7 +43,7 @@ public final class HuskClasses {
     public static final MonsterClass MUMMY = new MonsterClass() {
         @Override
         public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
-            ItemStack enchantedSword = EquipmentHelper.enchant(Items.GOLDEN_SWORD, waveOrdinal, 30, random);
+            ItemStack enchantedSword = EquipmentHelper.enchant(Items.GOLDEN_SWORD, waveOrdinal, 30, random, entity.getRegistryManager());
             if (random.nextBoolean())
                 entity.equipStack(EquipmentSlot.MAINHAND, enchantedSword);
 
@@ -55,23 +55,23 @@ public final class HuskClasses {
 
             ItemStack helmet = new ItemStack(Items.LEATHER_HELMET);
             if (random.nextBoolean())
-                helmet = EquipmentHelper.enchant(helmet.getItem(), waveOrdinal, 10, random);
-            helmet = DyeableItem.blendAndSetColor(helmet, dyeItems);
+                helmet = EquipmentHelper.enchant(helmet.getItem(), waveOrdinal, 10, random, entity.getRegistryManager());
+            helmet = DyedColorComponent.setColor(helmet, dyeItems);
 
             ItemStack chestplate = new ItemStack(Items.LEATHER_CHESTPLATE);
             if (random.nextBoolean())
-                chestplate = EquipmentHelper.enchant(chestplate.getItem(), waveOrdinal, 10, random);
-            chestplate = DyeableItem.blendAndSetColor(chestplate, dyeItems);
+                chestplate = EquipmentHelper.enchant(chestplate.getItem(), waveOrdinal, 10, random, entity.getRegistryManager());
+            chestplate = DyedColorComponent.setColor(chestplate, dyeItems);
 
             ItemStack leggings = new ItemStack(Items.LEATHER_LEGGINGS);
             if (random.nextBoolean())
-                leggings = EquipmentHelper.enchant(leggings.getItem(), waveOrdinal, 10, random);
-            leggings = DyeableItem.blendAndSetColor(leggings, dyeItems);
+                leggings = EquipmentHelper.enchant(leggings.getItem(), waveOrdinal, 10, random, entity.getRegistryManager());
+            leggings = DyedColorComponent.setColor(leggings, dyeItems);
 
             ItemStack boots = new ItemStack(Items.LEATHER_BOOTS);
             if (random.nextBoolean())
-                boots = EquipmentHelper.enchant(boots.getItem(), waveOrdinal, 10, random);
-            boots = DyeableItem.blendAndSetColor(boots, dyeItems);
+                boots = EquipmentHelper.enchant(boots.getItem(), waveOrdinal, 10, random, entity.getRegistryManager());
+            boots = DyedColorComponent.setColor(boots, dyeItems);
 
             entity.equipStack(EquipmentSlot.HEAD, helmet);
             entity.equipStack(EquipmentSlot.CHEST, chestplate);

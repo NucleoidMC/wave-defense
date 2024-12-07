@@ -8,6 +8,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.CaveSpiderEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import supercoder79.wavedefense.entity.MonsterModifier;
@@ -29,13 +30,13 @@ public class WaveCaveSpiderEntity extends CaveSpiderEntity implements WaveEntity
 
         this.goalSelector.add(2, new MoveTowardGameCenterGoal<>(this));
 
-        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(8);
+        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(8);
         this.setHealth((float) this.getMonsterClass().maxHealth());
     }
 
     @Override
-    public boolean tryAttack(Entity target) {
-        boolean didAttack = super.tryAttack(target);
+    public boolean tryAttack(ServerWorld world, Entity target) {
+        boolean didAttack = super.tryAttack(world, target);
 
         if (didAttack) {
             if (target instanceof LivingEntity && getMod().effect != null) {

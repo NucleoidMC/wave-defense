@@ -6,6 +6,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
@@ -45,8 +46,8 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
     }
 
     @Override
-    public boolean tryAttack(Entity target) {
-        boolean didAttack = super.tryAttack(target);
+    public boolean tryAttack(ServerWorld world, Entity target) {
+        boolean didAttack = super.tryAttack(world, target);
 
         if (didAttack) {
             if (target instanceof LivingEntity && getMod().effect != null) {
@@ -58,9 +59,9 @@ public final class WaveZombieEntity extends ZombieEntity implements WaveEntity {
     }
 
     public void setAttributes() {
-        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
         this.setHealth((float) this.getMonsterClass().maxHealth());
-        this.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE).setBaseValue(64d);
+        this.getAttributeInstance(EntityAttributes.FOLLOW_RANGE).setBaseValue(64d);
     }
 
     @Override

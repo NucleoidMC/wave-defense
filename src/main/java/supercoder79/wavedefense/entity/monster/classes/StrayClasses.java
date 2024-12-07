@@ -5,9 +5,9 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.DyeItem;
-import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.EquipmentHelper;
 import supercoder79.wavedefense.entity.MonsterModifier;
@@ -46,8 +46,9 @@ public final class StrayClasses {
         @Override
         public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
             ItemStack blazeRod = new ItemStack(Items.BLAZE_ROD);
-            blazeRod.addEnchantment(Enchantments.FIRE_ASPECT, 2);
-            blazeRod.addEnchantment(Enchantments.SHARPNESS, 10);
+            var reg = entity.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
+            blazeRod.addEnchantment(reg.getOrThrow(Enchantments.FIRE_ASPECT), 2);
+            blazeRod.addEnchantment(reg.getOrThrow(Enchantments.SHARPNESS), 10);
             entity.equipStack(EquipmentSlot.MAINHAND, blazeRod);
         }
 

@@ -9,6 +9,7 @@ import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
@@ -42,12 +43,12 @@ public final class WaveDrownedEntity extends DrownedEntity implements WaveEntity
         this.goalSelector.add(2, new MoveTowardGameCenterGoal<>(this));
         this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
         this.goalSelector.add(4, new LookAroundGoal(this));
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, true, false, this::canDrownedAttackTarget));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, 10, true, false, (a, b) -> this.canDrownedAttackTarget(a)));
     }
 
     @Override
-    public boolean tryAttack(Entity target) {
-        boolean didAttack = super.tryAttack(target);
+    public boolean tryAttack(ServerWorld world, Entity target) {
+        boolean didAttack = super.tryAttack(world, target);
 
         if (didAttack) {
             if (target instanceof LivingEntity && getMod().effect != null) {
@@ -59,9 +60,9 @@ public final class WaveDrownedEntity extends DrownedEntity implements WaveEntity
     }
 
     public void setAttributes() {
-        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
         this.setHealth((float) this.getMonsterClass().maxHealth());
-        this.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE).setBaseValue(64d);
+        this.getAttributeInstance(EntityAttributes.FOLLOW_RANGE).setBaseValue(64d);
     }
 
     @Override

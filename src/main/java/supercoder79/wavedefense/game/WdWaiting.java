@@ -7,7 +7,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
@@ -18,14 +17,16 @@ import net.minecraft.world.Heightmap;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.WdMapGenerator;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
-import xyz.nucleoid.plasmid.game.GameOpenContext;
-import xyz.nucleoid.plasmid.game.GameOpenProcedure;
-import xyz.nucleoid.plasmid.game.GameResult;
-import xyz.nucleoid.plasmid.game.GameSpace;
-import xyz.nucleoid.plasmid.game.common.GameWaitingLobby;
-import xyz.nucleoid.plasmid.game.event.GameActivityEvents;
-import xyz.nucleoid.plasmid.game.event.GamePlayerEvents;
-import xyz.nucleoid.plasmid.game.rule.GameRuleType;
+import xyz.nucleoid.plasmid.api.game.GameOpenContext;
+import xyz.nucleoid.plasmid.api.game.GameOpenProcedure;
+import xyz.nucleoid.plasmid.api.game.GameResult;
+import xyz.nucleoid.plasmid.api.game.GameSpace;
+import xyz.nucleoid.plasmid.api.game.common.GameWaitingLobby;
+import xyz.nucleoid.plasmid.api.game.event.GameActivityEvents;
+import xyz.nucleoid.plasmid.api.game.event.GamePlayerEvents;
+import xyz.nucleoid.plasmid.api.game.player.JoinOffer;
+import xyz.nucleoid.plasmid.api.game.rule.GameRuleType;
+import xyz.nucleoid.stimuli.event.EventResult;
 import xyz.nucleoid.stimuli.event.block.BlockUseEvent;
 import xyz.nucleoid.stimuli.event.item.ItemUseEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerAttackEntityEvent;
@@ -62,15 +63,16 @@ public final class WdWaiting {
 			WdWaiting waiting = new WdWaiting(game.getGameSpace(), map, config, world);
 			GameWaitingLobby.addTo(game, context.config().playerConfig);
 
-			game.setRule(GameRuleType.CRAFTING, ActionResult.FAIL);
-			game.setRule(GameRuleType.PORTALS, ActionResult.FAIL);
-			game.setRule(GameRuleType.PVP, ActionResult.FAIL);
-			game.setRule(GameRuleType.FALL_DAMAGE, ActionResult.FAIL);
-			game.setRule(GameRuleType.HUNGER, ActionResult.FAIL);
+			game.setRule(GameRuleType.CRAFTING, EventResult.DENY);
+			game.setRule(GameRuleType.PORTALS, EventResult.DENY);
+			game.setRule(GameRuleType.PVP, EventResult.DENY);
+			game.setRule(GameRuleType.FALL_DAMAGE, EventResult.DENY);
+			game.setRule(GameRuleType.HUNGER, EventResult.DENY);
 
 			game.listen(GameActivityEvents.REQUEST_START, waiting::requestStart);
 
-			game.listen(GamePlayerEvents.OFFER, offer -> offer.accept(world, new Vec3d(0, world.getTopY(Heightmap.Type.MOTION_BLOCKING, 0, 0), 0)));
+			game.listen(GamePlayerEvents.OFFER, JoinOffer::accept);
+			game.listen(GamePlayerEvents.ACCEPT, offer -> offer.teleport(world, new Vec3d(0, world.getTopY(Heightmap.Type.MOTION_BLOCKING, 0, 0), 0)));
 			game.listen(GamePlayerEvents.ADD, waiting::addPlayer);
 			game.listen(PlayerDeathEvent.EVENT, waiting::onPlayerDeath);
 			game.listen(PlayerAttackEntityEvent.EVENT, waiting::onAttackEntity);
@@ -79,16 +81,16 @@ public final class WdWaiting {
 		});
 	}
 
-	private ActionResult onAttackEntity(ServerPlayerEntity attacker, Hand hand, Entity attacked, EntityHitResult hitResult) {
-		return ActionResult.SUCCESS;
+	private EventResult onAttackEntity(ServerPlayerEntity attacker, Hand hand, Entity attacked, EntityHitResult hitResult) {
+		return EventResult.ALLOW;
 	}
 
 	private ActionResult onUseBlock(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
-		return ActionResult.SUCCESS;
+		return ActionResult.SUCCESS_SERVER;
 	}
 
-	private TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {
-		return TypedActionResult.success(player.getStackInHand(hand));
+	private ActionResult onUseItem(ServerPlayerEntity player, Hand hand) {
+		return ActionResult.SUCCESS_SERVER;
 	}
 
 	private GameResult requestStart() {
@@ -100,9 +102,9 @@ public final class WdWaiting {
 		this.spawnPlayer(player);
 	}
 
-	private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+	private EventResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
 		this.spawnPlayer(player);
-		return ActionResult.FAIL;
+		return EventResult.DENY;
 	}
 
 	private void spawnPlayer(ServerPlayerEntity player) {

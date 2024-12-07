@@ -11,6 +11,7 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
@@ -86,15 +87,16 @@ public class WaveStrayEntity extends StrayEntity implements WaveEntity {
 	}
 
 	public void setAttributes() {
-		this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+		this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
 		this.setHealth((float) this.getMonsterClass().maxHealth());
-		this.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE).setBaseValue(64d);
+		this.getAttributeInstance(EntityAttributes.FOLLOW_RANGE).setBaseValue(64d);
 	}
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		ItemStack itemStack = this.getProjectileType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
-		PersistentProjectileEntity arrowProjectile = this.createArrowProjectile(itemStack, pullProgress);
+		var bow = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
+		ItemStack itemStack = this.getProjectileType(bow);
+		PersistentProjectileEntity arrowProjectile = this.createArrowProjectile(itemStack, pullProgress, bow);
 		arrowProjectile.setDamage(arrowProjectile.getDamage() * this.getMonsterClass().damageScale());
 
 		// Add modifier effect

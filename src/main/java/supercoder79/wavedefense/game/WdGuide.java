@@ -12,7 +12,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.border.WorldBorder;
 import supercoder79.wavedefense.entity.GuideVillagerEntity;
 import supercoder79.wavedefense.map.gen.WdPath;
-import xyz.nucleoid.plasmid.game.player.PlayerSet;
+import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
 
 import java.util.List;
 

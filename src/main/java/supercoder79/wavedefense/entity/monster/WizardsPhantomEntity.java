@@ -6,6 +6,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.PhantomEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -22,10 +23,9 @@ public class WizardsPhantomEntity extends PhantomEntity implements WaveEntity {
     public WizardsPhantomEntity(World world, WdActive game) {
         super(EntityType.PHANTOM, world);
         this.experiencePoints = 0;
-
         this.game = game;
 
-        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(30);
+        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(30);
         this.setHealth((float) this.getMonsterClass().maxHealth());
     }
 
@@ -58,10 +58,10 @@ public class WizardsPhantomEntity extends PhantomEntity implements WaveEntity {
     }
 
     @Override
-    public boolean isInvulnerableTo(DamageSource damageSource) {
+    public boolean isInvulnerableTo(ServerWorld world, DamageSource damageSource) {
         if (this.hasPassengers())
             return true;
-        return super.isInvulnerableTo(damageSource);
+        return super.isInvulnerableTo(world, damageSource);
     }
 
     @Override

@@ -5,13 +5,12 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
+
+import java.util.Set;
 
 public record WdSpawnLogic(ServerWorld world, WdConfig config) {
 
@@ -28,12 +27,14 @@ public record WdSpawnLogic(ServerWorld world, WdConfig config) {
         player.setExperiencePoints(0);
     }
 
+    private static final ChunkTicketType<Integer> FORCE_TELEPORT = ChunkTicketType.create("force_teleport", Integer::compare, 300);
+
     public void spawnPlayer(ServerPlayerEntity player) {
         BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.world, this.config);
         ChunkPos chunkPos = new ChunkPos(pos);
-        world.getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, chunkPos, 1, player.getId());
+        world.getChunkManager().addTicket(FORCE_TELEPORT, chunkPos, 1, player.getId());
 
-        player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0F, 0.0F);
+        player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, Set.of(), 0.0F, 0.0F, false);
     }
 
     public static BlockPos findSurfaceAround(Vec3d centerPos, ServerWorld world, WdConfig config) {

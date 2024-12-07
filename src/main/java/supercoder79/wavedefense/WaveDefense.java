@@ -2,7 +2,7 @@ package supercoder79.wavedefense;
 
 import supercoder79.wavedefense.game.WdConfig;
 import supercoder79.wavedefense.game.WdWaiting;
-import xyz.nucleoid.plasmid.game.GameType;
+import xyz.nucleoid.plasmid.api.game.GameType;
 
 import net.minecraft.util.Identifier;
 
@@ -12,7 +12,7 @@ public class WaveDefense implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		GameType.register(
-				new Identifier("wavedefense", "wavedefense"),
+				Identifier.of("wavedefense", "wavedefense"),
 				WdConfig.CODEC,
 				WdWaiting::open
 				);

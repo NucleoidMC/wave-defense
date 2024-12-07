@@ -1,10 +1,13 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.EquipmentHelper;
 import supercoder79.wavedefense.entity.MonsterModifier;
@@ -186,18 +189,19 @@ public final class SkeletonClasses {
             iron = 12;
 
             ItemStack sword = new ItemStack(Items.GOLDEN_SWORD);
-            sword.addEnchantment(Enchantments.SHARPNESS, 6);
-            sword.addEnchantment(Enchantments.KNOCKBACK, 3);
+            var reg = entity.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
+            sword.addEnchantment(reg.getOrThrow(Enchantments.SHARPNESS), 6);
+            sword.addEnchantment(reg.getOrThrow(Enchantments.KNOCKBACK), 3);
             entity.equipStack(EquipmentSlot.MAINHAND, sword);
 
-            entity.equipStack(EquipmentSlot.HEAD, EnchantmentHelper.enchant(random, new ItemStack(Items.GOLDEN_HELMET), 40, true));
+            entity.equipStack(EquipmentSlot.HEAD, EnchantmentHelper.enchant(random, new ItemStack(Items.GOLDEN_HELMET), 40, entity.getRegistryManager(), Optional.empty()));
 
             ItemStack chestplate = new ItemStack(Items.LEATHER_CHESTPLATE);
             ArrayList<DyeItem> dyeItems = new ArrayList<>();
             dyeItems.add((DyeItem) Items.RED_DYE);
             dyeItems.add((DyeItem) Items.RED_DYE);
             dyeItems.add((DyeItem) Items.BLACK_DYE);
-            chestplate = DyeableItem.blendAndSetColor(chestplate, dyeItems);
+            chestplate = DyedColorComponent.setColor(chestplate, dyeItems);
 
             entity.equipStack(EquipmentSlot.CHEST, chestplate);
 

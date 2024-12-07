@@ -15,7 +15,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -23,16 +22,20 @@ import net.minecraft.world.GameMode;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.util.ASCIIProgressBar;
-import xyz.nucleoid.plasmid.game.GameCloseReason;
-import xyz.nucleoid.plasmid.game.GameSpace;
-import xyz.nucleoid.plasmid.game.common.GlobalWidgets;
-import xyz.nucleoid.plasmid.game.event.GameActivityEvents;
-import xyz.nucleoid.plasmid.game.event.GamePlayerEvents;
-import xyz.nucleoid.plasmid.game.player.MutablePlayerSet;
-import xyz.nucleoid.plasmid.game.player.PlayerSet;
-import xyz.nucleoid.plasmid.game.rule.GameRuleType;
-import xyz.nucleoid.plasmid.util.ItemStackBuilder;
-import xyz.nucleoid.plasmid.util.PlayerRef;
+import xyz.nucleoid.plasmid.api.game.GameCloseReason;
+import xyz.nucleoid.plasmid.api.game.GameSpace;
+import xyz.nucleoid.plasmid.api.game.common.GlobalWidgets;
+import xyz.nucleoid.plasmid.api.game.common.PlayerLimiter;
+import xyz.nucleoid.plasmid.api.game.common.config.PlayerLimiterConfig;
+import xyz.nucleoid.plasmid.api.game.event.GameActivityEvents;
+import xyz.nucleoid.plasmid.api.game.event.GamePlayerEvents;
+import xyz.nucleoid.plasmid.api.game.player.JoinOffer;
+import xyz.nucleoid.plasmid.api.game.player.MutablePlayerSet;
+import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
+import xyz.nucleoid.plasmid.api.game.rule.GameRuleType;
+import xyz.nucleoid.plasmid.api.util.ItemStackBuilder;
+import xyz.nucleoid.plasmid.api.util.PlayerRef;
+import xyz.nucleoid.stimuli.event.EventResult;
 import xyz.nucleoid.stimuli.event.block.BlockUseEvent;
 import xyz.nucleoid.stimuli.event.entity.EntityDeathEvent;
 import xyz.nucleoid.stimuli.event.item.ItemUseEvent;
@@ -76,19 +79,21 @@ public final class WdActive {
     public static void open(GameSpace gameSpace, WdMap map, WdConfig config, ServerWorld world) {
         gameSpace.setActivity(game -> {
             GlobalWidgets widgets = GlobalWidgets.addTo(game);
-            WdActive active = new WdActive(gameSpace, world, map, config, gameSpace.getPlayers().copy(world.getServer()), widgets);
+            WdActive active = new WdActive(gameSpace, world, map, config, gameSpace.getPlayers().participants().copy(world.getServer()), widgets);
 
-            game.setRule(GameRuleType.CRAFTING, ActionResult.SUCCESS);
-            game.setRule(GameRuleType.PORTALS, ActionResult.FAIL);
-            game.setRule(GameRuleType.PVP, ActionResult.FAIL);
-            game.setRule(GameRuleType.BLOCK_DROPS, ActionResult.SUCCESS);
-            game.setRule(GameRuleType.FALL_DAMAGE, ActionResult.SUCCESS);
-            game.setRule(GameRuleType.HUNGER, ActionResult.SUCCESS);
-            game.setRule(GameRuleType.THROW_ITEMS, ActionResult.FAIL);
-            game.setRule(GameRuleType.INTERACTION, ActionResult.SUCCESS);
+            game.setRule(GameRuleType.CRAFTING, EventResult.ALLOW);
+            game.setRule(GameRuleType.PORTALS, EventResult.DENY);
+            game.setRule(GameRuleType.PVP, EventResult.DENY);
+            game.setRule(GameRuleType.BLOCK_DROPS, EventResult.ALLOW);
+            game.setRule(GameRuleType.FALL_DAMAGE, EventResult.ALLOW);
+            game.setRule(GameRuleType.HUNGER, EventResult.ALLOW);
+            game.setRule(GameRuleType.THROW_ITEMS, EventResult.DENY);
+            game.setRule(GameRuleType.INTERACTION, EventResult.ALLOW);
 
             game.listen(GameActivityEvents.ENABLE, active::open);
-            game.listen(GamePlayerEvents.OFFER, offer -> offer.accept(world, active.guide.getCenterPos()));
+            game.listen(GameActivityEvents.STATE_UPDATE, state -> state.canPlay(false));
+            game.listen(GamePlayerEvents.OFFER, JoinOffer::acceptSpectators);
+            game.listen(GamePlayerEvents.ACCEPT, offer -> offer.teleport(world, active.guide.getCenterPos()));
             game.listen(GamePlayerEvents.ADD, active::addPlayer);
             game.listen(GamePlayerEvents.REMOVE, active::removePlayer);
 
@@ -102,8 +107,12 @@ public final class WdActive {
     }
 
     private void open() {
-        for (ServerPlayerEntity player : this.participants) {
+        for (ServerPlayerEntity player : this.space.getPlayers().participants()) {
             this.spawnParticipant(player);
+        }
+
+        for (ServerPlayerEntity player : this.space.getPlayers().spectators()) {
+            this.spawnSpectator(player);
         }
     }
 
@@ -184,18 +193,18 @@ public final class WdActive {
         }
     }
 
-    private TypedActionResult<ItemStack> onUseItem(ServerPlayerEntity player, Hand hand) {
+    private ActionResult onUseItem(ServerPlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
         if (stack.getItem() == Items.COMPASS) {
             WdItemShop.open(player, this);
-            return TypedActionResult.success(stack);
+            return ActionResult.SUCCESS_SERVER;
         }
 
-        return TypedActionResult.pass(stack);
+        return ActionResult.PASS;
     }
 
-    private ActionResult onEntityDeath(LivingEntity entity, DamageSource source) {
+    private EventResult onEntityDeath(LivingEntity entity, DamageSource source) {
         if (entity instanceof WaveEntity) {
             WdWave activeWave = waveManager.getActiveWave();
             if (activeWave != null) {
@@ -210,13 +219,13 @@ public final class WdActive {
                 }
             }
 
-            return ActionResult.FAIL;
+            return EventResult.DENY;
         }
 
-        return ActionResult.SUCCESS;
+        return EventResult.PASS;
     }
 
-    private ActionResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+    private EventResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
         this.eliminatePlayer(player);
 
         if (participants.isEmpty()) {
@@ -229,7 +238,7 @@ public final class WdActive {
             this.gameCloseTick = this.world.getTime() + (10 * 20);
         }
 
-        return ActionResult.FAIL;
+        return EventResult.DENY;
     }
 
     // TODO: this doesn't work. The logic has been moved to tick() as a hacky workaround.
@@ -342,7 +351,7 @@ public final class WdActive {
             MutableText message = Text.literal("You are too far away from your villager!");
             player.sendMessage(message.formatted(Formatting.RED), true);
 
-            player.damage(player.getDamageSources().outOfWorld(), 0.5F);
+            player.damage(world, player.getDamageSources().outOfWorld(), 0.5F);
         }
     }
 

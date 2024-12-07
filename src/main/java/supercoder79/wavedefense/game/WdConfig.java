@@ -1,12 +1,13 @@
 package supercoder79.wavedefense.game;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import xyz.nucleoid.plasmid.game.common.config.PlayerConfig;
+import xyz.nucleoid.plasmid.api.game.common.config.WaitingLobbyConfig;
 
 public final class WdConfig {
-    public static final Codec<WdConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            PlayerConfig.CODEC.fieldOf("players").forGetter(config -> config.playerConfig),
+    public static final MapCodec<WdConfig> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            WaitingLobbyConfig.CODEC.fieldOf("players").forGetter(config -> config.playerConfig),
             Path.CODEC.fieldOf("path").forGetter(config -> config.path),
             Codec.INT.fieldOf("spawn_radius").forGetter(config -> config.spawnRadius),
             Codec.DOUBLE.fieldOf("min_wave_spacing").forGetter(config -> config.minWaveSpacing),
@@ -16,7 +17,7 @@ public final class WdConfig {
             Shop.CODEC.fieldOf("shop").forGetter(config -> config.shop)
     ).apply(instance, (playerConfig1, path1, spawnRadius1, minWaveSpacing1, maxWaveSpacing1, monsterSpawns1, monsterSpawnChoices1, shop1) -> new WdConfig(playerConfig1, path1, monsterSpawns1, monsterSpawnChoices1, shop1, spawnRadius1, minWaveSpacing1, maxWaveSpacing1)));
 
-    public final PlayerConfig playerConfig;
+    public final WaitingLobbyConfig playerConfig;
     public final Path path;
     public final MonsterSpawns monsterSpawns;
     public final MonsterSpawnChoices monsterSpawnChoices;
@@ -25,7 +26,7 @@ public final class WdConfig {
     public final double minWaveSpacing;
     public final double maxWaveSpacing;
 
-    public WdConfig(PlayerConfig playerConfig, Path path, MonsterSpawns monsterSpawns, MonsterSpawnChoices monsterSpawnChoices, Shop shop, int spawnRadius, double minWaveSpacing, double maxWaveSpacing) {
+    public WdConfig(WaitingLobbyConfig playerConfig, Path path, MonsterSpawns monsterSpawns, MonsterSpawnChoices monsterSpawnChoices, Shop shop, int spawnRadius, double minWaveSpacing, double maxWaveSpacing) {
         this.playerConfig = playerConfig;
         this.path = path;
         this.monsterSpawns = monsterSpawns;

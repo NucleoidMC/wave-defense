@@ -1,5 +1,6 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
+import net.minecraft.server.world.ServerWorld;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
@@ -58,15 +59,16 @@ public class WaveSkeletonEntity extends SkeletonEntity implements WaveEntity {
 	}
 
 	public void setAttributes() {
-		this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+		this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
 		this.setHealth((float) this.getMonsterClass().maxHealth());
-		this.getAttributeInstance(EntityAttributes.GENERIC_FOLLOW_RANGE).setBaseValue(64d);
+		this.getAttributeInstance(EntityAttributes.FOLLOW_RANGE).setBaseValue(64d);
 	}
 
 	@Override
 	public void shootAt(LivingEntity target, float pullProgress) {
-		ItemStack itemStack = this.getProjectileType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
-		PersistentProjectileEntity arrowProjectile = this.createArrowProjectile(itemStack, pullProgress);
+		var bow = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
+		ItemStack itemStack = this.getProjectileType(bow);
+		PersistentProjectileEntity arrowProjectile = this.createArrowProjectile(itemStack, pullProgress, bow);
 		arrowProjectile.setDamage(arrowProjectile.getDamage() * this.getMonsterClass().damageScale());
 
 		// Add modifier effect

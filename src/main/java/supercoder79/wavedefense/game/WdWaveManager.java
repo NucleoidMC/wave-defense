@@ -8,7 +8,7 @@ import net.minecraft.text.TextColor;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.CallbackI;
-import xyz.nucleoid.plasmid.game.player.PlayerSet;
+import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
 
 public final class WdWaveManager {
     private final WdActive game;

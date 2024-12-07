@@ -3,6 +3,7 @@ package supercoder79.wavedefense.entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -29,8 +30,9 @@ public final class GuideVillagerEntity extends VillagerEntity {
         this.goalSelector.add(0, new SwimGoal(this));
     }
 
+
     @Override
-    protected void mobTick() {
+    protected void mobTick(ServerWorld world) {
         if (this.paused) {
             this.navigation.stop();
         } else if (this.targetPos != null && this.navigation.isIdle()) {

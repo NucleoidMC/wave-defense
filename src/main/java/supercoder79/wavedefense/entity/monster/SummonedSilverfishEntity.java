@@ -2,6 +2,7 @@ package supercoder79.wavedefense.entity.monster;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.SilverfishEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
 public class SummonedSilverfishEntity extends SilverfishEntity {
@@ -17,7 +18,7 @@ public class SummonedSilverfishEntity extends SilverfishEntity {
         super.tick();
         if (--this.lifeTicks <= 0) {
             this.lifeTicks = 40;
-            this.damage(this.getDamageSources().starve(), 1.0F);
+            this.damage((ServerWorld) this.getWorld(), this.getDamageSources().starve(), 1.0F);
         }
     }
 }
