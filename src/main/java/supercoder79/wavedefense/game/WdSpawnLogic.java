@@ -3,6 +3,7 @@ package supercoder79.wavedefense.game;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkTicket;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.*;
@@ -27,12 +28,12 @@ public record WdSpawnLogic(ServerWorld world, WdConfig config) {
         player.setExperiencePoints(0);
     }
 
-    private static final ChunkTicketType<Integer> FORCE_TELEPORT = ChunkTicketType.create("force_teleport", Integer::compare, 300);
+    private static final ChunkTicketType FORCE_TELEPORT = ChunkTicketType.PLAYER_LOADING;
 
     public void spawnPlayer(ServerPlayerEntity player) {
         BlockPos pos = findSurfaceAround(Vec3d.ZERO, this.world, this.config);
         ChunkPos chunkPos = new ChunkPos(pos);
-        world.getChunkManager().addTicket(FORCE_TELEPORT, chunkPos, 1, player.getId());
+        world.getChunkManager().addTicket(new ChunkTicket(FORCE_TELEPORT, 3), chunkPos);
 
         player.teleport(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, Set.of(), 0.0F, 0.0F, false);
     }

@@ -16,6 +16,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -177,7 +178,7 @@ public final class WdItemShop {
                 .withCost(Cost.ofIron((sharpness + 1) * config.sharpness.base + 4 * (int) (Math.max(0, Math.pow(sharpness - 2, config.sharpness.scale)))))
                 .onBuy(p -> {
                     properties.sharpness++;
-                    applyEnchantments(player, stack -> stack.getItem() instanceof SwordItem, Enchantments.SHARPNESS, sharpness + 1);
+                    applyEnchantments(player, stack -> stack.isIn(ItemTags.SWORDS), Enchantments.SHARPNESS, sharpness + 1);
                 })
         );
 

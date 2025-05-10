@@ -195,7 +195,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
                         }
 
                         // Set the state here
-                        chunk.setBlockState(mutable.set(x, y, z), state, false);
+                        chunk.setBlockState(mutable.set(x, y, z), state);
                     }
                 }
             }

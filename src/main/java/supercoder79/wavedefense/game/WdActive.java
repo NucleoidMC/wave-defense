@@ -2,6 +2,7 @@ package supercoder79.wavedefense.game;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.MobEntity;
@@ -302,10 +303,10 @@ public final class WdActive {
                         .build()
         );
 
-        player.getInventory().armor.set(3, ItemStackBuilder.of(Items.CHAINMAIL_HELMET).setUnbreakable().build());
-        player.getInventory().armor.set(2, ItemStackBuilder.of(Items.CHAINMAIL_CHESTPLATE).setUnbreakable().build());
-        player.getInventory().armor.set(1, ItemStackBuilder.of(Items.CHAINMAIL_LEGGINGS).setUnbreakable().build());
-        player.getInventory().armor.set(0, ItemStackBuilder.of(Items.CHAINMAIL_BOOTS).setUnbreakable().build());
+        player.equipStack(EquipmentSlot.HEAD, ItemStackBuilder.of(Items.CHAINMAIL_HELMET).setUnbreakable().build());
+        player.equipStack(EquipmentSlot.CHEST, ItemStackBuilder.of(Items.CHAINMAIL_CHESTPLATE).setUnbreakable().build());
+        player.equipStack(EquipmentSlot.LEGS, ItemStackBuilder.of(Items.CHAINMAIL_LEGGINGS).setUnbreakable().build());
+        player.equipStack(EquipmentSlot.FEET, ItemStackBuilder.of(Items.CHAINMAIL_BOOTS).setUnbreakable().build());
 
         players.put(PlayerRef.of(player), new WdPlayerProperties());
     }

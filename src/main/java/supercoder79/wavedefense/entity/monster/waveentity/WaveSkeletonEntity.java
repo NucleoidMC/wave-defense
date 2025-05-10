@@ -68,8 +68,8 @@ public class WaveSkeletonEntity extends SkeletonEntity implements WaveEntity {
 	public void shootAt(LivingEntity target, float pullProgress) {
 		var bow = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
 		ItemStack itemStack = this.getProjectileType(bow);
-		PersistentProjectileEntity arrowProjectile = this.createArrowProjectile(itemStack, pullProgress, bow);
-		arrowProjectile.setDamage(arrowProjectile.getDamage() * this.getMonsterClass().damageScale());
+		var arrowProjectile = this.createArrowProjectile(itemStack, pullProgress, bow);
+		arrowProjectile.setDamage(2 * pullProgress * this.getMonsterClass().damageScale());
 
 		// Add modifier effect
 		if (this.getMod().effect != null) {
