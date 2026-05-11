@@ -1,12 +1,10 @@
 package supercoder79.wavedefense.map.biome.impl;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import supercoder79.wavedefense.map.biome.BiomeGen;
-
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.BuiltinBiomes;
 
 public final class ForestGen implements BiomeGen {
 	public static final ForestGen INSTANCE = new ForestGen();
@@ -17,17 +15,17 @@ public final class ForestGen implements BiomeGen {
 	}
 
 	@Override
-	public int treeAmt(Random random) {
+	public int treeAmt(RandomSource random) {
 		return 3 + random.nextInt(4);
 	}
 
 	@Override
-	public int grassAmt(Random random) {
+	public int grassAmt(RandomSource random) {
 		return 4 + random.nextInt(4);
 	}
 
 	@Override
-	public RegistryKey<Biome> getFakingBiome() {
-		return BiomeKeys.FOREST;
+	public ResourceKey<Biome> getFakingBiome() {
+		return Biomes.FOREST;
 	}
 }

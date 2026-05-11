@@ -1,10 +1,10 @@
 package supercoder79.wavedefense.map.biome;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import xyz.nucleoid.substrate.gen.MapGen;
 import xyz.nucleoid.substrate.gen.tree.PoplarTreeGen;
 
@@ -21,39 +21,39 @@ public interface BiomeGen {
 		return 3.25;
 	}
 
-	int treeAmt(Random random);
+	int treeAmt(RandomSource random);
 
-	int grassAmt(Random random);
+	int grassAmt(RandomSource random);
 
-	default int shrubAmt(Random random) {
+	default int shrubAmt(RandomSource random) {
 		return 0;
 	}
 
-	default int cactusAmt(Random random) {
+	default int cactusAmt(RandomSource random) {
 		return 0;
 	}
 
-	default BlockState topState(Random random) {
-		return Blocks.GRASS_BLOCK.getDefaultState();
+	default BlockState topState(RandomSource random) {
+		return Blocks.GRASS_BLOCK.defaultBlockState();
 	}
 
 	default BlockState pathState() {
-		return Blocks.DIRT_PATH.getDefaultState();
+		return Blocks.DIRT_PATH.defaultBlockState();
 	}
 
 	default BlockState underState() {
-		return Blocks.DIRT.getDefaultState();
+		return Blocks.DIRT.defaultBlockState();
 	}
 
 	default BlockState underWaterState() {
-		return Blocks.DIRT.getDefaultState();
+		return Blocks.DIRT.defaultBlockState();
 	}
 
-	default MapGen tree(int x, int z, Random random) {
+	default MapGen tree(int x, int z, RandomSource random) {
 		return PoplarTreeGen.INSTANCE;
 	}
 
 	default boolean isSnowy() { return false; }
 
-	RegistryKey<Biome> getFakingBiome();
+	ResourceKey<Biome> getFakingBiome();
 }

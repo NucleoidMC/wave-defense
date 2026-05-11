@@ -1,33 +1,33 @@
 package supercoder79.wavedefense.game;
 
-import net.minecraft.network.packet.s2c.play.WorldBorderCenterChangedS2CPacket;
-import net.minecraft.network.packet.s2c.play.WorldBorderInitializeS2CPacket;
-import net.minecraft.network.packet.s2c.play.WorldBorderSizeChangedS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.border.WorldBorder;
 import supercoder79.wavedefense.entity.GuideVillagerEntity;
 import supercoder79.wavedefense.map.gen.WdPath;
 import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderCenterPacket;
+import net.minecraft.network.protocol.game.ClientboundSetBorderSizePacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
 
 public final class WdGuide {
     private static final float PAUSE_CHANCE = 1.0F / (20.0F * 15.0F);
     private static final long PAUSE_DURATION = 20 * 3;
 
     private final WdActive game;
-    private final ServerWorld world;
+    private final ServerLevel world;
 
-    private final Random random;
+    private final RandomSource random;
 
     private GuideVillagerEntity entity;
 
-    private Vec3d centerPos = Vec3d.ZERO;
+    private Vec3 centerPos = Vec3.ZERO;
     private double progressPercent;
 
     private long pauseTime = -1;
@@ -41,7 +41,7 @@ public final class WdGuide {
 
         PlayerSet players = game.space.getPlayers();
 
-        for (ServerPlayerEntity player : players) {
+        for (ServerPlayer player : players) {
             this.onAddPlayer(player);
         }
     }
@@ -76,14 +76,14 @@ public final class WdGuide {
             return;
         }
 
-        if (time % 10 == 0 || !entity.isNavigating()) {
+        if (time % 10 == 0 || !entity.isPathFinding()) {
             List<BlockPos> points = game.map.path().getPoints();
             if (currentTargetIndex >= points.size()) {
                 return;
             }
 
             BlockPos targetPos = points.get(currentTargetIndex);
-            targetPos = world.getTopPosition(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, targetPos);
+            targetPos = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, targetPos);
 
             entity.setTargetPos(targetPos);
 
@@ -111,24 +111,24 @@ public final class WdGuide {
         return false;
     }
 
-    public void onAddPlayer(ServerPlayerEntity player) {
+    public void onAddPlayer(ServerPlayer player) {
         WorldBorder worldBorder = getWorldBorder();
-        player.networkHandler.sendPacket(new WorldBorderInitializeS2CPacket(worldBorder));
+        player.connection.send(new ClientboundInitializeBorderPacket(worldBorder));
     }
 
     private void updateWorldBorder() {
         WorldBorder worldBorder = getWorldBorder();
         double size = worldBorder.getSize();
 
-        for (ServerPlayerEntity player : game.space.getPlayers()) {
+        for (ServerPlayer player : game.space.getPlayers()) {
             double deltaX = player.getX() - worldBorder.getCenterX();
             double deltaZ = player.getZ() - worldBorder.getCenterZ();
 
             boolean hidden = deltaX * deltaX + deltaZ * deltaZ < 1.5 * 1.5;
             worldBorder.setSize(hidden ? 20000.0 : size);
 
-            player.networkHandler.sendPacket(new WorldBorderCenterChangedS2CPacket(worldBorder));
-            player.networkHandler.sendPacket(new WorldBorderSizeChangedS2CPacket(worldBorder));
+            player.connection.send(new ClientboundSetBorderCenterPacket(worldBorder));
+            player.connection.send(new ClientboundSetBorderSizePacket(worldBorder));
         }
     }
 
@@ -152,17 +152,17 @@ public final class WdGuide {
     }
 
     private GuideVillagerEntity spawnEntity(double x, double z) {
-        BlockPos surfacePos = this.world.getTopPosition(Heightmap.Type.MOTION_BLOCKING, BlockPos.ofFloored(x, 0, z));
+        BlockPos surfacePos = this.world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, BlockPos.containing(x, 0, z));
 
         GuideVillagerEntity entity = new GuideVillagerEntity(this.world);
-        entity.refreshPositionAndAngles(surfacePos.getX() + 0.5, surfacePos.getY(), surfacePos.getZ() + 0.5, 0.0F, 0.0F);
+        entity.snapTo(surfacePos.getX() + 0.5, surfacePos.getY(), surfacePos.getZ() + 0.5, 0.0F, 0.0F);
 
-        this.world.spawnEntity(entity);
+        this.world.addFreshEntity(entity);
 
         return entity;
     }
 
-    public Vec3d getCenterPos() {
+    public Vec3 getCenterPos() {
         return centerPos;
     }
 

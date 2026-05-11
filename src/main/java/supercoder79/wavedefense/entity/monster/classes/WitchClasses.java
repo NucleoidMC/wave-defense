@@ -1,23 +1,23 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Mob;
 import supercoder79.wavedefense.entity.MonsterModifier;
 
 public class WitchClasses {
     public static final MonsterClass DEFAULT = new MonsterClass() {
         @Override
-        public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+        public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
 
         }
 
         @Override
-        public int ironCount(Random random) {
+        public int ironCount(RandomSource random) {
             return 6;
         }
 
         @Override
-        public int goldCount(Random random) {
+        public int goldCount(RandomSource random) {
             return random.nextInt(6) == 0 ? 1 : 0;
         }
 

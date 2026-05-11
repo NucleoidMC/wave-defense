@@ -1,11 +1,11 @@
 package supercoder79.wavedefense.map.biome.impl;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.feature.DeadTreeGen;
 import xyz.nucleoid.substrate.gen.MapGen;
@@ -29,7 +29,7 @@ public final class DesertGen implements BiomeGen {
 	}
 
 	@Override
-	public int treeAmt(Random random) {
+	public int treeAmt(RandomSource random) {
 		if (random.nextInt(6) == 0) {
 			return 1;
 		}
@@ -37,46 +37,46 @@ public final class DesertGen implements BiomeGen {
 	}
 
 	@Override
-	public int grassAmt(Random random) {
+	public int grassAmt(RandomSource random) {
 		return random.nextInt(2);
 	}
 
 	@Override
-	public int cactusAmt(Random random) {
+	public int cactusAmt(RandomSource random) {
 		return 1 + random.nextInt(3);
 	}
 
 	@Override
-	public BlockState topState(Random random) {
+	public BlockState topState(RandomSource random) {
 		if (random.nextInt(16) == 0) {
-			return Blocks.GRASS_BLOCK.getDefaultState();
+			return Blocks.GRASS_BLOCK.defaultBlockState();
 		}
 
-		return Blocks.SAND.getDefaultState();
+		return Blocks.SAND.defaultBlockState();
 	}
 
 	@Override
 	public BlockState pathState() {
-		return Blocks.RED_SANDSTONE.getDefaultState();
+		return Blocks.RED_SANDSTONE.defaultBlockState();
 	}
 
 	@Override
 	public BlockState underState() {
-		return Blocks.SANDSTONE.getDefaultState();
+		return Blocks.SANDSTONE.defaultBlockState();
 	}
 
 	@Override
 	public BlockState underWaterState() {
-		return Blocks.SAND.getDefaultState();
+		return Blocks.SAND.defaultBlockState();
 	}
 
 	@Override
-	public MapGen tree(int x, int z, Random random) {
+	public MapGen tree(int x, int z, RandomSource random) {
 		return DeadTreeGen.INSTANCE;
 	}
 
 	@Override
-	public RegistryKey<Biome> getFakingBiome() {
-		return BiomeKeys.DESERT;
+	public ResourceKey<Biome> getFakingBiome() {
+		return Biomes.DESERT;
 	}
 }

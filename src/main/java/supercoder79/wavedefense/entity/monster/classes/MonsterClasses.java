@@ -1,7 +1,7 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Mob;
 import supercoder79.wavedefense.entity.EquipmentHelper;
 import supercoder79.wavedefense.entity.MonsterModifier;
 
@@ -10,7 +10,7 @@ public final class MonsterClasses {
 		private int iron;
 
 		@Override
-		public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+		public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
 			iron = 1;
 
 			if (random.nextInt(100) >= Math.min(-3 + waveOrdinal, 33))
@@ -32,12 +32,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount(Random random) {
+		public int ironCount(RandomSource random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount(Random random) {
+		public int goldCount(RandomSource random) {
 			return 0;
 		}
 
@@ -58,7 +58,7 @@ public final class MonsterClasses {
 		private int iron;
 
 		@Override
-		public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+		public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
 			iron = 4;
 
 			iron = EquipmentHelper.equipSword(waveOrdinal, random, iron, entity, 7);
@@ -84,12 +84,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount(Random random) {
+		public int ironCount(RandomSource random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount(Random random) {
+		public int goldCount(RandomSource random) {
 			return random.nextInt(12) == 0 ? 1 : 0;
 		}
 
@@ -103,7 +103,7 @@ public final class MonsterClasses {
 		private int iron;
 
 		@Override
-		public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+		public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
 			iron = 7;
 			iron = EquipmentHelper.equipSword(waveOrdinal, random, iron, entity, 4);
 			iron = EquipmentHelper.equipHelmet(waveOrdinal, random, iron, entity, 8);
@@ -128,12 +128,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount(Random random) {
+		public int ironCount(RandomSource random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount(Random random) {
+		public int goldCount(RandomSource random) {
 			return random.nextInt(4) == 0 ? 1 : 0;
 		}
 
@@ -147,7 +147,7 @@ public final class MonsterClasses {
 		private int iron;
 		
 		@Override
-		public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+		public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
 			iron = 4;
 			iron = EquipmentHelper.equipHelmet(waveOrdinal, random, iron, entity, 1);
 			iron = EquipmentHelper.equipChestplate(waveOrdinal, random, iron, entity, 1);
@@ -170,12 +170,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount(Random random) {
+		public int ironCount(RandomSource random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount(Random random) {
+		public int goldCount(RandomSource random) {
 			return random.nextInt(8) == 0 ? 1 : 0;
 		}
 
@@ -189,7 +189,7 @@ public final class MonsterClasses {
 		private int iron;
 		
 		@Override
-		public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+		public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
 			iron = 2;
 			iron = EquipmentHelper.equipSword(waveOrdinal, random, iron, entity, -1);
 		}
@@ -210,12 +210,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount(Random random) {
+		public int ironCount(RandomSource random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount(Random random) {
+		public int goldCount(RandomSource random) {
 			return 0;
 		}
 
@@ -229,7 +229,7 @@ public final class MonsterClasses {
 		private int iron;
 
 		@Override
-		public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+		public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
 			iron = 2;
 
 			iron = EquipmentHelper.equipSword(waveOrdinal, random, iron, entity, 1 + waveOrdinal / 4);
@@ -264,12 +264,12 @@ public final class MonsterClasses {
 		}
 
 		@Override
-		public int ironCount(Random random) {
+		public int ironCount(RandomSource random) {
 			return iron;
 		}
 
 		@Override
-		public int goldCount(Random random) {
+		public int goldCount(RandomSource random) {
 			return 0;
 		}
 

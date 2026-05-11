@@ -2,40 +2,38 @@ package supercoder79.wavedefense.map.feature;
 
 import java.util.List;
 import java.util.Objects;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.LevelSimulatedRW;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import com.google.common.collect.Lists;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.PillarBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.ModifiableTestableWorld;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.gen.feature.TreeFeature;
-import net.minecraft.world.gen.foliage.FoliagePlacer;
 import xyz.nucleoid.substrate.gen.MapGen;
 
 public final class DeadTreeGen implements MapGen {
 	public static final DeadTreeGen INSTANCE = new DeadTreeGen();
-	private static final BlockState LOG = Blocks.OAK_LOG.getDefaultState();
+	private static final BlockState LOG = Blocks.OAK_LOG.defaultBlockState();
 
 	@Override
-	public void generate(ServerWorldAccess world, BlockPos pos, Random random) {
-		if (!(world.getBlockState(pos).isAir() && (world.getBlockState(pos.down()).isOf(Blocks.SAND) || world.getBlockState(pos.down()).isOf(Blocks.GRASS_BLOCK)))) {
+	public void generate(ServerLevelAccessor world, BlockPos pos, RandomSource random) {
+		if (!(world.getBlockState(pos).isAir() && (world.getBlockState(pos.below()).is(Blocks.SAND) || world.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)))) {
 			return;
 		}
 
 		int trunkHeight = random.nextInt(4) + 13;
-		int scaledTrunkHeight = MathHelper.floor((double) trunkHeight * 0.618D);
+		int scaledTrunkHeight = Mth.floor((double) trunkHeight * 0.618D);
 
-		int branchCount = Math.min(1, MathHelper.floor(1.382D + Math.pow(1.0D * (double) trunkHeight / 13.0D, 2.0D))); // wtf even is this lol
+		int branchCount = Math.min(1, Mth.floor(1.382D + Math.pow(1.0D * (double) trunkHeight / 13.0D, 2.0D))); // wtf even is this lol
 		int maxExtent = pos.getY() + scaledTrunkHeight;
 		int yProgress = trunkHeight - 5;
 		List<BranchPosition> list = Lists.newArrayList();
-		list.add(new BranchPosition(pos.up(yProgress), maxExtent));
+		list.add(new BranchPosition(pos.above(yProgress), maxExtent));
 
 		for(; yProgress >= 0; --yProgress) {
 			float heightProgress = this.getHeightProgress(trunkHeight, yProgress);
@@ -46,8 +44,8 @@ public final class DeadTreeGen implements MapGen {
 					double randomTheta = (double) (random.nextFloat() * 2.0F) * 3.141592653589793D;
 					double localX = branchDirection * Math.sin(randomTheta) + 0.5D;
 					double localZ = branchDirection * Math.cos(randomTheta) + 0.5D;
-					BlockPos local = pos.add(MathHelper.floor(localX), (yProgress - 1), MathHelper.floor(localZ));
-					BlockPos upperLocal = local.up(5);
+					BlockPos local = pos.offset(Mth.floor(localX), (yProgress - 1), Mth.floor(localZ));
+					BlockPos upperLocal = local.above(5);
 
 					if (this.makeOrCheckBranch(world, random, local, upperLocal, false)) {
 						int branchX = pos.getX() - local.getX();
@@ -63,27 +61,27 @@ public final class DeadTreeGen implements MapGen {
 			}
 		}
 
-		this.makeOrCheckBranch(world, random, pos, pos.up(scaledTrunkHeight), true);
+		this.makeOrCheckBranch(world, random, pos, pos.above(scaledTrunkHeight), true);
 		this.makeBranches(world, random, trunkHeight, pos, list);
 	}
 
-	private boolean makeOrCheckBranch(ModifiableTestableWorld world, Random random, BlockPos start, BlockPos end, boolean make) {
+	private boolean makeOrCheckBranch(LevelSimulatedRW world, RandomSource random, BlockPos start, BlockPos end, boolean make) {
 		if (make || !Objects.equals(start, end)) {
-			BlockPos blockPos = end.add(-start.getX(), -start.getY(), -start.getZ());
+			BlockPos blockPos = end.offset(-start.getX(), -start.getY(), -start.getZ());
 			int longestSide = this.getLongestSide(blockPos);
 			float sideX = (float) blockPos.getX() / (float) longestSide;
 			float sideY = (float) blockPos.getY() / (float) longestSide;
 			float sideZ = (float) blockPos.getZ() / (float) longestSide;
 
 			for (int side = 0; side <= longestSide; ++side) {
-				int offsetX = MathHelper.floor(0.5F + (float) side * sideX);
-				int offsetY = MathHelper.floor(0.5F + (float) side * sideY);
-				int offsetZ = MathHelper.floor(0.5F + (float) side * sideZ);
+				int offsetX = Mth.floor(0.5F + (float) side * sideX);
+				int offsetY = Mth.floor(0.5F + (float) side * sideY);
+				int offsetZ = Mth.floor(0.5F + (float) side * sideZ);
 
-				BlockPos blockPos2 = start.add(offsetX, offsetY, offsetZ);
+				BlockPos blockPos2 = start.offset(offsetX, offsetY, offsetZ);
 				if (make) {
-					world.setBlockState(blockPos2, LOG.with(PillarBlock.AXIS, this.getLogAxis(start, blockPos2)), 3);
-				} else if (!TreeFeature.canReplace(world, blockPos2)) {
+					world.setBlock(blockPos2, LOG.setValue(RotatedPillarBlock.AXIS, this.getLogAxis(start, blockPos2)), 3);
+				} else if (!TreeFeature.validTreePos(world, blockPos2)) {
 					return false;
 				}
 			}
@@ -99,7 +97,7 @@ public final class DeadTreeGen implements MapGen {
 		} else {
 			float scaledTrunkHeight = (float)trunkHeight / 2.0F;
 			float scaledBranches = scaledTrunkHeight - (float)branchCount;
-			float progress = MathHelper.sqrt(scaledTrunkHeight * scaledTrunkHeight - scaledBranches * scaledBranches);
+			float progress = Mth.sqrt(scaledTrunkHeight * scaledTrunkHeight - scaledBranches * scaledBranches);
 			if (scaledBranches == 0.0F) {
 				progress = scaledTrunkHeight;
 			} else if (Math.abs(scaledBranches) >= scaledTrunkHeight) {
@@ -115,9 +113,9 @@ public final class DeadTreeGen implements MapGen {
 	}
 
 	private int getLongestSide(BlockPos offset) {
-		int x = MathHelper.abs(offset.getX());
-		int y = MathHelper.abs(offset.getY());
-		int z = MathHelper.abs(offset.getZ());
+		int x = Mth.abs(offset.getX());
+		int y = Mth.abs(offset.getY());
+		int z = Mth.abs(offset.getZ());
 		return Math.max(x, Math.max(y, z));
 	}
 
@@ -138,23 +136,23 @@ public final class DeadTreeGen implements MapGen {
 		return axis;
 	}
 
-	private void makeBranches(ModifiableTestableWorld world, Random random, int treeHeight, BlockPos treePos, List<BranchPosition> branches) {
+	private void makeBranches(LevelSimulatedRW world, RandomSource random, int treeHeight, BlockPos treePos, List<BranchPosition> branches) {
 		for (BranchPosition branchPosition : branches) {
 			int endY = branchPosition.getEndY();
 			BlockPos startPos = new BlockPos(treePos.getX(), endY, treePos.getZ());
-			if (!startPos.equals(branchPosition.node.getCenter()) && this.isHighEnough(treeHeight, endY - treePos.getY())) {
-				this.makeOrCheckBranch(world, random, startPos, branchPosition.node.getCenter(), true);
+			if (!startPos.equals(branchPosition.node.pos()) && this.isHighEnough(treeHeight, endY - treePos.getY())) {
+				this.makeOrCheckBranch(world, random, startPos, branchPosition.node.pos(), true);
 			}
 		}
 
 	}
 
 	static class BranchPosition {
-		private final FoliagePlacer.TreeNode node;
+		private final FoliagePlacer.FoliageAttachment node;
 		private final int endY;
 
 		public BranchPosition(BlockPos pos, int endY) {
-			this.node = new FoliagePlacer.TreeNode(pos, 0, false);
+			this.node = new FoliagePlacer.FoliageAttachment(pos, 0, false);
 			this.endY = endY;
 		}
 

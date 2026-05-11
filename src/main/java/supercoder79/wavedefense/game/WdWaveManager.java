@@ -1,11 +1,11 @@
 package supercoder79.wavedefense.game;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.CallbackI;
 import xyz.nucleoid.plasmid.api.game.player.PlayerSet;
@@ -39,27 +39,27 @@ public final class WdWaveManager {
 
         if (waveSpawner == null && wave.remainingMonsterScore <= 0) {
             PlayerSet players = game.space.getPlayers();
-            players.sendMessage(Text.literal("The wave has ended!")
-                    .styled(style ->
-                            style.withColor(TextColor.parse("green").result().get())
+            players.sendMessage(Component.literal("The wave has ended!")
+                    .withStyle(style ->
+                            style.withColor(TextColor.parseColor("green").result().get())
                     ));
             int survivalBonus = 3 + wave.ordinal;
-            int survivalGold = wave.ordinal % 5 == 0 ? MathHelper.ceil(wave.ordinal / 20d) : 0;
+            int survivalGold = wave.ordinal % 5 == 0 ? Mth.ceil(wave.ordinal / 20d) : 0;
 
             if (survivalGold == 0)
-                players.sendMessage(Text.literal("You earned " + survivalBonus + " iron for surviving this wave!")
-                        .styled(style ->
-                                style.withColor(TextColor.parse("yellow").result().get())
+                players.sendMessage(Component.literal("You earned " + survivalBonus + " iron for surviving this wave!")
+                        .withStyle(style ->
+                                style.withColor(TextColor.parseColor("yellow").result().get())
                         ));
             else
-                players.sendMessage(Text.literal("You earned " + survivalBonus + " iron and " + survivalGold + " gold for surviving this wave!")
-                        .styled(style ->
-                                style.withColor(TextColor.parse("yellow").result().get())
+                players.sendMessage(Component.literal("You earned " + survivalBonus + " iron and " + survivalGold + " gold for surviving this wave!")
+                        .withStyle(style ->
+                                style.withColor(TextColor.parseColor("yellow").result().get())
                         ));
 
-            for (PlayerEntity player : game.getParticipants()) {
-                player.getInventory().insertStack(new ItemStack(Items.IRON_INGOT, survivalBonus));
-                player.getInventory().insertStack(new ItemStack(Items.GOLD_INGOT, survivalGold));
+            for (Player player : game.getParticipants()) {
+                player.getInventory().add(new ItemStack(Items.IRON_INGOT, survivalBonus));
+                player.getInventory().add(new ItemStack(Items.GOLD_INGOT, survivalGold));
             }
 
             activeWave = null;
@@ -82,9 +82,9 @@ public final class WdWaveManager {
         waveSpawner = new WdWaveSpawner(game, wave);
 
         PlayerSet players = game.space.getPlayers();
-        players.sendMessage(Text.literal("Wave #" + wave.ordinal + " with " + wave.monsterCount + " monsters is coming!")
-                .styled(style ->
-                        style.withColor(TextColor.parse("light_purple").result().get())
+        players.sendMessage(Component.literal("Wave #" + wave.ordinal + " with " + wave.monsterCount + " monsters is coming!")
+                .withStyle(style ->
+                        style.withColor(TextColor.parseColor("light_purple").result().get())
                 ));
 
         game.averageGroupSize = (game.averageGroupSize + game.getParticipants().size()) / 2;
@@ -114,6 +114,6 @@ public final class WdWaveManager {
     private int monsterScore(int index) {
         WdConfig.MonsterSpawns monsterSpawns = game.config.monsterSpawns;
         double base = game.averageGroupSize * monsterSpawns.baseGroupSizeScale + index * monsterSpawns.baseIndexScale + 2;
-        return Math.min(MathHelper.floor(base + Math.pow(Math.max(0, index - 5), monsterSpawns.postWaveFiveScale) + Math.pow(index, monsterSpawns.indexScale) * Math.pow(game.averageGroupSize, monsterSpawns.groupSizeScale)), MathHelper.floor(80 + Math.pow(game.averageGroupSize, monsterSpawns.upperGroupSizeScale) * 18 + Math.pow(index, monsterSpawns.upperIndexScale)));
+        return Math.min(Mth.floor(base + Math.pow(Math.max(0, index - 5), monsterSpawns.postWaveFiveScale) + Math.pow(index, monsterSpawns.indexScale) * Math.pow(game.averageGroupSize, monsterSpawns.groupSizeScale)), Mth.floor(80 + Math.pow(game.averageGroupSize, monsterSpawns.upperGroupSizeScale) * 18 + Math.pow(index, monsterSpawns.upperIndexScale)));
     }
 }

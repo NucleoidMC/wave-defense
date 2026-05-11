@@ -1,25 +1,25 @@
 package supercoder79.wavedefense.entity;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.util.RandomCollection;
 
 import java.util.Optional;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 public class EquipmentHelper {
-    public static ItemStack enchant(Item item, int waveOrdinal, int difficulty, Random random, DynamicRegistryManager manager) {
+    public static ItemStack enchant(Item item, int waveOrdinal, int difficulty, RandomSource random, RegistryAccess manager) {
         if (random.nextDouble() > Math.max(0, 1 - (difficulty / 80d + waveOrdinal / 40d)))
-            return EnchantmentHelper.enchant(random, new ItemStack(item), (int) (Math.ceil((waveOrdinal - 10) / 5d) * (Math.max(difficulty, 2) / 4d)), manager,Optional.empty());
+            return EnchantmentHelper.enchantItem(random, new ItemStack(item), (int) (Math.ceil((waveOrdinal - 10) / 5d) * (Math.max(difficulty, 2) / 4d)), manager,Optional.empty());
         return new ItemStack(item);
     }
 
-    public static int equipHelmet(int waveOrdinal, Random random, int iron, MobEntity entity, int difficulty) {
+    public static int equipHelmet(int waveOrdinal, RandomSource random, int iron, Mob entity, int difficulty) {
         RandomCollection<Item> helmet = new RandomCollection<>();
         helmet
                 .add(Math.max(0, 10 - difficulty - waveOrdinal / 8d), Items.LEATHER_HELMET)
@@ -40,11 +40,11 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.HEAD, enchant(selectedHelmet, waveOrdinal, difficulty, random, entity.getRegistryManager()));
+        entity.setItemSlot(EquipmentSlot.HEAD, enchant(selectedHelmet, waveOrdinal, difficulty, random, entity.registryAccess()));
         return iron;
     }
 
-    public static int equipChestplate(int waveOrdinal, Random random, int iron, MobEntity entity, int difficulty) {
+    public static int equipChestplate(int waveOrdinal, RandomSource random, int iron, Mob entity, int difficulty) {
         RandomCollection<Item> chestplate = new RandomCollection<>();
         chestplate
                 .add(Math.max(0, 10 - difficulty), Items.LEATHER_CHESTPLATE)
@@ -65,11 +65,11 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.CHEST, enchant(selectedChestplate, waveOrdinal, difficulty, random, entity.getRegistryManager()));
+        entity.setItemSlot(EquipmentSlot.CHEST, enchant(selectedChestplate, waveOrdinal, difficulty, random, entity.registryAccess()));
         return iron;
     }
 
-    public static int equipLeggings(int waveOrdinal, Random random, int iron, MobEntity entity, int difficulty) {
+    public static int equipLeggings(int waveOrdinal, RandomSource random, int iron, Mob entity, int difficulty) {
         RandomCollection<Item> leggings = new RandomCollection<>();
         leggings
                 .add(Math.max(0, 10 - difficulty), Items.LEATHER_LEGGINGS)
@@ -90,11 +90,11 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.LEGS, enchant(selectedLeggings, waveOrdinal, difficulty, random, entity.getRegistryManager()));
+        entity.setItemSlot(EquipmentSlot.LEGS, enchant(selectedLeggings, waveOrdinal, difficulty, random, entity.registryAccess()));
         return iron;
     }
 
-    public static int equipBoots(int waveOrdinal, Random random, int iron, MobEntity entity, int difficulty) {
+    public static int equipBoots(int waveOrdinal, RandomSource random, int iron, Mob entity, int difficulty) {
         RandomCollection<Item> boots = new RandomCollection<>();
         boots
                 .add(Math.max(0, 10 - difficulty), Items.LEATHER_BOOTS)
@@ -115,11 +115,11 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.FEET, enchant(selectedBoots, waveOrdinal, difficulty, random, entity.getRegistryManager()));
+        entity.setItemSlot(EquipmentSlot.FEET, enchant(selectedBoots, waveOrdinal, difficulty, random, entity.registryAccess()));
         return iron;
     }
 
-    public static int equipSword(int waveOrdinal, Random random, int iron, MobEntity entity, int difficulty) {
+    public static int equipSword(int waveOrdinal, RandomSource random, int iron, Mob entity, int difficulty) {
         RandomCollection<Item> sword = new RandomCollection<>();
         sword
                 .add(Math.max(0, 10 - difficulty), Items.WOODEN_SWORD)
@@ -140,7 +140,7 @@ public class EquipmentHelper {
             if (random.nextInt(2) == 0) iron++;
         }
 
-        entity.equipStack(EquipmentSlot.MAINHAND, enchant(selectedSword, waveOrdinal, difficulty, random, entity.getRegistryManager()));
+        entity.setItemSlot(EquipmentSlot.MAINHAND, enchant(selectedSword, waveOrdinal, difficulty, random, entity.registryAccess()));
         return iron;
     }
 }

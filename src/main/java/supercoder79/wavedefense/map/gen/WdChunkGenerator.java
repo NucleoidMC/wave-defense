@@ -1,38 +1,35 @@
 package supercoder79.wavedefense.map.gen;
 
 import kdotjpg.opensimplex.OpenSimplexNoise;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.state.property.Properties;
-import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.StructureWorldAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.Blender;
-import net.minecraft.world.gen.chunk.placement.StructurePlacementCalculator;
-import net.minecraft.world.gen.densityfunction.DensityFunctionTypes;
-import net.minecraft.world.gen.noise.NoiseConfig;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
+import net.minecraft.world.level.levelgen.DensityFunctions;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.blending.Blender;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import supercoder79.wavedefense.game.WdConfig;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
 import supercoder79.wavedefense.map.feature.*;
-import xyz.nucleoid.plasmid.api.game.world.generator.GameChunkGenerator;
+import xyz.nucleoid.plasmid.api.game.level.generator.GameChunkGenerator;
 import xyz.nucleoid.substrate.gen.GrassGen;
 
 import java.util.Collections;
@@ -40,7 +37,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public final class WdChunkGenerator extends GameChunkGenerator {
-    private static final MultiNoiseUtil.MultiNoiseSampler ZERO_SAMPLER = new MultiNoiseUtil.MultiNoiseSampler(DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), DensityFunctionTypes.zero(), Collections.emptyList());
+    private static final Climate.Sampler ZERO_SAMPLER = new Climate.Sampler(DensityFunctions.zero(), DensityFunctions.zero(), DensityFunctions.zero(), DensityFunctions.zero(), DensityFunctions.zero(), DensityFunctions.zero(), Collections.emptyList());
     private final WdHeightSampler heightSampler;
     private final OpenSimplexNoise pathNoise;
     private final OpenSimplexNoise detailNoise;
@@ -65,8 +62,8 @@ public final class WdChunkGenerator extends GameChunkGenerator {
         this.minBarrierRadius2 = minBarrierRadius * minBarrierRadius;
         this.maxBarrierRadius2 = maxBarrierRadius * maxBarrierRadius;
 
-        Random random = server.getOverworld().getRandom();
-        this.biomeSource = new FakeBiomeSource(server.getRegistryManager().getOrThrow(RegistryKeys.BIOME), random.nextLong());
+        RandomSource random = server.overworld().getRandom();
+        this.biomeSource = new FakeBiomeSource(server.registryAccess().lookupOrThrow(Registries.BIOME), random.nextLong());
         this.heightSampler = new WdHeightSampler(map.path(), biomeSource, random.nextLong());
         this.pathNoise = new OpenSimplexNoise(random.nextLong());
         this.detailNoise = new OpenSimplexNoise(random.nextLong());
@@ -79,21 +76,21 @@ public final class WdChunkGenerator extends GameChunkGenerator {
     }
 
     @Override
-    public CompletableFuture<Chunk> populateBiomes(NoiseConfig noiseConfig, Blender blender, StructureAccessor structureAccessor, Chunk chunk) {
+    public CompletableFuture<ChunkAccess> createBiomes(RandomState noiseConfig, Blender blender, StructureManager structureAccessor, ChunkAccess chunk) {
         return CompletableFuture.supplyAsync(() -> {
-            chunk.populateBiomes(this.biomeSource, ZERO_SAMPLER);
+            chunk.fillBiomesFromNoise(this.biomeSource, ZERO_SAMPLER);
             return chunk;
-        }, Util.getMainWorkerExecutor().named("init_biomes"));
+        }, Util.backgroundExecutor().forName("init_biomes"));
     }
 
     @Override
-    public CompletableFuture<Chunk> populateNoise(Blender blender, NoiseConfig noiseConfig, StructureAccessor structureAccessor, Chunk chunk) {
+    public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState noiseConfig, StructureManager structureAccessor, ChunkAccess chunk) {
         return CompletableFuture.supplyAsync(() -> {
-            int chunkX = chunk.getPos().x * 16;
-            int chunkZ = chunk.getPos().z * 16;
+            int chunkX = chunk.getPos().x() * 16;
+            int chunkZ = chunk.getPos().z() * 16;
 
-            BlockPos.Mutable mutable = new BlockPos.Mutable();
-            Random random = Random.createLocal();
+            BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
+            RandomSource random = RandomSource.createThreadLocalInstance();
 
             for (int x = chunkX; x < chunkX + 16; x++) {
                 for (int z = chunkZ; z < chunkZ + 16; z++) {
@@ -101,7 +98,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 
                     BiomeGen biome = biomeSource.getRealBiome(x, z);
 
-                    int terrainHeight = MathHelper.floor(this.heightSampler.sampleHeight(x, z));
+                    int terrainHeight = Mth.floor(this.heightSampler.sampleHeight(x, z));
                     double slope = this.heightSampler.sampleSlope(x, z);
 
                     BlockState surface = biome.topState(random);
@@ -110,17 +107,17 @@ public final class WdChunkGenerator extends GameChunkGenerator {
 
                     double erosionThreshold = 1.8 + this.erosionNoise.eval(x / 2.0, z / 2.0) * 0.5;
                     if (slope * slope > erosionThreshold * erosionThreshold) {
-                        surface = underwater = subsoil = Blocks.STONE.getDefaultState();
+                        surface = underwater = subsoil = Blocks.STONE.defaultBlockState();
                     }
 
-                    BlockState waterState = Blocks.WATER.getDefaultState();
-                    BlockState topWaterState = Blocks.WATER.getDefaultState();
-                    BlockState underWaterState = Blocks.WATER.getDefaultState();
+                    BlockState waterState = Blocks.WATER.defaultBlockState();
+                    BlockState topWaterState = Blocks.WATER.defaultBlockState();
+                    BlockState underWaterState = Blocks.WATER.defaultBlockState();
 
-                    if (biome.getFakingBiome().equals(BiomeKeys.SNOWY_PLAINS)) {
-                        waterState = Blocks.ICE.getDefaultState();
-                        topWaterState = Blocks.ICE.getDefaultState();
-                        underWaterState = Blocks.ICE.getDefaultState();
+                    if (biome.getFakingBiome().equals(Biomes.SNOWY_PLAINS)) {
+                        waterState = Blocks.ICE.defaultBlockState();
+                        topWaterState = Blocks.ICE.defaultBlockState();
+                        underWaterState = Blocks.ICE.defaultBlockState();
                     }
 
                     int distanceToPath2 = this.map.path().distanceToPath2(x, z);
@@ -132,25 +129,25 @@ public final class WdChunkGenerator extends GameChunkGenerator {
                             surface = biome.pathState();
                         }
 
-                        underWaterState = Blocks.OAK_PLANKS.getDefaultState();
+                        underWaterState = Blocks.OAK_PLANKS.defaultBlockState();
 
                         // Use a very low frequency noise to basically be a more coherent random
                         // Technically we should be using separate noises here but this can do for now :P
                         double damageNoise = detailNoise.eval(x / 2.0, z / 2.0) + pathNoise.eval(x / 12.0, z / 12.0);
                         if (damageNoise > -0.5) {
-                            topWaterState = Blocks.OAK_PLANKS.getDefaultState();
+                            topWaterState = Blocks.OAK_PLANKS.defaultBlockState();
 
                             // Randomly place support blocks for bridge
                             if (random.nextInt(8) == 0) {
-                                waterState = Blocks.OAK_FENCE.getDefaultState().with(Properties.WATERLOGGED, Boolean.TRUE);
+                                waterState = Blocks.OAK_FENCE.defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, Boolean.TRUE);
                             }
                         }
                     }
 
                     // Generation height ensures that the generator iterates up to at least the water level.
                     int seaLevel = 48;
-                    BlockState air = Blocks.AIR.getDefaultState();
-                    BlockState stone = Blocks.STONE.getDefaultState();
+                    BlockState air = Blocks.AIR.defaultBlockState();
+                    BlockState stone = Blocks.STONE.defaultBlockState();
 
                     int genHeight = Math.max(terrainHeight, seaLevel);
 
@@ -185,11 +182,11 @@ public final class WdChunkGenerator extends GameChunkGenerator {
                         if (biome.isSnowy()) {
                             if (!surface.equals(biome.pathState())) {
                                 if (y == genHeight) {
-                                    state = Blocks.GRASS_BLOCK.getDefaultState().with(Properties.SNOWY, true);
+                                    state = Blocks.GRASS_BLOCK.defaultBlockState().setValue(BlockStateProperties.SNOWY, true);
                                 }
 
                                 if (y == genHeight + 1) {
-                                    state = Blocks.SNOW.getDefaultState().with(Properties.LAYERS, (int) Math.ceil((this.detailNoise.eval(x / 6d, z / 6d) + 1) * 3));
+                                    state = Blocks.SNOW.defaultBlockState().setValue(BlockStateProperties.LAYERS, (int) Math.ceil((this.detailNoise.eval(x / 6d, z / 6d) + 1) * 3));
                                 }
                             }
                         }
@@ -201,16 +198,16 @@ public final class WdChunkGenerator extends GameChunkGenerator {
             }
 
             return chunk;
-        }, Util.getMainWorkerExecutor().named("populate_noise"));
+        }, Util.backgroundExecutor().forName("populate_noise"));
     }
 
     @Override
-    public void generateFeatures(StructureWorldAccess world, Chunk chunk, StructureAccessor structures) {
-        BlockPos.Mutable mutable = new BlockPos.Mutable();
-        Random random = world.getRandom();
+    public void applyBiomeDecoration(WorldGenLevel world, ChunkAccess chunk, StructureManager structures) {
+        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
+        RandomSource random = world.getRandom();
         
-        int chunkX = chunk.getPos().x * 16;
-        int chunkZ = chunk.getPos().z * 16;
+        int chunkX = chunk.getPos().x() * 16;
+        int chunkZ = chunk.getPos().z() * 16;
 
         BiomeGen biome = biomeSource.getRealBiome(chunkX + 8, chunkZ + 8);
 
@@ -218,36 +215,36 @@ public final class WdChunkGenerator extends GameChunkGenerator {
         for (int i = 0; i < treeAmt; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = world.getTopY(Heightmap.Type.MOTION_BLOCKING, x, z);
+            int y = world.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
 
-            biome.tree(x, z, random).generate(world, mutable.set(x, y, z).toImmutable(), random);
+            biome.tree(x, z, random).generate(world, mutable.set(x, y, z).immutable(), random);
         }
 
         int shrubAmt = biome.shrubAmt(random);
         for (int i = 0; i < shrubAmt; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+            int y = world.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
 
-            ShrubGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
+            ShrubGen.INSTANCE.generate(world, mutable.set(x, y, z).immutable(), random);
         }
 
         int grassAmt = biome.grassAmt(random);
         for (int i = 0; i < grassAmt; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+            int y = world.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
 
-            GrassGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
+            GrassGen.INSTANCE.generate(world, mutable.set(x, y, z).immutable(), random);
         }
 
         for (int i = 0; i < 4; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = world.getTopY(Heightmap.Type.OCEAN_FLOOR_WG, x, z);
+            int y = world.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z);
 
             if (y <= 48) {
-                ImprovedDiskGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
+                ImprovedDiskGen.INSTANCE.generate(world, mutable.set(x, y, z).immutable(), random);
             }
         }
 
@@ -255,34 +252,34 @@ public final class WdChunkGenerator extends GameChunkGenerator {
         for (int i = 0; i < cactusAmt; i++) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+            int y = world.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
 
-            CactusGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
+            CactusGen.INSTANCE.generate(world, mutable.set(x, y, z).immutable(), random);
         }
 
         if (random.nextInt(6) == 0) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = world.getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z);
+            int y = world.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
 
-            chestGen.generate(world, mutable.set(x, y, z).toImmutable(), random);
+            chestGen.generate(world, mutable.set(x, y, z).immutable(), random);
         }
 
         if (biome.isSnowy() && random.nextInt(5) == 0) {
             int x = chunkX + random.nextInt(16);
             int z = chunkZ + random.nextInt(16);
-            int y = world.getTopY(Heightmap.Type.MOTION_BLOCKING, x, z);
+            int y = world.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
 
-            CustomIceSpikeGen.INSTANCE.generate(world, mutable.set(x, y, z).toImmutable(), random);
+            CustomIceSpikeGen.INSTANCE.generate(world, mutable.set(x, y, z).immutable(), random);
         }
     }
 
     @Override
-    public void setStructureStarts(DynamicRegistryManager registryManager, StructurePlacementCalculator placementCalculator, StructureAccessor structureAccessor, Chunk chunk, StructureTemplateManager structureTemplateManager, RegistryKey<World> dimension) {
+    public void createStructures(RegistryAccess registryManager, ChunkGeneratorStructureState placementCalculator, StructureManager structureAccessor, ChunkAccess chunk, StructureTemplateManager structureTemplateManager, ResourceKey<Level> dimension) {
 
     }
 
     @Override
-    public void addStructureReferences(StructureWorldAccess world, StructureAccessor accessor, Chunk chunk) {
+    public void createReferences(WorldGenLevel world, StructureManager accessor, ChunkAccess chunk) {
     }
 }

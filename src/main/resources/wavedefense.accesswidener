@@ -1,4 +1,3 @@
-accessWidener v1 named
-
-accessible class net/minecraft/entity/mob/DrownedEntity$DrownedAttackGoal
-accessible class net/minecraft/entity/mob/DrownedEntity$TargetAboveWaterGoal
+accessWidener	v1	official
+accessible	class	net/minecraft/world/entity/monster/zombie/Drowned$DrownedAttackGoal
+accessible	class	net/minecraft/world/entity/monster/zombie/Drowned$DrownedSwimUpGoal

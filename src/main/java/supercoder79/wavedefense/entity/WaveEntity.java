@@ -1,13 +1,13 @@
 package supercoder79.wavedefense.entity;
 
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 import supercoder79.wavedefense.entity.monster.classes.MonsterClass;
 import supercoder79.wavedefense.game.WdActive;
 
 public interface WaveEntity {
-    int ironCount(Random random);
-    int goldCount(Random random);
+    int ironCount(RandomSource random);
+    int goldCount(RandomSource random);
     int monsterScore();
 
     MonsterClass getMonsterClass();
@@ -16,7 +16,7 @@ public interface WaveEntity {
 
     MonsterModifier getMod();
     
-    Vec3d pos = Vec3d.ZERO;
+    Vec3 pos = Vec3.ZERO;
 
     WdActive getGame();
 

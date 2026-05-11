@@ -2,13 +2,12 @@ package supercoder79.wavedefense.map.gen;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 
 public final class WdPath {
     private final List<BlockPos> points;
@@ -21,8 +20,8 @@ public final class WdPath {
         this.length = length;
     }
 
-    public static WdPath generate(Random random, int totalLength, int segmentLength) {
-        BlockPos point = BlockPos.ORIGIN;
+    public static WdPath generate(RandomSource random, int totalLength, int segmentLength) {
+        BlockPos point = BlockPos.ZERO;
 
         List<BlockPos> points = new ArrayList<>();
         DoubleList pointDistances = new DoubleArrayList();
@@ -34,11 +33,11 @@ public final class WdPath {
         int maxDeltaX = segmentLength / 2;
 
         while (currentLength < totalLength) {
-            int deltaX = random.nextBetween(-maxDeltaX, maxDeltaX);
-            int deltaZ = MathHelper.floor(Math.sqrt(segmentLength * segmentLength - deltaX * deltaX));
+            int deltaX = random.nextIntBetweenInclusive(-maxDeltaX, maxDeltaX);
+            int deltaZ = Mth.floor(Math.sqrt(segmentLength * segmentLength - deltaX * deltaX));
             double length = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
 
-            point = point.add(deltaX, 0, deltaZ);
+            point = point.offset(deltaX, 0, deltaZ);
             points.add(point);
 
             currentLength += length;
@@ -76,7 +75,7 @@ public final class WdPath {
         double distanceAlongSegment = progressAlongSegment * length;
         double percent = (distance + distanceAlongSegment) / this.length;
 
-        Vec3d center = new Vec3d(
+        Vec3 center = new Vec3(
                 start.getX() + (end.getX() - start.getX()) * progressAlongSegment,
                 0.0,
                 start.getZ() + (end.getZ() - start.getZ()) * progressAlongSegment
@@ -89,8 +88,8 @@ public final class WdPath {
         int minDistance2 = Integer.MAX_VALUE;
         int segmentIndex = -1;
 
-        int ix = MathHelper.floor(x);
-        int iz = MathHelper.floor(z);
+        int ix = Mth.floor(x);
+        int iz = Mth.floor(z);
 
         for (int i = 0; i < this.points.size() - 1; i++) {
             BlockPos start = this.points.get(i);
@@ -165,10 +164,10 @@ public final class WdPath {
     }
 
     public static class Progress {
-        public final Vec3d center;
+        public final Vec3 center;
         public final double percent;
 
-        Progress(Vec3d center, double percent) {
+        Progress(Vec3 center, double percent) {
             this.center = center;
             this.percent = percent;
         }

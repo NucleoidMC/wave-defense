@@ -1,17 +1,16 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Mob;
 import supercoder79.wavedefense.entity.MonsterModifier;
-
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.util.RandomCollection;
 
 public interface MonsterClass {
-	void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal);
+	void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal);
 
-	int ironCount(Random random);
+	int ironCount(RandomSource random);
 
-	int goldCount(Random random);
+	int goldCount(RandomSource random);
 
 	int monsterPoints();
 

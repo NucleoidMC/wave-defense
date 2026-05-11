@@ -8,17 +8,12 @@ import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import kdotjpg.opensimplex.OpenSimplexNoise;
-import net.minecraft.registry.RegistryCodecs;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryElementCodec;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryFixedCodec;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
 import supercoder79.wavedefense.map.biome.impl.*;
-
-import net.minecraft.registry.Registry;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeSource;
 
 public final class FakeBiomeSource extends BiomeSource {
 	public static final MapCodec<FakeBiomeSource> CODEC = MapCodec.unit(() -> null);
@@ -40,17 +35,17 @@ public final class FakeBiomeSource extends BiomeSource {
 	}
 
 	@Override
-	protected Stream<RegistryEntry<Biome>> biomeStream() {
-		return this.biomeRegistry.streamEntries().map(Function.identity());
+	protected Stream<Holder<Biome>> collectPossibleBiomes() {
+		return this.biomeRegistry.listElements().map(Function.identity());
 	}
 
 	@Override
-	protected MapCodec<? extends BiomeSource> getCodec() {
+	protected MapCodec<? extends BiomeSource> codec() {
 		return CODEC;
 	}
 
 	@Override
-	public RegistryEntry<Biome> getBiome(int x, int y, int z, MultiNoiseUtil.MultiNoiseSampler noise) {
+	public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler noise) {
 		return biomeRegistry.getOrThrow(getRealBiome(x << 2,z << 2).getFakingBiome());
 	}
 

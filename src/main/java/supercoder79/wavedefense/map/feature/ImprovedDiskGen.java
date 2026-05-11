@@ -1,24 +1,24 @@
 package supercoder79.wavedefense.map.feature;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import xyz.nucleoid.substrate.gen.MapGen;
 
 public final class ImprovedDiskGen implements MapGen {
 	public static final ImprovedDiskGen INSTANCE = new ImprovedDiskGen();
 
-	private static final BlockState[] STATES = new BlockState[]{ Blocks.SAND.getDefaultState(), Blocks.GRAVEL.getDefaultState() };
+	private static final BlockState[] STATES = new BlockState[]{ Blocks.SAND.defaultBlockState(), Blocks.GRAVEL.defaultBlockState() };
 
 	@Override
-	public void generate(ServerWorldAccess world, BlockPos pos, Random random) {
+	public void generate(ServerLevelAccessor world, BlockPos pos, RandomSource random) {
 
 		int radius = random.nextInt(5) + 2;
 		int radiusSquared = radius * radius;
 
-		BlockPos.Mutable mutable = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
 		BlockState state = STATES[random.nextInt(2)];
 
 		for(int x = pos.getX() - radius; x <= pos.getX() + radius; ++x) {
@@ -29,11 +29,11 @@ public final class ImprovedDiskGen implements MapGen {
 					for(int y = pos.getY() - 2; y <= pos.getY() + 2; ++y) {
 						mutable.set(x, y, z);
 
-						if (world.getBlockState(mutable).isOf(Blocks.DIRT) || world.getBlockState(mutable).isOf(Blocks.GRASS_BLOCK)) {
-							world.setBlockState(mutable, state, 3);
+						if (world.getBlockState(mutable).is(Blocks.DIRT) || world.getBlockState(mutable).is(Blocks.GRASS_BLOCK)) {
+							world.setBlock(mutable, state, 3);
 
-							if (!world.getBlockState(mutable.up()).canPlaceAt(world, mutable) && !world.getBlockState(mutable.up()).isOf(Blocks.DIRT_PATH)) {
-								world.setBlockState(mutable.up(), Blocks.AIR.getDefaultState(), 3);
+							if (!world.getBlockState(mutable.above()).canSurvive(world, mutable) && !world.getBlockState(mutable.above()).is(Blocks.DIRT_PATH)) {
+								world.setBlock(mutable.above(), Blocks.AIR.defaultBlockState(), 3);
 							}
 						}
 					}

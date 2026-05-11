@@ -6,7 +6,7 @@ import supercoder79.wavedefense.map.gen.WdChunkGenerator;
 import supercoder79.wavedefense.map.gen.WdPath;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 
 public record WdMap(WdPath path, WdConfig config, DoubleList waveStarts) {
 

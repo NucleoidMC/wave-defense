@@ -1,33 +1,33 @@
 package supercoder79.wavedefense.entity.monster;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.SpiderEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.spider.Spider;
+import net.minecraft.world.level.Level;
 
-public class SummonersSpiderEntity extends SpiderEntity {
-    public SummonersSpiderEntity(EntityType<? extends SpiderEntity> entityType, World world) {
+public class SummonersSpiderEntity extends Spider {
+    public SummonersSpiderEntity(EntityType<? extends Spider> entityType, Level world) {
         super(entityType, world);
-        this.experiencePoints = 0;
+        this.xpReward = 0;
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (!this.hasPassengers())
-            this.damage((ServerWorld) this.getWorld(),this.getDamageSources().starve(), 100);
+        if (!this.isVehicle())
+            this.hurtServer((ServerLevel) this.level(),this.damageSources().starve(), 100);
     }
 
     @Override
-    public boolean isInvulnerableTo(ServerWorld world, DamageSource damageSource) {
-        if (this.hasPassengers())
+    public boolean isInvulnerableTo(ServerLevel world, DamageSource damageSource) {
+        if (this.isVehicle())
             return true;
         return super.isInvulnerableTo(world, damageSource);
     }
 
     @Override
-    protected boolean shouldDropLoot() {
+    protected boolean shouldDropLoot(ServerLevel level) {
         return false;
     }
 }

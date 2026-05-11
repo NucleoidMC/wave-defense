@@ -5,10 +5,9 @@ import java.util.Random;
 
 import it.unimi.dsi.fastutil.HashCommon;
 import kdotjpg.opensimplex.OpenSimplexNoise;
+import net.minecraft.world.level.ChunkPos;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.biome.FakeBiomeSource;
-
-import net.minecraft.util.math.ChunkPos;
 
 public final class WdHeightSampler {
     private final ThreadLocal<HeightCache> heightCache;
@@ -128,7 +127,7 @@ public final class WdHeightSampler {
         }
 
         private static long key(int x, int z) {
-            return ChunkPos.toLong(x, z);
+            return ChunkPos.pack(x, z);
         }
     }
 
@@ -170,7 +169,7 @@ public final class WdHeightSampler {
         }
 
         private static long key(int x, int z) {
-            return ChunkPos.toLong(x, z);
+            return ChunkPos.pack(x, z);
         }
     }
 }

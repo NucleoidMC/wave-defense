@@ -3,23 +3,21 @@ package supercoder79.wavedefense.util;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
-
-import net.minecraft.util.math.random.Random;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
+import net.minecraft.util.RandomSource;
 
 public class WeightedList<U> {
     protected final List<Entry<U>> entries;
-    private final Random random;
+    private final RandomSource random;
 
     public WeightedList() {
         this(Lists.newArrayList());
     }
 
     private WeightedList(List<WeightedList.Entry<U>> entries) {
-        this.random = Random.createLocal();
+        this.random = RandomSource.createThreadLocalInstance();
         this.entries = Lists.newArrayList(entries);
     }
 
@@ -38,7 +36,7 @@ public class WeightedList<U> {
         return this.shuffle(this.random);
     }
 
-    public WeightedList<U> shuffle(Random random) {
+    public WeightedList<U> shuffle(RandomSource random) {
         this.entries.forEach((entry) -> {
             entry.setShuffledOrder(random.nextFloat());
         });
@@ -54,7 +52,7 @@ public class WeightedList<U> {
         return this.entries.stream().map(WeightedList.Entry::getElement);
     }
 
-    public U pickRandom(Random random) {
+    public U pickRandom(RandomSource random) {
         return this.shuffle(random).stream().findFirst().orElseThrow(RuntimeException::new);
     }
 

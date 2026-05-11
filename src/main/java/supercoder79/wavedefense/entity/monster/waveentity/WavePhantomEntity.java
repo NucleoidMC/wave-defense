@@ -1,28 +1,25 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.PhantomEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Phantom;
+import net.minecraft.world.level.Level;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.classes.PhantomClass;
 import supercoder79.wavedefense.game.WdActive;
 
-public class WavePhantomEntity extends PhantomEntity implements WaveEntity {
+public class WavePhantomEntity extends Phantom implements WaveEntity {
     private final WdActive game;
     private MonsterModifier mod;
     private PhantomClass phantomClass;
 
-    public WavePhantomEntity(World world, WdActive game, PhantomClass phantomClass) {
+    public WavePhantomEntity(Level world, WdActive game, PhantomClass phantomClass) {
         super(EntityType.PHANTOM, world);
 
         this.game = game;
@@ -36,17 +33,17 @@ public class WavePhantomEntity extends PhantomEntity implements WaveEntity {
     @Override
     public void tick() {
         super.tick();
-        if (this.game.guide.getCenterPos().distanceTo(this.getPos()) > 30)
-            this.setPositionTarget(BlockPos.ofFloored(this.game.guide.getCenterPos()), 999);
+        if (this.game.guide.getCenterPos().distanceTo(this.position()) > 30)
+            this.setHomeTo(BlockPos.containing(this.game.guide.getCenterPos()), 999);
     }
 
     @Override
-    public boolean tryAttack(ServerWorld world, Entity target) {
-        boolean didAttack = super.tryAttack(world, target);
+    public boolean doHurtTarget(ServerLevel world, Entity target) {
+        boolean didAttack = super.doHurtTarget(world, target);
 
         if (didAttack) {
             if (target instanceof LivingEntity && getMod().effect != null) {
-                ((LivingEntity)target).addStatusEffect(getMod().effect.get());
+                ((LivingEntity)target).addEffect(getMod().effect.get());
             }
         }
 
@@ -54,18 +51,18 @@ public class WavePhantomEntity extends PhantomEntity implements WaveEntity {
     }
 
     public void setAttributes() {
-        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
         this.setHealth((float) this.getMonsterClass().maxHealth());
-        this.getAttributeInstance(EntityAttributes.FOLLOW_RANGE).setBaseValue(64d);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(64d);
     }
 
     @Override
-    public int ironCount(Random random) {
+    public int ironCount(RandomSource random) {
         return this.getMonsterClass().ironCount(random) + this.getMod().ironBonus;
     }
 
     @Override
-    public int goldCount(Random random) {
+    public int goldCount(RandomSource random) {
         return this.getMonsterClass().goldCount(random);
     }
 

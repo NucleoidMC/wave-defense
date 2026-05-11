@@ -1,21 +1,24 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.mob.StrayEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.RangedBowAttackGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.skeleton.Stray;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
@@ -24,12 +27,12 @@ import supercoder79.wavedefense.entity.monster.classes.StrayClasses;
 import supercoder79.wavedefense.entity.projectile.WizardsSnowballEntity;
 import supercoder79.wavedefense.game.WdActive;
 
-public class WaveStrayEntity extends StrayEntity implements WaveEntity {
+public class WaveStrayEntity extends Stray implements WaveEntity {
 	private final WdActive game;
 	private MonsterModifier mod;
 	private SkeletonClass skeletonClass;
 
-	public WaveStrayEntity(World world, WdActive game, SkeletonClass skeletonClass) {
+	public WaveStrayEntity(Level world, WdActive game, SkeletonClass skeletonClass) {
 		super(EntityType.STRAY, world);
 		this.game = game;
 		this.setMonsterClass(skeletonClass);
@@ -48,19 +51,19 @@ public class WaveStrayEntity extends StrayEntity implements WaveEntity {
 	private int shootSnowballTimer = 60;
 
 	private void wizardTick() {
-		PlayerEntity closestPlayer = this.getWorld().getClosestPlayer(this, 64);
+		Player closestPlayer = this.level().getNearestPlayer(this, 64);
 		shootSnowballTimer--;
 
 		if (shootSnowballTimer == 4)
-			this.setAttacking(true);
+			this.setAggressive(true);
 
 		if (shootSnowballTimer == 36)
-			this.setAttacking(false);
+			this.setAggressive(false);
 
 		if (closestPlayer != null && shootSnowballTimer <= 0 && shootSnowballTimer % 10 == 0) {
-			WizardsSnowballEntity snowball = new WizardsSnowballEntity(this.getWorld(), this);
-			snowball.setVelocity(closestPlayer.getPos().subtract(this.getPos()).multiply(0.09));
-			this.getWorld().spawnEntity(snowball);
+			WizardsSnowballEntity snowball = new WizardsSnowballEntity(this.level(), this);
+			snowball.setDeltaMovement(closestPlayer.position().subtract(this.position()).scale(0.09));
+			this.level().addFreshEntity(snowball);
 
 			if (shootSnowballTimer <= -20)
 			shootSnowballTimer = 60;
@@ -68,7 +71,7 @@ public class WaveStrayEntity extends StrayEntity implements WaveEntity {
 	}
 
 	@Override
-	protected void initGoals() {
+	protected void registerGoals() {
 
 	}
 
@@ -78,50 +81,50 @@ public class WaveStrayEntity extends StrayEntity implements WaveEntity {
 	}
 
 	protected void initializeGoals() {
-		this.goalSelector.add(1, new BowAttackGoal<>(this, this.getMonsterClass().speed(), this.getMonsterClass().attackInterval(), this.getMonsterClass().range()));
-		this.goalSelector.add(2, new MoveTowardGameCenterGoal<>(this));
-		this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
-		this.goalSelector.add(6, new LookAroundGoal(this));
-		this.targetSelector.add(1, new RevengeGoal(this));
-		this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+		this.goalSelector.addGoal(1, new RangedBowAttackGoal<>(this, this.getMonsterClass().speed(), this.getMonsterClass().attackInterval(), this.getMonsterClass().range()));
+		this.goalSelector.addGoal(2, new MoveTowardGameCenterGoal<>(this));
+		this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
+		this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+		this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+		this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
 	}
 
 	public void setAttributes() {
-		this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
 		this.setHealth((float) this.getMonsterClass().maxHealth());
-		this.getAttributeInstance(EntityAttributes.FOLLOW_RANGE).setBaseValue(64d);
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(64d);
 	}
 
 	@Override
-	public void shootAt(LivingEntity target, float pullProgress) {
-		var bow = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
-		ItemStack itemStack = this.getProjectileType(bow);
-		PersistentProjectileEntity arrowProjectile = this.createArrowProjectile(itemStack, pullProgress, bow);
-		arrowProjectile.setDamage(2 * pullProgress * this.getMonsterClass().damageScale());
+	public void performRangedAttack(LivingEntity target, float pullProgress) {
+		var bow = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, Items.BOW));
+		ItemStack itemStack = this.getProjectile(bow);
+		AbstractArrow arrowProjectile = this.getArrow(itemStack, pullProgress, bow);
+		arrowProjectile.setBaseDamage(2 * pullProgress * this.getMonsterClass().damageScale());
 
 		// Add modifier effect
 		if (this.getMod().effect != null) {
-			((ArrowEntity) arrowProjectile).addEffect(this.getMod().effect.get());
+			((Arrow) arrowProjectile).addEffect(this.getMod().effect.get());
 		}
 
 		double xDist = target.getX() - this.getX();
-		double yDist = target.getBodyY(0.3333333333333333D) - arrowProjectile.getY();
+		double yDist = target.getY(0.3333333333333333D) - arrowProjectile.getY();
 		double zDist = target.getZ() - this.getZ();
-		double yScale = MathHelper.sqrt((float) (xDist * xDist + zDist * zDist));
+		double yScale = Mth.sqrt((float) (xDist * xDist + zDist * zDist));
 
-		arrowProjectile.setVelocity(xDist, yDist + yScale * 0.20000000298023224D, zDist, this.getMonsterClass().arrowSpeed(), this.getMonsterClass().arrowDivergence());
-		this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
+		arrowProjectile.shoot(xDist, yDist + yScale * 0.20000000298023224D, zDist, this.getMonsterClass().arrowSpeed(), this.getMonsterClass().arrowDivergence());
+		this.playSound(SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
 
-		this.getWorld().spawnEntity(arrowProjectile);
+		this.level().addFreshEntity(arrowProjectile);
 	}
 
 	@Override
-	public int ironCount(Random random) {
+	public int ironCount(RandomSource random) {
 		return this.getMonsterClass().ironCount(random) + this.getMod().ironBonus;
 	}
 
 	@Override
-	public int goldCount(Random random) {
+	public int goldCount(RandomSource random) {
 		return this.getMonsterClass().goldCount(random);
 	}
 

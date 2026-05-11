@@ -1,22 +1,25 @@
 package supercoder79.wavedefense.game;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.data.worldgen.DimensionTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.Heightmap;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.clock.ClockState;
+import net.minecraft.world.clock.PackedClockStates;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import supercoder79.wavedefense.map.WdMap;
 import supercoder79.wavedefense.map.WdMapGenerator;
-import xyz.nucleoid.fantasy.RuntimeWorldConfig;
+import xyz.nucleoid.fantasy.RuntimeLevelConfig;
 import xyz.nucleoid.plasmid.api.game.GameOpenContext;
 import xyz.nucleoid.plasmid.api.game.GameOpenProcedure;
 import xyz.nucleoid.plasmid.api.game.GameResult;
@@ -32,15 +35,17 @@ import xyz.nucleoid.stimuli.event.item.ItemUseEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerAttackEntityEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 
+import java.util.Map;
+
 public final class WdWaiting {
 	private final GameSpace gameSpace;
 	private final WdMap map;
 	private final WdConfig config;
 
 	private final WdSpawnLogic spawnLogic;
-	private final ServerWorld world;
+	private final ServerLevel world;
 
-	private WdWaiting(GameSpace gameSpace, WdMap map, WdConfig config, ServerWorld world) {
+	private WdWaiting(GameSpace gameSpace, WdMap map, WdConfig config, ServerLevel world) {
 		this.gameSpace = gameSpace;
 		this.map = map;
 		this.config = config;
@@ -53,13 +58,16 @@ public final class WdWaiting {
 		WdMapGenerator generator = new WdMapGenerator();
 		WdConfig config = context.config();
 
-		WdMap map = generator.build(config, Random.createLocal());
-		RuntimeWorldConfig worldConfig = new RuntimeWorldConfig()
+		WdMap map = generator.build(config, RandomSource.createThreadLocalInstance());
+		RuntimeLevelConfig worldConfig = new RuntimeLevelConfig()
 				.setGenerator(map.chunkGenerator(context.server()))
-				.setTimeOfDay(18000)
+				.setDimensionType(BuiltinDimensionTypes.OVERWORLD)
+				.setClockManagerConstructor(new PackedClockStates(Map.of(
+						context.server().overworld().dimensionType().defaultClock().orElseThrow(), new ClockState(18000, 0, 0, true)
+				)))
 				.setDifficulty(Difficulty.NORMAL);
 
-		return context.openWithWorld(worldConfig, (game, world) -> {
+		return context.openWithLevel(worldConfig, (game, world) -> {
 			WdWaiting waiting = new WdWaiting(game.getGameSpace(), map, config, world);
 			GameWaitingLobby.addTo(game, context.config().playerConfig);
 
@@ -72,7 +80,7 @@ public final class WdWaiting {
 			game.listen(GameActivityEvents.REQUEST_START, waiting::requestStart);
 
 			game.listen(GamePlayerEvents.OFFER, JoinOffer::accept);
-			game.listen(GamePlayerEvents.ACCEPT, offer -> offer.teleport(world, new Vec3d(0, world.getTopY(Heightmap.Type.MOTION_BLOCKING, 0, 0), 0)));
+			game.listen(GamePlayerEvents.ACCEPT, offer -> offer.teleport(world, new Vec3(0, world.getHeight(Heightmap.Types.MOTION_BLOCKING, 0, 0), 0)));
 			game.listen(GamePlayerEvents.ADD, waiting::addPlayer);
 			game.listen(PlayerDeathEvent.EVENT, waiting::onPlayerDeath);
 			game.listen(PlayerAttackEntityEvent.EVENT, waiting::onAttackEntity);
@@ -81,16 +89,16 @@ public final class WdWaiting {
 		});
 	}
 
-	private EventResult onAttackEntity(ServerPlayerEntity attacker, Hand hand, Entity attacked, EntityHitResult hitResult) {
+	private EventResult onAttackEntity(ServerPlayer attacker, InteractionHand hand, Entity attacked, EntityHitResult hitResult) {
 		return EventResult.ALLOW;
 	}
 
-	private ActionResult onUseBlock(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
-		return ActionResult.SUCCESS_SERVER;
+	private InteractionResult onUseBlock(ServerPlayer player, InteractionHand hand, BlockHitResult hitResult) {
+		return InteractionResult.SUCCESS_SERVER;
 	}
 
-	private ActionResult onUseItem(ServerPlayerEntity player, Hand hand) {
-		return ActionResult.SUCCESS_SERVER;
+	private InteractionResult onUseItem(ServerPlayer player, InteractionHand hand) {
+		return InteractionResult.SUCCESS_SERVER;
 	}
 
 	private GameResult requestStart() {
@@ -98,17 +106,17 @@ public final class WdWaiting {
 		return GameResult.ok();
 	}
 
-	private void addPlayer(ServerPlayerEntity player) {
+	private void addPlayer(ServerPlayer player) {
 		this.spawnPlayer(player);
 	}
 
-	private EventResult onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
+	private EventResult onPlayerDeath(ServerPlayer player, DamageSource source) {
 		this.spawnPlayer(player);
 		return EventResult.DENY;
 	}
 
-	private void spawnPlayer(ServerPlayerEntity player) {
-		this.spawnLogic.resetPlayer(player, GameMode.ADVENTURE);
+	private void spawnPlayer(ServerPlayer player) {
+		this.spawnLogic.resetPlayer(player, GameType.ADVENTURE);
 		this.spawnLogic.spawnPlayer(player);
 	}
 }

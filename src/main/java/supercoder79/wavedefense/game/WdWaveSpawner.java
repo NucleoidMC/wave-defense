@@ -1,18 +1,5 @@
 package supercoder79.wavedefense.game;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Position;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.*;
 import supercoder79.wavedefense.entity.monster.classes.*;
@@ -22,6 +9,18 @@ import supercoder79.wavedefense.util.RandomCollection;
 import supercoder79.wavedefense.util.WeightedList;
 
 import java.util.ArrayList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public final class WdWaveSpawner {
     // Magic values for finding faraway players
@@ -40,44 +39,44 @@ public final class WdWaveSpawner {
         this.game = game;
         this.wave = wave;
 
-        this.startTime = game.world.getTime();
+        this.startTime = game.world.getGameTime();
 
         int currentScore = wave.totalMonsterScore;
 
-        ServerWorld world = this.game.world;
-        Vec3d centerPos = this.game.guide.getCenterPos();
-        Random random = world.getRandom();
+        ServerLevel world = this.game.world;
+        Vec3 centerPos = this.game.guide.getCenterPos();
+        RandomSource random = world.getRandom();
 
         WeightedList<Position> validCenters = new WeightedList<>();
         validCenters.add(centerPos, this.game.getParticipants().size() * 100);
 
-        for (ServerPlayerEntity participant : this.game.getParticipants()) {
-            BlockPos pos = participant.getBlockPos();
-            double aX = pos.getX() - centerPos.getX();
-            double aZ = pos.getZ() - centerPos.getZ();
+        for (ServerPlayer participant : this.game.getParticipants()) {
+            BlockPos pos = participant.blockPosition();
+            double aX = pos.getX() - centerPos.x();
+            double aZ = pos.getZ() - centerPos.z();
             double dist = (aX * aX) + (aZ * aZ);
 
             double threshold = this.game.config.spawnRadius * SQRT2_2;
 
             if (dist * dist >= threshold * threshold) {
-                validCenters.add(participant.getPos(), (int) (getDistWeight(dist - threshold) * 100));
+                validCenters.add(participant.position(), (int) (getDistWeight(dist - threshold) * 100));
             }
         }
 
         while (currentScore >= 0) {
             BlockPos pos = randomMonsterSpawnPos(centerPos, random, validCenters);
             WaveEntity entity = createMob(this.wave.ordinal, world,
-                    world.containsFluid(new Box(pos).expand(1.0)),
+                    world.containsAnyLiquid(new AABB(pos).inflate(1.0)),
                     world.getBlockState(pos).getBlock().equals(Blocks.SNOW),
-                    world.getBlockState(pos.down()).getBlock().equals(Blocks.SAND) || world.getBlockState(pos.down()).getBlock().equals(Blocks.SMOOTH_RED_SANDSTONE));
+                    world.getBlockState(pos.below()).getBlock().equals(Blocks.SAND) || world.getBlockState(pos.below()).getBlock().equals(Blocks.SMOOTH_RED_SANDSTONE));
 
             MonsterModifier mod = MonsterModifier.next(this.wave.ordinal, entity);
             entity.setMod(mod);
-            entity.getMonsterClass().apply((MobEntity) entity, mod, world.getRandom(), game.waveManager.getWaveOrdinal());
+            entity.getMonsterClass().apply((Mob) entity, mod, world.getRandom(), game.waveManager.getWaveOrdinal());
 
             if (entity instanceof WavePhantomEntity) {
-                pos = WdSpawnLogic.findSurfaceAt((int) centerPos.getX() + random.nextInt(11) - 5, (int) centerPos.getZ() + random.nextInt(11) - 5, 12, game.world)
-                        .add(0, 16, 0);
+                pos = WdSpawnLogic.findSurfaceAt((int) centerPos.x() + random.nextInt(11) - 5, (int) centerPos.z() + random.nextInt(11) - 5, 12, game.world)
+                        .offset(0, 16, 0);
             }
 
             if (entity.getMonsterClass().equals(StrayClasses.WIZARD)) {
@@ -87,10 +86,10 @@ public final class WdWaveSpawner {
             }
 
             if (entity instanceof WaveCaveSpiderEntity)
-                pos = pos.up();
+                pos = pos.above();
 
-            ((MobEntity) entity).refreshPositionAndAngles(pos, 0, 0);
-            ((MobEntity) entity).setPersistent();
+            ((Mob) entity).snapTo(pos, 0, 0);
+            ((Mob) entity).setPersistenceRequired();
 
             mobsToSpawn.add(entity);
             currentScore -= entity.monsterScore();
@@ -116,7 +115,7 @@ public final class WdWaveSpawner {
         return mobTick >= mobsToSpawn.size();
     }
 
-    private BlockPos randomMonsterSpawnPos(Vec3d centerPos, Random random, WeightedList<Position> validCenters) {
+    private BlockPos randomMonsterSpawnPos(Vec3 centerPos, RandomSource random, WeightedList<Position> validCenters) {
         Position chosenPos = validCenters.pickRandom(random);
 
         // Spawn monsters closer to faraway players
@@ -126,15 +125,15 @@ public final class WdWaveSpawner {
         double theta = random.nextDouble() * 2 * Math.PI;
 
         int x, z;
-        BlockPos surfacePos = new BlockPos.Mutable(0, 0, 0);
+        BlockPos surfacePos = new BlockPos.MutableBlockPos(0, 0, 0);
         BlockState surfaceBlock;
 
         boolean found = false;
 
         while (!found) {
-            x = (int) (chosenPos.getX() + (Math.cos(theta) * distance));
-            z = (int) (chosenPos.getZ() + (Math.sin(theta) * distance));
-            surfacePos = WdSpawnLogic.findSurfaceAt(x, z, 12, game.world).down();
+            x = (int) (chosenPos.x() + (Math.cos(theta) * distance));
+            z = (int) (chosenPos.z() + (Math.sin(theta) * distance));
+            surfacePos = WdSpawnLogic.findSurfaceAt(x, z, 12, game.world).below();
             surfaceBlock = game.world.getBlockState(surfacePos);
 
             if (!surfaceBlock.getBlock().equals(Blocks.PACKED_ICE)) {
@@ -142,39 +141,39 @@ public final class WdWaveSpawner {
             }
         }
 
-        return surfacePos.up();
+        return surfacePos.above();
     }
 
-    private boolean spawnMonster(ServerWorld world, int order) {
-        MobEntity monster;
+    private boolean spawnMonster(ServerLevel world, int order) {
+        Mob monster;
 
-        monster = (MobEntity) mobsToSpawn.get(order);
+        monster = (Mob) mobsToSpawn.get(order);
 
         if (monster instanceof WaveSummonerEntity) {
-            world.spawnEntity(monster);
+            world.addFreshEntity(monster);
             SummonersSpiderEntity spider = new SummonersSpiderEntity(EntityType.SPIDER, this.game.world);
-            spider.refreshPositionAndAngles(monster.getBlockPos(), 0, 0);
-            spider.setPersistent();
-            this.game.world.spawnEntity(spider);
+            spider.snapTo(monster.blockPosition(), 0, 0);
+            spider.setPersistenceRequired();
+            this.game.world.addFreshEntity(spider);
             return monster.startRiding(spider);
         }
 
         if (monster instanceof WaveStrayEntity && ((WaveStrayEntity) monster).getMonsterClass().equals(StrayClasses.WIZARD)) {
-            world.spawnEntity(monster);
+            world.addFreshEntity(monster);
             WizardsPhantomEntity phantom = new WizardsPhantomEntity(this.game.world, this.game);
-            phantom.refreshPositionAndAngles(monster.getBlockPos(), 0, 0);
-            phantom.setPersistent();
+            phantom.snapTo(monster.blockPosition(), 0, 0);
+            phantom.setPersistenceRequired();
             phantom.setPhantomSize(3);
-            this.game.world.spawnEntity(phantom);
+            this.game.world.addFreshEntity(phantom);
             return monster.startRiding(phantom);
         }
 
-        monster.setCustomName(Text.literal(mobsToSpawn.get(order).getMod().prefix + " " + mobsToSpawn.get(order).getMonsterClass().name()));
+        monster.setCustomName(Component.literal(mobsToSpawn.get(order).getMod().prefix + " " + mobsToSpawn.get(order).getMonsterClass().name()));
 
-        return world.spawnEntity(monster);
+        return world.addFreshEntity(monster);
     }
 
-    private WaveEntity createMob(int waveOrdinal, ServerWorld world, boolean aquatic, boolean snow, boolean sand) {
+    private WaveEntity createMob(int waveOrdinal, ServerLevel world, boolean aquatic, boolean snow, boolean sand) {
         RandomCollection<WaveEntity> mobChoices = new RandomCollection<>();
 
         WaveEntity zombieType = new WaveZombieEntity(world, this.game, MonsterClass.nextZombie(waveOrdinal));

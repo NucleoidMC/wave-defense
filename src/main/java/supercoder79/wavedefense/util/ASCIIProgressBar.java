@@ -1,13 +1,13 @@
 package supercoder79.wavedefense.util;
 
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
 
 public class ASCIIProgressBar {
-    public static MutableText get(double progress, int length) {
+    public static MutableComponent get(double progress, int length) {
         // █
-        MutableText bar = Text.empty();
+        MutableComponent bar = Component.empty();
 
         for (int i = 1; i <= length; i++) {
             double currentProgress = (double) i / length;
@@ -20,7 +20,7 @@ public class ASCIIProgressBar {
                 color = "gray";
 
             String finalColor = color;
-            bar.append(Text.literal("█").styled(style -> style.withColor(TextColor.parse(finalColor).result().get())));
+            bar.append(Component.literal("█").withStyle(style -> style.withColor(TextColor.parseColor(finalColor).result().get())));
         }
 
         return bar;

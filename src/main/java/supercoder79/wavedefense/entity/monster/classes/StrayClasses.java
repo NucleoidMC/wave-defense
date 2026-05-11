@@ -1,33 +1,31 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.entity.EquipmentHelper;
 import supercoder79.wavedefense.entity.MonsterModifier;
 
 import java.util.ArrayList;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 public final class StrayClasses {
     public static final SkeletonClass DEFAULT = new SkeletonClass() {
         @Override
-        public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
-            entity.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+        public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
+            entity.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
         }
 
         @Override
-        public int ironCount(Random random) {
+        public int ironCount(RandomSource random) {
             return 2;
         }
 
         @Override
-        public int goldCount(Random random) {
+        public int goldCount(RandomSource random) {
             return 0;
         }
 
@@ -44,21 +42,21 @@ public final class StrayClasses {
 
     public static final SkeletonClass WIZARD = new SkeletonClass() {
         @Override
-        public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+        public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
             ItemStack blazeRod = new ItemStack(Items.BLAZE_ROD);
-            var reg = entity.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
-            blazeRod.addEnchantment(reg.getOrThrow(Enchantments.FIRE_ASPECT), 2);
-            blazeRod.addEnchantment(reg.getOrThrow(Enchantments.SHARPNESS), 10);
-            entity.equipStack(EquipmentSlot.MAINHAND, blazeRod);
+            var reg = entity.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+            blazeRod.enchant(reg.getOrThrow(Enchantments.FIRE_ASPECT), 2);
+            blazeRod.enchant(reg.getOrThrow(Enchantments.SHARPNESS), 10);
+            entity.setItemSlot(EquipmentSlot.MAINHAND, blazeRod);
         }
 
         @Override
-        public int ironCount(Random random) {
+        public int ironCount(RandomSource random) {
             return 16;
         }
 
         @Override
-        public int goldCount(Random random) {
+        public int goldCount(RandomSource random) {
             return 1;
         }
 

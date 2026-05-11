@@ -1,12 +1,11 @@
 package supercoder79.wavedefense.map.biome.impl;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import supercoder79.wavedefense.map.biome.BiomeGen;
 import supercoder79.wavedefense.map.feature.SprucePoplarTreeGen;
-
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
 import xyz.nucleoid.substrate.gen.MapGen;
 
 public final class TaigaGen implements BiomeGen {
@@ -18,22 +17,22 @@ public final class TaigaGen implements BiomeGen {
 	}
 
 	@Override
-	public int treeAmt(Random random) {
+	public int treeAmt(RandomSource random) {
 		return 2 + random.nextInt(2);
 	}
 
 	@Override
-	public int grassAmt(Random random) {
+	public int grassAmt(RandomSource random) {
 		return 4 + random.nextInt(4);
 	}
 
 	@Override
-	public RegistryKey<Biome> getFakingBiome() {
-		return BiomeKeys.TAIGA;
+	public ResourceKey<Biome> getFakingBiome() {
+		return Biomes.TAIGA;
 	}
 
 	@Override
-	public MapGen tree(int x, int z, Random random) {
+	public MapGen tree(int x, int z, RandomSource random) {
 		return SprucePoplarTreeGen.INSTANCE;
 	}
 }

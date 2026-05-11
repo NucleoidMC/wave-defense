@@ -2,33 +2,34 @@ package supercoder79.wavedefense.entity.monster.classes;
 
 import java.util.ArrayList;
 import java.util.Optional;
-
-import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.*;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import supercoder79.wavedefense.entity.EquipmentHelper;
 import supercoder79.wavedefense.entity.MonsterModifier;
-
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.mob.MobEntity;
 
 public final class SkeletonClasses {
     public static final SkeletonClass DEFAULT = new SkeletonClass() {
         @Override
-        public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
-            entity.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+        public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
+            entity.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
         }
 
         @Override
-        public int ironCount(Random random) {
+        public int ironCount(RandomSource random) {
             return 2;
         }
 
         @Override
-        public int goldCount(Random random) {
+        public int goldCount(RandomSource random) {
             return 0;
         }
 
@@ -47,8 +48,8 @@ public final class SkeletonClasses {
         private int iron;
 
         @Override
-        public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
-            entity.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+        public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
+            entity.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
 
             iron = 3;
 
@@ -90,12 +91,12 @@ public final class SkeletonClasses {
         }
 
         @Override
-        public int ironCount(Random random) {
+        public int ironCount(RandomSource random) {
             return iron;
         }
 
         @Override
-        public int goldCount(Random random) {
+        public int goldCount(RandomSource random) {
             return random.nextInt(15) == 0 ? 1 : 0;
         }
 
@@ -109,8 +110,8 @@ public final class SkeletonClasses {
         private int iron;
 
         @Override
-        public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
-            entity.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+        public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
+            entity.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
 
             iron = 4;
 
@@ -165,12 +166,12 @@ public final class SkeletonClasses {
         }
 
         @Override
-        public int ironCount(Random random) {
+        public int ironCount(RandomSource random) {
             return iron;
         }
 
         @Override
-        public int goldCount(Random random) {
+        public int goldCount(RandomSource random) {
             return random.nextInt(8) == 0 ? 1 : 0;
         }
 
@@ -185,25 +186,25 @@ public final class SkeletonClasses {
         private int iron;
 
         @Override
-        public void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal) {
+        public void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal) {
             iron = 12;
 
             ItemStack sword = new ItemStack(Items.GOLDEN_SWORD);
-            var reg = entity.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
-            sword.addEnchantment(reg.getOrThrow(Enchantments.SHARPNESS), 6);
-            sword.addEnchantment(reg.getOrThrow(Enchantments.KNOCKBACK), 3);
-            entity.equipStack(EquipmentSlot.MAINHAND, sword);
+            var reg = entity.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+            sword.enchant(reg.getOrThrow(Enchantments.SHARPNESS), 6);
+            sword.enchant(reg.getOrThrow(Enchantments.KNOCKBACK), 3);
+            entity.setItemSlot(EquipmentSlot.MAINHAND, sword);
 
-            entity.equipStack(EquipmentSlot.HEAD, EnchantmentHelper.enchant(random, new ItemStack(Items.GOLDEN_HELMET), 40, entity.getRegistryManager(), Optional.empty()));
+            entity.setItemSlot(EquipmentSlot.HEAD, EnchantmentHelper.enchantItem(random, new ItemStack(Items.GOLDEN_HELMET), 40, entity.registryAccess(), Optional.empty()));
 
             ItemStack chestplate = new ItemStack(Items.LEATHER_CHESTPLATE);
-            ArrayList<DyeItem> dyeItems = new ArrayList<>();
-            dyeItems.add((DyeItem) Items.RED_DYE);
-            dyeItems.add((DyeItem) Items.RED_DYE);
-            dyeItems.add((DyeItem) Items.BLACK_DYE);
-            chestplate = DyedColorComponent.setColor(chestplate, dyeItems);
+            ArrayList<DyeColor> dyeItems = new ArrayList<>();
+            dyeItems.add(DyeColor.RED);
+            dyeItems.add(DyeColor.RED);
+            dyeItems.add(DyeColor.BLACK);
+            chestplate = DyedItemColor.applyDyes(chestplate, dyeItems);
 
-            entity.equipStack(EquipmentSlot.CHEST, chestplate);
+            entity.setItemSlot(EquipmentSlot.CHEST, chestplate);
 
             EquipmentHelper.equipLeggings(waveOrdinal, random, iron, entity, 10);
         }
@@ -249,12 +250,12 @@ public final class SkeletonClasses {
         }
 
         @Override
-        public int ironCount(Random random) {
+        public int ironCount(RandomSource random) {
             return iron;
         }
 
         @Override
-        public int goldCount(Random random) {
+        public int goldCount(RandomSource random) {
             return random.nextInt(2) + random.nextInt(2);
         }
 

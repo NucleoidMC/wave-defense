@@ -1,17 +1,17 @@
 package supercoder79.wavedefense.entity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.level.Level;
 
-public final class GuideVillagerEntity extends VillagerEntity {
+public final class GuideVillagerEntity extends Villager {
     private BlockPos targetPos;
     private boolean paused;
 
-    public GuideVillagerEntity(World world) {
+    public GuideVillagerEntity(Level world) {
         super(EntityType.VILLAGER, world);
 
         this.setInvulnerable(true);
@@ -26,17 +26,17 @@ public final class GuideVillagerEntity extends VillagerEntity {
     }
 
     @Override
-    protected void initGoals() {
-        this.goalSelector.add(0, new SwimGoal(this));
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new FloatGoal(this));
     }
 
 
     @Override
-    protected void mobTick(ServerWorld world) {
+    protected void customServerAiStep(ServerLevel world) {
         if (this.paused) {
             this.navigation.stop();
-        } else if (this.targetPos != null && this.navigation.isIdle()) {
-            this.navigation.startMovingTo(this.targetPos.getX() + 0.5, this.targetPos.getY(), this.targetPos.getZ() + 0.5, 0.5);
+        } else if (this.targetPos != null && this.navigation.isDone()) {
+            this.navigation.moveTo(this.targetPos.getX() + 0.5, this.targetPos.getY(), this.targetPos.getZ() + 0.5, 0.5);
         }
     }
 
@@ -58,7 +58,7 @@ public final class GuideVillagerEntity extends VillagerEntity {
     }*/
 
     @Override
-    public boolean isPersistent() {
+    public boolean isPersistenceRequired() {
         return true;
     }
 }

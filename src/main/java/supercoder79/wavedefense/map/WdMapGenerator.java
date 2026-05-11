@@ -2,15 +2,14 @@ package supercoder79.wavedefense.map;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.random.Random;
 import supercoder79.wavedefense.game.WdConfig;
 import supercoder79.wavedefense.map.gen.WdPath;
 
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.util.RandomSource;
 
 public final class WdMapGenerator {
-    public WdMap build(WdConfig config, Random random) {
+    public WdMap build(WdConfig config, RandomSource random) {
         WdPath path = WdPath.generate(random, config.path.length, config.path.segmentLength);
 
         DoubleList waveStarts = new DoubleArrayList();

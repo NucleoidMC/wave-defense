@@ -19,7 +19,7 @@
   },
   "accessWidener": "wavedefense.accesswidener",
   "depends": {
-    "fabric": "*",
-    "minecraft": ">=1.18.2"
+    "fabric-api": "*",
+    "minecraft": ">=26.1-"
   }
 }

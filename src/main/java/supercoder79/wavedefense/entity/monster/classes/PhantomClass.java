@@ -1,12 +1,12 @@
 package supercoder79.wavedefense.entity.monster.classes;
 
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Mob;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.util.RandomCollection;
 
 public interface PhantomClass extends MonsterClass {
-    void apply(MobEntity entity, MonsterModifier mod, Random random, int waveOrdinal);
+    void apply(Mob entity, MonsterModifier mod, RandomSource random, int waveOrdinal);
 
     default int size() {
         return 1;

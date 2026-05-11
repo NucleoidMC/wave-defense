@@ -1,16 +1,13 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.CaveSpiderEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.spider.CaveSpider;
+import net.minecraft.world.level.Level;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
@@ -18,29 +15,29 @@ import supercoder79.wavedefense.entity.monster.classes.CaveSpiderClasses;
 import supercoder79.wavedefense.entity.monster.classes.MonsterClass;
 import supercoder79.wavedefense.game.WdActive;
 
-public class WaveCaveSpiderEntity extends CaveSpiderEntity implements WaveEntity {
+public class WaveCaveSpiderEntity extends CaveSpider implements WaveEntity {
     private final WdActive game;
     private MonsterModifier mod;
 
-    public WaveCaveSpiderEntity(World world, WdActive game, MonsterClass monsterClass) {
+    public WaveCaveSpiderEntity(Level world, WdActive game, MonsterClass monsterClass) {
         super(EntityType.CAVE_SPIDER, world);
 
         this.game = game;
         this.setMod(mod);
 
-        this.goalSelector.add(2, new MoveTowardGameCenterGoal<>(this));
+        this.goalSelector.addGoal(2, new MoveTowardGameCenterGoal<>(this));
 
-        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(8);
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(8);
         this.setHealth((float) this.getMonsterClass().maxHealth());
     }
 
     @Override
-    public boolean tryAttack(ServerWorld world, Entity target) {
-        boolean didAttack = super.tryAttack(world, target);
+    public boolean doHurtTarget(ServerLevel world, Entity target) {
+        boolean didAttack = super.doHurtTarget(world, target);
 
         if (didAttack) {
             if (target instanceof LivingEntity && getMod().effect != null) {
-                ((LivingEntity)target).addStatusEffect(getMod().effect.get());
+                ((LivingEntity)target).addEffect(getMod().effect.get());
             }
         }
 
@@ -48,12 +45,12 @@ public class WaveCaveSpiderEntity extends CaveSpiderEntity implements WaveEntity
     }
 
     @Override
-    public int ironCount(Random random) {
+    public int ironCount(RandomSource random) {
         return this.getMonsterClass().ironCount(random) + this.getMod().ironBonus;
     }
 
     @Override
-    public int goldCount(Random random) {
+    public int goldCount(RandomSource random) {
         return this.getMonsterClass().goldCount(random);
     }
 

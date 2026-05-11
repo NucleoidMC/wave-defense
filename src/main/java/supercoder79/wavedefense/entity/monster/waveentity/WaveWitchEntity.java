@@ -1,44 +1,40 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
-import net.minecraft.util.math.ColorHelper;
 import org.joml.Vector3f;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.SkeletonEntity;
-import net.minecraft.entity.mob.WitchEntity;
-import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Witch;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
 import supercoder79.wavedefense.entity.monster.classes.MonsterClass;
 import supercoder79.wavedefense.game.WdActive;
 
-public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
+public final class WaveWitchEntity extends Witch implements WaveEntity {
     private final WdActive game;
     private MonsterClass monsterClass;
 
-    public WaveWitchEntity(World world, WdActive game, MonsterClass monsterClass) {
+    public WaveWitchEntity(Level world, WdActive game, MonsterClass monsterClass) {
         super(EntityType.WITCH, world);
         this.game = game;
         this.setMonsterClass(monsterClass);
 
-        this.goalSelector.add(0, new MoveTowardGameCenterGoal<>(this));
-        this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
-        this.targetSelector.add(0, new ActiveTargetGoal<>(this, MobEntity.class, 1, false, false, (e, a) -> !(e instanceof WitchEntity)));
+        this.goalSelector.addGoal(0, new MoveTowardGameCenterGoal<>(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Mob.class, 1, false, false, (e, a) -> !(e instanceof Witch)));
 
         this.setAttributes();
     }
@@ -100,54 +96,54 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
         }
 
         if (particleSpawnY >= 0 && stateTimer % 2 == 0) {
-            for (Entity entity : this.getWorld().getOtherEntities(this,
-                    new Box(this.getPos().subtract(3, 3, 3),
-                            this.getPos().add(3, 3, 3)), e -> !(e.equals(this)))) {
+            for (Entity entity : this.level().getEntities(this,
+                    new AABB(this.position().subtract(3, 3, 3),
+                            this.position().add(3, 3, 3)), e -> !(e.equals(this)))) {
 
-                MobEntity mob;
-                PlayerEntity player;
+                Mob mob;
+                Player player;
 
-                if (entity instanceof MobEntity) {
-                    mob = (MobEntity) entity;
+                if (entity instanceof Mob) {
+                    mob = (Mob) entity;
 
                     switch (state) {
                         case 0:
                             mob.heal(0.15f);
                             break;
                         case 1:
-                            mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 60, 0));
+                            mob.addEffect(new MobEffectInstance(MobEffects.SPEED, 60, 0));
                             break;
                         case 2:
-                            mob.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 15, 0));
+                            mob.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 15, 0));
                             stateTimer--;
                     }
                 }
-                else if (entity instanceof PlayerEntity) {
-                    player = (PlayerEntity) entity;
+                else if (entity instanceof Player) {
+                    player = (Player) entity;
 
                     if (state == 3) {
-                        player.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 40, 1));
+                        player.addEffect(new MobEffectInstance(MobEffects.POISON, 40, 1));
                     }
                 }
             }
         }
 
-        ((ServerWorld) this.getWorld()).spawnParticles(
-                new DustParticleEffect(ColorHelper.fromFloats(1, red, green, blue), scale + stateTimer / 150f),
+        ((ServerLevel) this.level()).sendParticles(
+                new DustParticleOptions(ARGB.colorFromFloat(1, red, green, blue), scale + stateTimer / 150f),
                 this.getX(), this.getY() + particleSpawnY + 0.3, this.getZ(),
                 2, 0.2, 0.0, 0.2, 0.1
         );
     }
 
     public void setAttributes() {
-        this.getAttributeInstance(EntityAttributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.getMonsterClass().maxHealth());
         this.setHealth((float) this.getMonsterClass().maxHealth());
 
-        this.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED).setBaseValue(0.3);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.3);
     }
 
     @Override
-    public void shootAt(LivingEntity target, float pullProgress) {
+    public void performRangedAttack(LivingEntity target, float pullProgress) {
     }
 
     @Override
@@ -156,12 +152,12 @@ public final class WaveWitchEntity extends WitchEntity implements WaveEntity {
     }
 
     @Override
-    public int ironCount(Random random) {
+    public int ironCount(RandomSource random) {
         return this.getMonsterClass().ironCount(random) + this.getMod().ironBonus;
     }
 
     @Override
-    public int goldCount(Random random) {
+    public int goldCount(RandomSource random) {
         return this.getMonsterClass().goldCount(random);
     }
 
