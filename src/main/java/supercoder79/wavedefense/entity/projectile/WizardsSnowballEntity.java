@@ -45,6 +45,6 @@ public class WizardsSnowballEntity extends Snowball {
 
     @Override
     public void playerTouch(Player player) {
-        player.knockback(1, this.getDeltaMovement().x(),  this.getDeltaMovement().z());
+        player.knockback(1, this.getDeltaMovement().x(),  this.getDeltaMovement().z(), this.level().damageSources().mobProjectile(this, player), 1);
     }
 }

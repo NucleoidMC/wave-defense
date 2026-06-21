@@ -1,5 +1,6 @@
 package supercoder79.wavedefense.entity.goal;
 
+import net.minecraft.world.entity.EntityTypes;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.SummonedSilverfishEntity;
 import supercoder79.wavedefense.entity.monster.waveentity.WaveSummonerEntity;
@@ -31,7 +32,7 @@ public final class SummonGoal<T extends WaveSummonerEntity & WaveEntity> extends
     public void start() {
         entity.summonTimer = 80;
         entity.handSwingTimer = 10;
-        Silverfish silverfish = new SummonedSilverfishEntity(EntityType.SILVERFISH, entity.level());
+        Silverfish silverfish = new SummonedSilverfishEntity(EntityTypes.SILVERFISH, entity.level());
         BlockPos pos = entity.blockPosition();
         RandomSource random = entity.getRandom();
         silverfish.snapTo(pos.offset(random.nextInt(5) - 2, 2, random.nextInt(5) - 2), 0, 0);

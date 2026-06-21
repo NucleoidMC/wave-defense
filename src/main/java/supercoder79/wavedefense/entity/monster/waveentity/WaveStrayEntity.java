@@ -4,6 +4,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
@@ -33,7 +34,7 @@ public class WaveStrayEntity extends Stray implements WaveEntity {
 	private SkeletonClass skeletonClass;
 
 	public WaveStrayEntity(Level world, WdActive game, SkeletonClass skeletonClass) {
-		super(EntityType.STRAY, world);
+		super(EntityTypes.STRAY, world);
 		this.game = game;
 		this.setMonsterClass(skeletonClass);
 

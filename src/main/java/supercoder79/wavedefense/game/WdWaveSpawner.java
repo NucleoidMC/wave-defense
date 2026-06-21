@@ -1,5 +1,6 @@
 package supercoder79.wavedefense.game;
 
+import net.minecraft.world.entity.EntityTypes;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.monster.*;
 import supercoder79.wavedefense.entity.monster.classes.*;
@@ -151,7 +152,7 @@ public final class WdWaveSpawner {
 
         if (monster instanceof WaveSummonerEntity) {
             world.addFreshEntity(monster);
-            SummonersSpiderEntity spider = new SummonersSpiderEntity(EntityType.SPIDER, this.game.world);
+            SummonersSpiderEntity spider = new SummonersSpiderEntity(EntityTypes.SPIDER, this.game.world);
             spider.snapTo(monster.blockPosition(), 0, 0);
             spider.setPersistenceRequired();
             this.game.world.addFreshEntity(spider);

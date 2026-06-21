@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Phantom;
@@ -20,7 +21,7 @@ public class WavePhantomEntity extends Phantom implements WaveEntity {
     private PhantomClass phantomClass;
 
     public WavePhantomEntity(Level world, WdActive game, PhantomClass phantomClass) {
-        super(EntityType.PHANTOM, world);
+        super(EntityTypes.PHANTOM, world);
 
         this.game = game;
         this.setMonsterClass(phantomClass);

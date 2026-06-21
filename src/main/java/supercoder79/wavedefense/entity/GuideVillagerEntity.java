@@ -3,6 +3,7 @@ package supercoder79.wavedefense.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.Level;
@@ -12,7 +13,7 @@ public final class GuideVillagerEntity extends Villager {
     private boolean paused;
 
     public GuideVillagerEntity(Level world) {
-        super(EntityType.VILLAGER, world);
+        super(EntityTypes.VILLAGER, world);
 
         this.setInvulnerable(true);
     }

@@ -1,5 +1,6 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
+import net.minecraft.world.entity.EntityTypes;
 import supercoder79.wavedefense.entity.MonsterModifier;
 import supercoder79.wavedefense.entity.WaveEntity;
 import supercoder79.wavedefense.entity.goal.MoveTowardGameCenterGoal;
@@ -32,7 +33,7 @@ public class WaveSkeletonEntity extends Skeleton implements WaveEntity {
 	private SkeletonClass skeletonClass;
 
 	public WaveSkeletonEntity(Level world, WdActive game, SkeletonClass skeletonClass) {
-		super(EntityType.SKELETON, world);
+		super(EntityTypes.SKELETON, world);
 		this.game = game;
 		this.setMonsterClass(skeletonClass);
 

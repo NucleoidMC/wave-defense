@@ -1,5 +1,6 @@
 package supercoder79.wavedefense.entity.monster.waveentity;
 
+import net.minecraft.world.entity.*;
 import org.joml.Vector3f;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
@@ -7,10 +8,6 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Witch;
@@ -28,7 +25,7 @@ public final class WaveWitchEntity extends Witch implements WaveEntity {
     private MonsterClass monsterClass;
 
     public WaveWitchEntity(Level world, WdActive game, MonsterClass monsterClass) {
-        super(EntityType.WITCH, world);
+        super(EntityTypes.WITCH, world);
         this.game = game;
         this.setMonsterClass(monsterClass);
 

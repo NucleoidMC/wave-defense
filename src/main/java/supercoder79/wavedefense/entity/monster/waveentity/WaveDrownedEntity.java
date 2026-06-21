@@ -4,6 +4,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
@@ -24,7 +25,7 @@ public final class WaveDrownedEntity extends Drowned implements WaveEntity {
     private MonsterClass monsterClass;
 
     public WaveDrownedEntity(Level world, WdActive game, MonsterClass monsterClass) {
-        super(EntityType.DROWNED, world);
+        super(EntityTypes.DROWNED, world);
         this.game = game;
         this.setMonsterClass(monsterClass);
 

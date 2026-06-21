@@ -8,6 +8,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Phantom;
 import net.minecraft.world.level.Level;
@@ -21,7 +22,7 @@ public class WizardsPhantomEntity extends Phantom implements WaveEntity {
     private final WdActive game;
 
     public WizardsPhantomEntity(Level world, WdActive game) {
-        super(EntityType.PHANTOM, world);
+        super(EntityTypes.PHANTOM, world);
         this.xpReward = 0;
         this.game = game;
 
