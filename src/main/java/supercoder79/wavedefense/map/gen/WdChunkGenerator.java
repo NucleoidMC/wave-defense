@@ -35,6 +35,7 @@ import xyz.nucleoid.substrate.gen.GrassGen;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class WdChunkGenerator extends GameChunkGenerator {
     private static final Climate.Sampler ZERO_SAMPLER = new Climate.Sampler(DensityFunctions.zero(), DensityFunctions.zero(), DensityFunctions.zero(), DensityFunctions.zero(), DensityFunctions.zero(), DensityFunctions.zero(), Collections.emptyList());
@@ -61,8 +62,7 @@ public final class WdChunkGenerator extends GameChunkGenerator {
         int maxBarrierRadius = minBarrierRadius + 1;
         this.minBarrierRadius2 = minBarrierRadius * minBarrierRadius;
         this.maxBarrierRadius2 = maxBarrierRadius * maxBarrierRadius;
-
-        RandomSource random = server.overworld().getRandom();
+        RandomSource random = RandomSource.create();
         this.biomeSource = new FakeBiomeSource(server.registryAccess().lookupOrThrow(Registries.BIOME), random.nextLong());
         this.heightSampler = new WdHeightSampler(map.path(), biomeSource, random.nextLong());
         this.pathNoise = new OpenSimplexNoise(random.nextLong());
